@@ -4,24 +4,67 @@
 \paperw11900\paperh16840\margl1440\margr1440\vieww20120\viewh8600\viewkind0
 \pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural
 
-\f0\b\fs24 \cf0 \
+\f0\b\fs48 \cf0 General info\
 
-\fs48 Documentation
 \fs24 \
-\
 
-\b0 The Git repository will also work as a place to document our work and to communicate between one another. In the doc folder you can access different documents and edit them.\
+\b0 These are some general rules that you should follow in this project:\
+  \
+  (1) Communicate! Use the tools at your disposal to inform the other members of the team of your progress, the issues that you are tackling, and what you are working on at the moment.\
+  (2) Really, communicate! \
+  (3) Do not \'93push\'94 buggy code to the remote server; always do extensive testing before pushing a major upgrade in the code.\
+	\'97 always ask for someone to cross-check your code when uploading major changes; you can do that via the 
+\i Issue tracking 
+\i0 system in Git.\
+  (4) Ensure modularity of your code.\
+  (5) Ensure scalability: do not hardcode any parts of your code.\
 \
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural
 
-\b Communication\
+\b \cf0 Communication\
 \
 
 \b0 Communication will be done via two ways: \
   (1)  issue a ticket in Git (look on the right side bar for \'93Issues\'94) or \
   (2) write an e-mail (either to everybody or just to the teaching assistant).\
 \
-The first one is preferred given that it\'92s easy to assign people that can work on the bug/enhancement/question and you can also close the issue when the problem has been fixed. \
+The first one is preferred given that it\'92s easy to assign people that can work on the bug/enhancement/question and you can also close the issue when the problem has been fixed. 
+\b \
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural
+\cf0 \
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural
+\cf0 Git usage\
+\
 
+\b0 To set up Git use a GUI based software such as, e.g, Sourcetree. There are numerous softwares like this for all platforms.\
+\
+You can also do it via command line as follows:\
+
+\b \
+\pard\pardeftab720\sl360
+
+\f1\b0 \cf2   mkdir /path/to/your/project\cb3 \
+\cb1   cd /path/to/your/project\cb3 \
+\cb1   git init\cb3 \
+\cb1   git remote add origin https://github.com/faitdivers/pyao.git\
+\
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural
+
+\f0 \cf0 More information on how to commit, reset, branch, stage files, pull, etc. can be found in github.com.
+\b \
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural
+\cf0 \
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural
+
+\fs48 \cf0 Documentation
+\fs24 \
+\
+
+\b0 The Git repository will also work as a place to document our work and to communicate between one another. In the doc folder you can access different documents and edit them. The way to document the progress should be modular, but structured in such way that the links between each module of the simulator are clear.\
+\
+
+\b Important remark: 
+\b0 the documentation is to be done in LaTeX.
 \b \
 \
 Why not a wiki?\
@@ -41,22 +84,4 @@ Why not a wiki?\
 \
 A Wikimedia website would be preferred, but we have no host for that at the moment.\
 \
-
-\b Git usage\
-\
-
-\b0 To set up Git use a GUI based software such as, e.g, Sourcetree. There are numerous softwares like this for all platforms.\
-\
-You can also do it via command line as follows:\
-
-\b \
-\pard\pardeftab720\sl360
-
-\f1\b0 \cf2   mkdir /path/to/your/project\cb3 \
-\cb1   cd /path/to/your/project\cb3 \
-\cb1   git init\cb3 \
-\cb1   git remote add origin https://github.com/faitdivers/pyao.git\
-\
-\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural
-
-\f0 \cf0 More information on how to commit, reset, branch, stage files, pull, etc. can be found in github.com.}
+}
