@@ -33,7 +33,7 @@ You can also do it via command line as follows:
   >
   > git clone https://github.com/faitdivers/pyao.git
 
-More information on how to commit, reset, branch, stage files, pull, etc. can be found in github.com.
+More information on how to commit, reset, branch, stage files, pull, etc. can be found in [git-scm.com/book/en/Git-Basics](http://git-scm.com/book/en/Git-Basics)
 
 # Documentation
 The Git repository will also work as a place to document our work and to communicate between one another. In the doc folder you can access different documents and edit them. The way to document the progress should be modular, but structured in such way that the links between each module of the simulator are clear.
@@ -44,8 +44,8 @@ __Important remark:__ The documentation is to be done in LaTex.
 
 Several wikis were tested; none of them were suitable for our project.
 
-- *wikia.com* -  free hosting but no support for LaTeX; everybody can see it and change it;
-- *wiki.tudelft.nl* - free hosting but incredibly slow; not active at all; no support for LaTeX; search engine is horrible; supports having users with different permissions though;
+- [wikia.com](http://wikia.com "") -  free hosting but no support for LaTeX; everybody can see it and change it;
+- [wiki.tudelft.nl](http://wiki.tudelft.nl "") - free hosting but incredibly slow; not active at all; no support for LaTeX; search engine is horrible; supports having users with different permissions though;
 - *gitwiki* - there is a wiki embedded in the git repository; however it is very very simple and although only people with commit permissions can write on it it has no support for LaTeX formulas 	and other advanced document formatting tools.
 
 A Wikimedia website would be prefered, but we have no host for that at the moment.
