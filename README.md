@@ -14,7 +14,9 @@ There are some general rules that you should follow in this project:
 
 ## Communication
 Communication will be done via two ways:
+
 1. issue a ticket in Git (look on the right side bar for “Issues”)
+
 2. write an e-mail (either to everybody or just to the teaching assistant).
 
 The first one is preferred given that it’s easy to assign people that can work on the bug/enhancement/question and you can also close the issue when the problem has been fixed. 
