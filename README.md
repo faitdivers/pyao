@@ -42,8 +42,8 @@ __Important remark:__ The documentation is to be done in LaTex.
 
 Several wikis were tested; none of them were suitable for our project.
 
-*wikia.com* -  free hosting but no support for LaTeX; everybody can see it and change it;
-*wiki.tudelft.nl* - free hosting but incredibly slow; not active at all; no support for LaTeX; search engine is horrible; supports having users with different permissions though;
-*gitwiki* - there is a wiki embedded in the git repository; however it is very very simple and although only people with commit permissions can write on it it has no support for LaTeX formulas 	and other advanced document formatting tools.
+- *wikia.com* -  free hosting but no support for LaTeX; everybody can see it and change it;
+- *wiki.tudelft.nl* - free hosting but incredibly slow; not active at all; no support for LaTeX; search engine is horrible; supports having users with different permissions though;
+- *gitwiki* - there is a wiki embedded in the git repository; however it is very very simple and although only people with commit permissions can write on it it has no support for LaTeX formulas 	and other advanced document formatting tools.
 
 A Wikimedia website would be prefered, but we have no host for that at the moment.
