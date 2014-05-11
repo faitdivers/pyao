@@ -1,0 +1,66 @@
+\documentclass{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{mathrsfs,amsmath}
+\usepackage{float}
+\usepackage{subfig}
+
+% Puts captions of tables on top
+\floatstyle{plaintop}
+\restylefloat{table}
+
+% Puts captions in bold
+\captionsetup{labelfont=bf}
+
+\begin{document}
+\section{The Fraunhofer Approximation}
+The Fraunhofer approximation is a more stringent approximation of the Fresnel approximation which is valid when
+\begin{equation}
+z\gg\frac{2\pi(\xi^2+\eta^2)_{\text{max}}}{2\lambda},
+\label{eq:strong_con}
+\end{equation}
+where $\lambda$ is the wavelength and ($\xi,\eta$) are the 2 dimensional positions on the aperture plane. It is used to compute wave propagation in the far field, whereas the Fresnel approximation is used to compute wave propagation in the near field. Another condition for the Fraunhofer approximation, which as well applies to the Fresnel approximation, is that the incident waves must be within the paraxial regime, meaning that the direction of propagation must be small towards the optical axis of the system. In other words, this is simply a restriction to small incident angels. A less stringent condition to Equation \eqref{eq:strong_con} is 
+\begin{equation}
+z>\frac{2D^2}{\lambda},
+\label{eq:normal_con}
+\end{equation}
+where $D$ is the dimension of the aperture. Although the distance $z$ requires to be large, the Fraunhofer diffraction patterns can still be observed at distances much closer than implied by the above conditions. 
+
+The observed field strength $U(x,y)$ can be calculated by the Fraunhofer approximation as
+\begin{equation}
+U(x,y)=\frac{e^{jkz}e^{j\frac{k}{2z}(x^2+y^2)}}{j\lambda z}\iint\limits_{-\infty}^{~~~\infty} \left. U(\xi,\eta)e^{-j2\pi(f_X\xi+f_Y\eta)}d\xi d\eta \right|_{f_X=\frac{x}{\lambda z},f_Y=\frac{y}{\lambda z}},
+\label{eq:fraunhofer}
+\end{equation}
+with $k=2\pi/\lambda$ the wavenumber and where $U(\xi,\eta)$ is the field distribution at the aperture. From this equation it can be seen that the Fraunhofer approximation simply is the Fourier transform of the distribution $U(\xi,\eta)$ times a multiplicative factor, evaluated at frequencies $f_X$ and $f_Y$.
+
+\section{Diffraction Patterns at the Focal Plane of a Single Lens}
+Here we assume a diffraction-limited system with the input directly placed against the lens, to model the lens system for our purposes that is used to measure the intensity in the focal plane. The input $U_i(\xi,\eta)$ then contains the disturbance induced by the atmosphere and is illuminated by the solar system which has a flat wavefront. The field distribution behind the lens is then calculated by
+\begin{equation}
+U^\prime_i(\xi,\eta)=U_i(\xi,\eta)P(\xi,\eta)e^{-j\frac{k}{2f}(\xi^2 + \eta^2)},
+\label{eq:dis_behind_lens}
+\end{equation}
+where $P(\xi,\eta)$ is the pupil function of the lens system and is defined by
+\begin{equation}
+P(\xi,\eta)= \begin{cases} 1 & \text{inside the aperture} \\ 0 & \text{otherwise.} \end{cases}
+\end{equation}
+Moreover the exponential function in Equation \eqref{eq:dis_behind_lens}, is the phase change introduced by the lens with focal length $f$. Using the Fresnel diffraction formula the field distribution in the back focal plane of the lens can be found as
+\begin{equation}
+U_f(x,y)=\frac{e^{jkf}e^{j\frac{k}{2f}(x^2+y^2)}}{j\lambda f}\iint\limits_{-\infty}^{~~~\infty} \left. U_i(\xi,\eta)P(\xi,\eta)e^{-j2\pi(f_X\xi+f_Y\eta)}d\xi d\eta \right|_{f_X=\frac{x}{\lambda z},f_Y=\frac{y}{\lambda z}}.
+\end{equation}
+Hence the complex amplitude field distribution in the back focal plane of the lens is simply the Fraunhofer diffraction pattern seen in Equation \eqref{eq:fraunhofer}, but with the propagation distance $f$ instead of $z$. Thus the Fraunhofer diffraction patterns can be observed although not satisfying the before discussed conditions \eqref{eq:strong_con} and \eqref{eq:normal_con}. The real interest is the intensity across the focal plane and is computed by
+\begin{equation}
+I_f(x,y)=|U_f(x,y)|^2.
+\end{equation}
+Also the model of the lens system as derived here is studied under the condition that the illumination is monochromatic. 
+
+
+The above text is based on (\textbf{Goodman,2005}) and is also advised for further reading.
+
+\section{Numerical Computation of the Intensity Distribution in the Focal Plane}
+
+
+
+
+
+\end{document}
