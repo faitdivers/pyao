@@ -32,7 +32,7 @@ The observed field strength $U(x,y)$ can be calculated by the Fraunhofer approxi
 U(x,y)=\frac{e^{jkz}e^{j\frac{k}{2z}(x^2+y^2)}}{j\lambda z}\iint\limits_{-\infty}^{~~~\infty} \left. U(\xi,\eta)e^{-j2\pi(f_X\xi+f_Y\eta)}d\xi d\eta \right|_{f_X=\frac{x}{\lambda z},f_Y=\frac{y}{\lambda z}},
 \label{eq:fraunhofer}
 \end{equation}
-with $k=2\pi/\lambda$ the wavenumber and where $U(\xi,\eta)$ is the field distribution at the aperture. From this equation it can be seen that the Fraunhofer approximation simply is the Fourier transform of the distribution $U(\xi,\eta)$ times a multiplicative factor, evaluated at frequencies $f_X$ and $f_Y$.
+with $k=2\pi/\lambda$ the wavenumber and where $U(\xi,\eta)$ is the field distribution at the aperture. From this equation it can be seen that the Fraunhofer approximation simply is the Fourier Transform (FT) of the distribution $U(\xi,\eta)$ times a multiplicative factor, evaluated at frequencies $f_X$ and $f_Y$.
 
 \section{Diffraction Patterns at the Focal Plane of a Single Lens}
 Here we assume a diffraction-limited system with the input directly placed against the lens, to model the lens system for our purposes that is used to measure the intensity in the focal plane. The input $U_i(\xi,\eta)$ then contains the disturbance induced by the atmosphere and is illuminated by the solar system which has a flat wavefront. The field distribution behind the lens is then calculated by
@@ -58,9 +58,28 @@ Also the model of the lens system as derived here is studied under the condition
 The above text is based on (\textbf{Goodman,2005}) and is also advised for further reading.
 
 \section{Numerical Computation of the Intensity Distribution in the Focal Plane}
-
-
-
+The computation of the FT will be done numerically. This can be done in a highly efficient algorithm called the Fast Fourier Transform (FFT). Using the Discrete Fourier Transform (DFT) it approximates the continuous FT of a function $g(x)$, where the FT of a two dimensional function is defined as
+\begin{equation}
+\hat{g}(f_X,f_Y)=\iint\limits_{-\infty}^{~~~\infty} g(x,y)e^{-j2\pi(f_Xx + f_Yy)}dxdy.
+\end{equation}
+A first approximation is restricting the integral to the finite interval $-L_x/2 \leq x \leq L_y/2$ and $-L_y/2 \leq y \leq L_y/2$, giving us, for $L=L_x=L_y$,
+\begin{equation}
+\hat{g}(f_X,f_Y)\approx\iint\limits_{-L/2}^{~~~L/2} g(x,y)e^{-j2\pi(f_Xx + f_Yy)}dxdy.
+\end{equation}
+Where the size $L_x$ and $L_y$ must be large enough to cover the essential non-zero parts of the function $g(x,y)$. Second the integral is approximated by replacing it by a finite sum, then we get
+\begin{equation}
+\hat{g}(f_X,f_Y)\approx  \Delta y \sum\limits_{m=N_y/2}^{N_y/2} e^{-j2\pi mf_Y\Delta y}\Delta x\sum\limits_{n=-N_x/2}^{N_x/2}g(n\Delta x,m\Delta y)e^{-j2\pi nf_X\Delta x },
+\end{equation}
+where the $x,y$-coordinates are sampled in the before described intervals with $N_x,N_y$ samples, when $N=N_x=N_y$, spaced at $\Delta x=\Delta y = L/N$ at positions $x_n=n\Delta x$ and $y_m=m\Delta y$ with $n=m=-N/2,...,N/2-1$. A connection to the DFT can be made by sampling the spatial frequencies with $N$ values in the interval $-\Delta x/2 \leq f_X \leq \Delta x/2$ and $-\Delta y/2 \leq f_Y \leq \Delta y/2$, the samples being spaced by $\Delta f_X=\Delta f_Y=1/L$ at frequencies $f_k=k\Delta f_X$ and $f_l=l\Delta f_Y$, with $k=l=-N/2,...,N/2-1$. This produces the exact DFT described by
+\begin{equation}
+\hat{g}(k\Delta f_X,l\Delta f_Y)\approx  \Delta y \sum\limits_{m=N_y/2}^{N_y/2} e^{-j2\pi lm/N_y}\Delta x\sum\limits_{n=-N_x/2}^{N_x/2}g(n\Delta x,m\Delta y)e^{-j2\pi kn/N_x}.
+\end{equation}
+In short the procedure is:
+\begin{enumerate}
+	\item sampling the function $g(x,y)$ in a grid at values $(x_n,y_m)$ and storing the values in a matrix of size $(N_x,N_y)$,
+	\item doing a DFT on this matrix and multiplying it with the sample spacings $\Delta x$ and $\Delta y$,
+	\item plotting the resulting matrix of size $(N_x,N_y)$ at points $(f_k,f_l)$ in the spatial frequency space.
+\end{enumerate}
 
 
 \end{document}
