@@ -1,4 +1,13 @@
 # Main file for PyAO toolbox
+# _  _  _  _         _  _  _        _  _  _  _        _  _  _       
+#(_)(_)(_)(_)     _ (_)(_)(_) _   _(_)(_)(_)(_)_   _ (_)(_)(_) _    
+# (_)      (_)_  (_)         (_) (_)          (_) (_)         (_)   
+# (_)        (_) (_)             (_)_  _  _  _    (_)               
+# (_)        (_) (_)               (_)(_)(_)(_)_  (_)               
+# (_)       _(_) (_)          _   _           (_) (_)          _    
+# (_)_  _  (_)   (_) _  _  _ (_) (_)_  _  _  _(_) (_) _  _  _ (_)   
+#(_)(_)(_)(_)       (_)(_)(_)      (_)(_)(_)(_)      (_)(_)(_)   
+#
 
 from numpy import *
 import matplotlib.pyplot as pl
@@ -38,37 +47,51 @@ def setup_params():
 
 	return paramsSensor, paramsActuator
 
-# --------------------------------------------------
+#-----------------------------------------------------------------------
+#
+#
+#-----------------------------------------------------------------------
+def runClosedLoop(iterations):
+	paramsSensor, paramsActuator = setup_params()
+	for i in range(0, iterations):
+		print "Running simulation step %d" % (i)
+		wf = wfg(paramsSensor)
+		intensities = wfs(wf) 
+		centroids = centroid(intensities, paramsSensor)
+		wfRec = wfr(centroids, paramsSensor)
+		actCommands = control(wfRec, paramsActuator)
+		wfDM = dm(actCommands, paramsSensor)
+		wfRes = wf-wfDM
+	return
+		
+def runOpenLoop():
+	paramsSensor, paramsActuator = setup_params()
+	print "Running open loop simulation"
+	# Generate wavefront
+	wf = wfg(paramsSensor)
+	#pl.imshow(wf), pl.show(), pl.title('Incoming wavefront')
 
-paramsSensor, paramsActuator = setup_params()
+	# Generate intensity measurements
+	intensities = wfs(wf)
+	
+	# Compute centroids (this step is not needed if we are to use focal 
+	# plane reconstruction techniques) 
+	centroids = centroid(intensities, paramsSensor)
+	#print centroids.shape
+	
+	# Reconstruct the wavefront
+	wfRec = wfr(centroids, paramsSensor)
+	
+	# Compute the actuator commands via a control technique
+	actCommands = control(wfRec, paramsActuator)
+	
+	# Deformable mirror
+	wfDM = dm(actCommands, paramsSensor)
+	
+	# Compute the residual wavefront
+	wfRes = wf-wfDM
+	return
 
-# NOTE: this is an open-loop simulation; bear in mind that the end goal is to run it in closed 
-# loop with changing wavefronts
+#runClosedLoop(10)
 
-# Generate wavefront
-wf = wfg(paramsSensor)
-#pl.imshow(wf), pl.show(), pl.title('Incoming wavefront')
-
-# Generate intensity measurements
-intensities = wfs(wf) 
-
-# Compute centroids (this step is not needed if we are to use focal plane reconstruction techniques)
-centroids = centroid(intensities, paramsSensor)
-#print centroids.shape
-
-# Reconstruct the wavefront
-wfRec = wfr(centroids, paramsSensor)
-
-# Compute the actuator commands via a control technique
-actCommands = control(wfRec, paramsActuator)
-
-# Deformable mirror
-wfDM = dm(actCommands, paramsSensor)
-
-# Compute the residual wavefront
-wfRes = wf-wfDM
-
-# Plot the results
-
-
-
+runOpenLoop()
