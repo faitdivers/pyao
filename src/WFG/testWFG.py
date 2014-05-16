@@ -1,34 +1,56 @@
-from mainWFG import * 
+from mainWFG import *
+#from main import *
+from zernike import *
+from numpy import *
+from scipy import *
+import math
 
-def setup_params() :
-	paramsSensor = {
-	# number of samples in the pupil plane
-	'numPupilx' : 100,
-	'numPupily' : 100,
-	# number of samples in the imaging plane(s)
-	'numImagx' : 100,
-	'numImagy' : 100,
-	# number of apertures in the wfs
-	'noApertx': 10,
-	'noAperty': 10,
-	# focal distance, pixel length, sizes/diameters of the apertures, ...
+import pylab as p
+#import matplotlib.axes3d as p3
+import mpl_toolkits.mplot3d.axes3d as p3
+
+# Constants
+#params,paramsAct = setup_params()
+paramt = {
+	'numPupilx' : 11,
+	'numPupily' : 11,
+	'numImagx' : 50,
+	'numImagy' : 50,
+	'noApertx': 5,
+	'noAperty': 5
 	}
-	paramsActuator = {
-	# number of actuators
-	'numActx' : 8,
-	'numActy' : 8,
-	# parameters to characterize influence function
-	# ...
-	}
-	return paramsSensor,paramsActuator
-	
-params,paramsAct = setup_params()	
+
+# Show the values in paramt in the console
 count = 0
-print "Check properties:"
-for obj in params :
-    print "\tprop(%d) | %r = %d" %(count,obj,params[obj])
+print "Check properties of the test file:"  
+for obj in paramt :
+    print "\tprop(%d) | %r = %d" %(count,obj,paramt[obj])
     count += 1
-    
-res = wfg(params)
+
+# Test zernike function
+#   Change the zernike indices u and v here:
+u = 2
+v = 0
+x = linspace(-1,1,paramt['numImagx'])
+y = linspace(-1,1,paramt['numImagy'])
+X,Y = meshgrid(x,y)
+R,T = cart2pol(X,Y)
+
+Zg = zernike(u,v,R,T)
+title = 'Zernike Polynomial: u = %d, v = %d' %(u,v)
+
+#   Plot results in a surface plot
+fig = p.figure();
+ax = p3.Axes3D(fig)
+ax.plot_surface(X,Y,Zg, rstride=1, cstride=1, cmap='jet')
+ax.set_xlabel('x')
+ax.set_ylabel('y')
+ax.set_zlabel(title)
+p.show()
+
+# Test the total wfg routine here
+#   DO NOT USE RESULTS! It will always be ones
+res = wfg(paramt)
 print "\nWave Front Generation:"
 print "%r" %res
+
