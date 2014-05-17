@@ -5,7 +5,6 @@ Created on May 17, 2014
 '''
 
 class PIDcontroller:
-    
     def __init__(self, Kp, Ki, Kd):
         self.Kp = Kp
         self.Ki = Ki
@@ -40,11 +39,14 @@ class PIDcontroller:
     def _calculateD(self):
         """ Calculate the derivative effect on the controller output.
         """
-        deltaInput = self.oldInput - self.currentInput
+        deltaInput = self.currentInput - self.oldInput
         return self.Kd * deltaInput
         
     def setKp(self, Kp):
         self.Kp = Kp
+    
+    def getKp(self):
+        return self.Kp
         
     def setKi(self, Ki):
         self.Ki = Ki
