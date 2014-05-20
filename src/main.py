@@ -3,17 +3,27 @@
 from numpy import *
 import matplotlib.pyplot as pl
 
-from WFG.mainWFG import * 
-from WFS.mainWFS import * 
-from Centroid.mainCentroid import * 
-from WFR.mainWFR import * 
-from Control.mainControl import * 
-from DM.mainDM import * 
+from WFG.mainWFG import *
+from WFS.mainWFS import *
+from Centroid.mainCentroid import *
+from WFR.mainWFR import *
+from Control.mainControl import *
+from DM.mainDM import *
 
 
 # --------------------------------------------------
 # Setting up the parameters
 def setup_params():
+	""" Set-up the simulation parameters
+
+	Setup the parameters used for all steps of the simulation.
+	This includes parameters for the sensor, for the actuator and
+	possibly other necessary simulation configuration.
+
+	Returns:
+		Multiple dicts, containing the parameters and their values.
+	"""
+
 	paramsSensor = {
 	# number of samples in the pupil plane
 	'numPupilx' : 100,
@@ -26,49 +36,91 @@ def setup_params():
 	'noAperty': 10,
 	# focal distance, pixel length, sizes/diameters of the apertures, ...
 	}
+
 	paramsActuator = {
 	# number of actuators
 	'numActx' : 8,
 	'numActy' : 8,
 	# parameters to characterize influence function
-	# ...
+	}
+
+	simulationParameters = {
+	'frequency' : 10,       # Frequency of the simulation in Hertz
+	'time' : 10             # Simulated time in seconds
 	}
 
 	# other sets of parameters may be defined if necessary
 
-	return paramsSensor, paramsActuator
+	# Encapsulate all the parameter dicts
+	parameters = {
+	'Sensor' : paramsSensor,
+	'Actuator' : paramsActuator,
+	'Simulation' : simulationParameters
+	}
 
-# --------------------------------------------------
+	return parameters
 
-paramsSensor, paramsActuator = setup_params()
+def runClosedLoop():
 
-# NOTE: this is an open-loop simulation; bear in mind that the end goal is to run it in closed 
-# loop with changing wavefronts
+	""" Run a closed loop simulation
 
-# Generate wavefront
-wf = wfg(paramsSensor)
-#pl.imshow(wf), pl.show(), pl.title('Incoming wavefront')
+	The closed-loop simulation consists of
+	1. generating the wafe-front
+	2. applying the deformable mirror to the wafe-front
+	3. a) measuring intensities
+	3. b) determining centroids
+	4. reconstructing the wafe-front
+	5. calculate the control values for the actuators,
+	6. actuate the mirror
+	7. continue from step 1
 
-# Generate intensity measurements
-intensities = wfs(wf) 
+	The stop condition is the simulation time.
+	"""
+	# Get parameters.
+	parameters = setup_params()
+	sensorParameters = parameters['Sensor'];
+	actuatorParameters = parameters['Actuator'];
+	simulationParameters = parameters['Simulation'];
 
-# Compute centroids (this step is not needed if we are to use focal plane reconstruction techniques)
-centroids = centroid(intensities, paramsSensor)
-#print centroids.shape
+	# Calculate number of simulation steps
+	iterations = simulationParameters['time']*simulationParameters['frequency'];
+	
+	# The first deformable mirror effect: (No effect)
+	wfDM = dm(0, sensorParameters);
+	
+	for i in range(0, iterations):
+		print("Running simulation step %d" % (i));
+		wf = wfg(sensorParameters);
+		wfRes = wf-wfDM
+		intensities = wfs(wfRes)
+		centroids = centroid(intensities, sensorParameters)
+		wfRec = wfr(centroids, sensorParameters)
+		actCommands = control(wfRec, actuatorParameters)
+		wfDM = dm(actCommands, sensorParameters)
+	return
 
-# Reconstruct the wavefront
-wfRec = wfr(centroids, paramsSensor)
+def runOpenLoop():
+	paramsSensor, paramsActuator = setup_params()
+	print("Running open loop simulation");
+	# Generate wavefront
+	wf = wfg(paramsSensor)
+	#pl.imshow(wf), pl.show(), pl.title('Incoming wavefront')
+	# Generate intensity measurements
+	intensities = wfs(wf)
+	# Compute centroids (this step is not needed if we are to use focal
+	# plane reconstruction techniques)
+	centroids = centroid(intensities, paramsSensor)
+	#print centroids.shape
+	# Reconstruct the wavefront
+	wfRec = wfr(centroids, paramsSensor)
+	# Compute the actuator commands via a control technique
+	actCommands = control(wfRec, paramsActuator)
+	# Deformable mirror
+	wfDM = dm(actCommands, paramsSensor)
+	# Compute the residual wavefront
+	wfRes = wf-wfDM
+	return
 
-# Compute the actuator commands via a control technique
-actCommands = control(wfRec, paramsActuator)
+runClosedLoop()
 
-# Deformable mirror
-wfDM = dm(actCommands, paramsSensor)
-
-# Compute the residual wavefront
-wfRes = wf-wfDM
-
-# Plot the results
-
-
-
+#runOpenLoop()
