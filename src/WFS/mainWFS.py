@@ -8,19 +8,17 @@ import numpy.fft
 import matplotlib.pyplot as pl
 from mpl_toolkits.mplot3d import Axes3D
 
-def wfs(phase):
+def wfs(phase, pS):
 	# start parameter mapping (for now)
-	D = 300e-6        # Diameter pupil[m], nominal value 300e-6
-	f = 18e-3         # Focal length [m], nominal value 18e-3
-	lam = 630e-9      # Wavelength [m], nominal value 630e-9
-	N = 50            # Number of samples
-	L = 4000e-6       # Support width in real space [m]
-	N_x = N
-	N_y = N
-	L_x = L
-	L_y = L
-	k = 2*pi/lam      # Wavenumber
-	
+	D = pS['numPupilx']           # Diameter pupil[m], nominal value 300e-6
+	f = pS['F']            # Focal length [m], nominal value 18e-3
+	lam = pS['lam']        # Wavelength [m], nominal value 630e-9
+	N_x = pS['numPupilx']  # Number of samples
+	N_y = pS['numPupily']  # Number of samples
+	L_x = pS['Lx']
+	L_y = pS['Ly']
+	k = 2*pi/lam        # Wavenumber
+
 	# Prepare Spatial Grid
 	delta_x = L_x/N_x                      # Sample spacing [m]
 	delta_y = L_y/N_y                      # Sample spacing [m]
