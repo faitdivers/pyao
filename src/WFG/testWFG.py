@@ -5,9 +5,9 @@ from scipy import *
 from zernike import *
 from nollMap import *
 
-import pylab as p
+#import pylab as p
 #import matplotlib.axes3d as p3
-import mpl_toolkits.mplot3d.axes3d as p3
+#import mpl_toolkits.mplot3d.axes3d as p3
 
 # Constants
 #params,paramsAct = setup_params()
@@ -20,34 +20,40 @@ paramt = {
 	'noAperty': 5
 	}
 
+#
 # Show the values in paramt in the console
+#
 count = 0
 print "Check properties of the test file:"  
 for obj in paramt :
     print "\tprop(%d) | %r = %d" %(count,obj,paramt[obj])
     count += 1
 
-# Test zernike function
-# Change the zernike indices u and v or i here:
-i = 7
-u,v = zernikeIndex(i)
-x = linspace(-1,1,paramt['numImagx'])
-y = linspace(-1,1,paramt['numImagy'])
-X,Y = meshgrid(x,y)
-R,T = cart2pol(X,Y)
-Zg = zernike(R,T,i)
-title = 'Zernike Polynomial: u = %d, v = %d' %(u,v)
+#
+# Create Zernike wavefront
+#
+i =4
+zw = ZernikeWave()
+zw.addMode([2,4,21],[0.5,0.25,-0.6])
+zw.plotMode(i,paramt['numImagx'],paramt['numImagy'])
 
-# Plot results in a surface plot
-fig = p.figure();
-ax = p3.Axes3D(fig)
-ax.plot_surface(X,Y,Zg, rstride=1, cstride=1, cmap='jet')
-ax.set_xlabel('x')
-ax.set_ylabel('y')
-ax.set_zlabel(title)
-p.show()
+#
+#zw.plotWavefront(paramt['numImagx'],paramt['numImagy'])
+#
+zw.plotWavefront(paramt['numImagx'],paramt['numImagy'])
+WF = zw.createWavefront(paramt['numImagx'],paramt['numImagy'])
+Z,A = zw.decomposeWavefront(WF)
+print("\nThe wave front contains the following weights:")
+print(reshape(A,(1,len(A))))
+print("Check these with the weights you provided above:")
+print(zw.getWeights())
+print("Do they match?")
+print(reshape(A,(1,len(A))) == zw.getWeights())
+print("No? This is likely due to numerical inaccuracies!")
 
+#
 # Test Noll's mapping
+#
 ul = 0
 str = ""
 for n in range(1,81):
@@ -58,8 +64,10 @@ for n in range(1,81):
         str = ""
     str = str + "%d: (%d,%d) " %(n,u,v)
 
+#
 # Test the total wfg routine here
 #   DO NOT USE RESULTS! It will always be ones
+#
 res = wfg(paramt)
 print "\nWave Front Generation:"
 print "%r" %res
