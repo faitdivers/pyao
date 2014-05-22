@@ -32,6 +32,7 @@ def setup_params():
 	'numActy' : 8,
 	# parameters to characterize influence function
 	# ...
+
 	}
 
 	# other sets of parameters may be defined if necessary
@@ -63,12 +64,12 @@ wfRec = wfr(centroids, paramsSensor)
 actCommands = control(wfRec, paramsActuator)
 
 # Deformable mirror
-wfDM = dm(actCommands, paramsSensor)
+wfDM = dm(actCommands, paramsSensor, paramsActuator)
 
 # Compute the residual wavefront
 wfRes = wf-wfDM
 
 # Plot the results
-
+#print("Coba - coba")
 
 
