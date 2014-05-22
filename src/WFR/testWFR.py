@@ -19,8 +19,8 @@ def setup_params():
 	'numImagx' : 100,
 	'numImagy' : 100,
 	# number of apertures in the wfs
-	'noApertx': 3,
-	'noAperty': 3,
+	'noApertx': 2,
+	'noAperty': 2,
 	# focal distance, pixel length, sizes/diameters of the apertures, ...
 	}
 
