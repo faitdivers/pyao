@@ -40,9 +40,10 @@ class LatencyBufferTest(unittest.TestCase):
         myBuffer = LatencyBuffer.LatencyBuffer(2, dataSize)
         dataSet = np.ones([10, 10])
         actual = myBuffer.update(dataSet)
+        self.assertEquals(actual.shape, dataSize)
         actual = np.reshape(actual, 100)
         result1 = all(x == 0 for x in actual)
-        self.assertTrue(result1, "Not all the first 100 elements are ones")
+        self.assertTrue(result1, "Returned data is different than expected.")
 
     def test_udate_return_2steps(self):
         dataSize = (10, 10)
@@ -51,9 +52,10 @@ class LatencyBufferTest(unittest.TestCase):
         myBuffer.update(dataSet1)
         dataSet2 = 2 * np.ones([10, 10])
         actual = myBuffer.update(dataSet2)
+        self.assertEquals(actual.shape, dataSize)
         actual = np.reshape(actual, 100)
         result = all(x == 1 for x in actual)
-        self.assertTrue(result, "Not all the first 100 elements are ones")
+        self.assertTrue(result, "Returned data is different than expected.")
 
     def test_udate_return_3steps(self):
         dataSize = (10, 10)
@@ -64,9 +66,10 @@ class LatencyBufferTest(unittest.TestCase):
         myBuffer.update(dataSet2)
         dataSet3 = 3 * np.ones([10, 10])
         actual = myBuffer.update(dataSet3)
+        self.assertEquals(actual.shape, dataSize)
         actual = np.reshape(actual, 100)
         result = all(x == 2 for x in actual)
-        self.assertTrue(result, "Not all the first 100 elements are ones")
+        self.assertTrue(result, "Returned data is different than expected.")
 
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']
