@@ -41,7 +41,6 @@ class LatencyBuffer():
 
         TODO:
             - Better error handling
-            - Reshape data output
         """
         self._set_newest(data)
         return self._get_oldest()
@@ -49,12 +48,11 @@ class LatencyBuffer():
     def _get_oldest(self):
         """ Returns the oldest data stored
 
-        TODO:
-            - Reshape data output.
         """
         r_index = (self.index + np.arange(self.data_framesize))
         r_index = r_index % self.data.size
         output = self.data[r_index]
+        output = np.reshape(output, self.data_shape)
         return output
 
     def _set_newest(self, data):
