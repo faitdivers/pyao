@@ -8,7 +8,7 @@ import LatencyBuffer
 import numpy as np
 
 
-class TestLatencyBuffer(unittest.TestCase):
+class LatencyBufferTest(unittest.TestCase):
 
     def test_constructor_datasize(self):
         dataSize = (10, 10)
