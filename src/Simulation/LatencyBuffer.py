@@ -31,7 +31,10 @@ class LatencyBuffer():
         self.index = 0
 
     def update(self, data):
-        """ Updates the content of the buffer
+        """ Updates the content of the buffer.
+
+        First the new data is stored into the buffer, after that the buffer
+        is read.
 
         Args:
             data: The data to be inserted into the buffer.
