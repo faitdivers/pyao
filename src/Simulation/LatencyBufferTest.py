@@ -66,4 +66,5 @@ class LatencyBufferTest(unittest.TestCase):
         self.assertTrue(result, "Not all the first 100 elements are ones")
 
 if __name__ == "__main__":
+    #import sys;sys.argv = ['', 'Test.testName']
     unittest.main()
