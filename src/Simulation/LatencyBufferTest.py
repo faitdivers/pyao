@@ -39,8 +39,9 @@ class LatencyBufferTest(unittest.TestCase):
         dataSize = (10, 10)
         myBuffer = LatencyBuffer.LatencyBuffer(2, dataSize)
         dataSet = np.ones([10, 10])
-        data = myBuffer.update(dataSet)
-        result1 = all(x == 0 for x in data)
+        actual = myBuffer.update(dataSet)
+        actual = np.reshape(actual, 100)
+        result1 = all(x == 0 for x in actual)
         self.assertTrue(result1, "Not all the first 100 elements are ones")
 
     def test_udate_return_2steps(self):
@@ -50,6 +51,7 @@ class LatencyBufferTest(unittest.TestCase):
         myBuffer.update(dataSet1)
         dataSet2 = 2 * np.ones([10, 10])
         actual = myBuffer.update(dataSet2)
+        actual = np.reshape(actual, 100)
         result = all(x == 1 for x in actual)
         self.assertTrue(result, "Not all the first 100 elements are ones")
 
@@ -62,6 +64,7 @@ class LatencyBufferTest(unittest.TestCase):
         myBuffer.update(dataSet2)
         dataSet3 = 3 * np.ones([10, 10])
         actual = myBuffer.update(dataSet3)
+        actual = np.reshape(actual, 100)
         result = all(x == 2 for x in actual)
         self.assertTrue(result, "Not all the first 100 elements are ones")
 
