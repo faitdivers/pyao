@@ -41,8 +41,7 @@ class LatencyBufferTest(unittest.TestCase):
         dataSet = np.ones([10, 10])
         actual = myBuffer.update(dataSet)
         self.assertEquals(actual.shape, dataSize)
-        actual = np.reshape(actual, 100)
-        result1 = all(x == 0 for x in actual)
+        result1 = np.array_equal(np.zeros([10, 10]), actual)
         self.assertTrue(result1, "Returned data is different than expected.")
 
     def test_udate_return_2steps(self):
@@ -53,8 +52,7 @@ class LatencyBufferTest(unittest.TestCase):
         dataSet2 = 2 * np.ones([10, 10])
         actual = myBuffer.update(dataSet2)
         self.assertEquals(actual.shape, dataSize)
-        actual = np.reshape(actual, 100)
-        result = all(x == 1 for x in actual)
+        result = np.array_equal(dataSet1, actual)
         self.assertTrue(result, "Returned data is different than expected.")
 
     def test_udate_return_3steps(self):
@@ -66,11 +64,18 @@ class LatencyBufferTest(unittest.TestCase):
         myBuffer.update(dataSet2)
         dataSet3 = 3 * np.ones([10, 10])
         actual = myBuffer.update(dataSet3)
-        self.assertEquals(actual.shape, dataSize)
-        actual = np.reshape(actual, 100)
-        result = all(x == 2 for x in actual)
+        result = np.array_equal(dataSet2, actual)
+        self.assertTrue(result, "Returned data is different than expected.")
+
+    def test_update_reshape(self):
+        dataSize = (2, 2)
+        myBuffer = LatencyBuffer.LatencyBuffer(2, dataSize)
+        dataSet1 = np.array([[1, 2], [3, 4]])
+        dataSet2 = np.array([[5, 6], [7, 8]])
+        myBuffer.update(dataSet1)
+        actual_data = myBuffer.update(dataSet2)
+        result = np.array_equal(dataSet1, actual_data)
         self.assertTrue(result, "Returned data is different than expected.")
 
 if __name__ == "__main__":
-    #import sys;sys.argv = ['', 'Test.testName']
     unittest.main()
