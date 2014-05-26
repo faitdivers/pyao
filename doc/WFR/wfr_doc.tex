@@ -1,9 +1,5 @@
 \documentclass{article}
 
-\usepackage{graphicx}
-\usepackage{amsmath}
-\usepackage{mathtools}
-
 \usepackage[utf8]{inputenc}
 \usepackage[english]{babel}
 \usepackage{mathrsfs,amsmath}
@@ -20,101 +16,8 @@
 
 \begin{document}
 
-\begin{titlepage}
-\begin{center}
+This is a template.
 
-\textsc{\LARGE Delft University of Technology}\\[1.5cm]
-\textsc{ SC4045 Control for High Resolution Imaging}\\[0.5cm]
 
-% Title
-{\huge\bfseries Wavefront Reconstruction \\[0.4cm] }
 
-% Author and supervisor
-\begin{minipage}{0.4\textwidth}
-\begin{flushleft} \large
-\emph{Author:}\\
-Jacco van der Spek \\
-4002512 \\
-Niels Tielen \\
-4011147
-
-\end{flushleft}
-\end{minipage}
-\begin{minipage}{0.4\textwidth}
-\begin{flushright} \large
-\emph{Supervisors:} \\
-Prof. M. Verhagen \\
-Phd. João P. Lopes e Silva  
-\end{flushright}
-\end{minipage}
-
-\vfill
-% Bottom of the page
-{\large \today}
-\end{center}
-\end{titlepage}
-
-\section*{Introduction}
-
-In the previous part of this report, we already mentioned the first steps in the use of adaptive optics. First we described waverfront generating and wavefront sensing. In this chapter of the report, we take a closer look at the reconstruction of the wavefront. 
-
-\section{Zonal Reconstruction}
-In order to describe the gradient of the wavefront, we first take a look at a zonal reconstruction method. With zonal reconstruction, we split up the wavefront in zones. These zones can represent a regular grid of square or rectangular elements or some other local region such as a hexagonal or other shape. For Shack-Hartmann wavefront sensors, the type of sensor that is used, these zones are generally chosen to match the lenslets.
-
-\subsection{reconstruction of wavefront slopes}
-As can be seen in the part of the centroid algorithm, the relation between the slope of the wavefront and the wavefront phase can be defined as the following partial derivative:
-$$ \sigma_x = \frac{\partial\phi(x,y)}{\partial x}$$ 
-$$ \sigma_y = \frac{\partial\phi(x,y)}{\partial y}$$ 
-In order to estimate the derivatives, we need to use a finite difference (FD) method. There are a number of different FD methods which depend on the sampling geometry. Some of these geometries are the Fried, Hudgin and Southwell geometries. We first start with a detailed explanation of the Fried geometry.
-
-\subsection{Fried Geometry}
-The Fried FD method calculates the average slope in one grid cell by using the four phase points. We first take a look at one part of the cell grid.
-\begin{figure}[h!]
-  \centering
-%  \includegraphics[scale=0.6]{figures/fried}
-  \caption{slope approximation}
-\end{figure}
-\newpage
-\noindent The goal is to calculate average of the both slopes. The first slope (in the x-direction) is given by the red line. We can easily see that this slope is given by:
-$$ \sigma_{x,red} = \frac{\phi(2,1) - \phi(1,1)}{Dl} $$
-where $Dl$ is the step between the 2 phase measurments, ussualy the size of the subapperature.
-Now we do the same for the other slope:
-$$ \sigma_{x,blue} = \frac{\phi(2,2) - \phi(1,2)}{Dl} $$
-Now we take the average of these 2 slopes on then we know the slope of the wavefront in this zone (for x-direction).
-$$ \sigma_x = \frac{\sigma_{x,red}+\sigma_{x,blue}}{2}$$
-$$ \sigma_x = \frac{(\phi(2,1) - \phi(1,1))+(\phi(2,2) - \phi(1,2))}{2Dl}$$
-From this example, we can derive a general method for calculating the slope. 
-$$ \sigma_x = \frac{[(\phi(i+1,j)-\phi(i,j))+(\phi(i+1,j+1)-\phi(i,j+1)]}{2Dl} + n_x(i,j)$$
-$$ \sigma_y = \frac{[(\phi(i,j+1)-\phi(i,j))+(\phi(i+1,j+1)-\phi(i+1,j)]}{2Dl} + n_y(i,j)$$
-This is the Fried geometry model. Later in this chapter the Southwell and Hudgin geometries will be introduced, but for now we stick with the Fried geometry.  
-
-\subsection{Creating the geometry matrix}
-The next step is to take geometry model and structurize it in an ordery fashion. We structurize the model as followed:
-$$ s = G\phi + n$$  
-Here s is the vector containing the slopes, made by appending $[\sigma_x \sigma_y]^T$. $\phi$ is a vector filled with the phase points used define the slope and n is the noise. The equations used to link $\phi$ with $s$ can be found in the geometry matrix G. In our previous example we can derive the following G matrix:
-$$ 
-\begin{bmatrix}
-\sigma_x \\
-\sigma_y
-\end{bmatrix} 
-=
-G
-*
-\begin{bmatrix}
-\phi(1,1) \\
-\phi(2,1) \\
-\phi(1,2) \\
-\phi(2,2) 
-\end{bmatrix}
-$$
-Where, in this case, G is defined as:
-$$
-G
-=
-\frac{\alpha}{2Dl}
-\begin{bmatrix}
--1 & 1 & -1 & 1 \\
--1 & -1 & 1 & 1 \\
-\end{bmatrix}
-$$
 \end{document}
