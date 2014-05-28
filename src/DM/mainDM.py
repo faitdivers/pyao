@@ -80,9 +80,9 @@ def dm(actCom, paramsSens, paramsAct):
     # residual error
     wfDM = dot(H,u);
     wfRes = wfRec - wfDM;
-    powerRes = (wfRes*wfRes).sum();
+    powerRes = (wfRes*wfRes).mean();
     
-    print("Total power of wavefront error is %f  ", powerRes);
+    print("RMS power of wavefront error is %f  ", powerRes);
     
     # plot the deformable mirror (after wave front reconstruction)
     xgrid = linspace(0,(noApertx+1)*d,111);
