@@ -12,23 +12,37 @@ def wfr(centroids, params):
 	#Get dimensions
 	x_dim = params['noApertx']
 	y_dim = params['noAperty']
-	number_slopes = x_dim*y_dim
 	
-	s = centroids
+	#Create phase_id matrix
+	phase_id = create_phase_id(centroids,x_dim,y_dim)
+	#Create phase_num matrix
+	phase_num, teller = create_phase_num(phase_id,x_dim,y_dim)
+	#Create G matrix
+	G = create_G(centroids, phase_num, teller, x_dim, y_dim)
+	print('G = \n{}'.format(G))	
 	
+	#TODO inversion
+	
+	# syntax: ones(shape, dtype=None, order='C')
+	return ones((params['numPupilx'],params['numPupily']))
+
+def create_phase_id(centroids, x_dim, y_dim):
 	#Create a phase_id matrix
+	number_slopes = x_dim*y_dim
 	phase_id = zeros(((x_dim+1),(y_dim+1)),dtype=int)
 	for i in range(0,x_dim):
 		for j in range(0,y_dim):
 			#Check if the slope at s(i,j) is non zero
 			#Put a 1 at each place of phi we need
-			if s[i*x_dim+j,0] != 0 or s[i*x_dim+j+number_slopes,0] != 0:
+			if centroids[i*x_dim+j,0] != 0 or centroids[i*x_dim+j+number_slopes,0] != 0:
 				phase_id[i,j] = 1
 				phase_id[i,j+1] = 1
 				phase_id[i+1,j] = 1
 				phase_id[i+1,j+1] = 1
+	return phase_id
 	
-	#Create phase_num matrix
+def create_phase_num(phase_id, x_dim, y_dim):
+		#Create phase_num matrix
 	teller = 0
 	phase_num = zeros(((x_dim+1),(y_dim+1)),dtype=int)
 	for i in range(0,x_dim+1):
@@ -37,14 +51,17 @@ def wfr(centroids, params):
 			if phase_id[i,j] != 0:
 				phase_num[i,j] = teller
 				teller += 1
-	
+	return phase_num, teller
+
+def create_G(centroids, phase_num, teller, x_dim, y_dim):
 	#Create G matrix
 	#For clarity an actual matrix shape is used
+	number_slopes = x_dim*y_dim
 	G = zeros((2*number_slopes, teller),dtype=int)
 	counter = 0
 	for i in range(0,x_dim):
 		for j in range(0,y_dim):
-			if s[i*x_dim+j,0] != 0 or s[i*x_dim+j+number_slopes,0] != 0:
+			if centroids[i*x_dim+j,0] != 0 or centroids[i*x_dim+j+number_slopes,0] != 0:
 				#For s_x
 				G[counter, phase_num[i,j]] = -1
 				G[counter, phase_num[i,j+1]] = -1
@@ -56,7 +73,4 @@ def wfr(centroids, params):
 				G[counter+number_slopes, phase_num[i,j+1]] = 1
 				G[counter+number_slopes, phase_num[i+1,j+1]] = 1
 				counter += 1
-	print('G = \n{}'.format(G))	
-	# syntax: ones(shape, dtype=None, order='C')
-	return ones((params['numPupilx'],params['numPupily']))
-
+	return G
