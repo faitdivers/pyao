@@ -67,7 +67,8 @@ actCommands = control(wfRec, paramsActuator)
 wfDM = dm(actCommands, paramsSensor, paramsActuator)
 
 # Compute the residual wavefront
-wfRes = wf-wfDM
+#wfRes = wf-wfDM
+
 
 # Plot the results
 #print("Coba - coba")

@@ -78,7 +78,11 @@ def dm(actCom, paramsSens, paramsAct):
     # u = pinv(H)*wfRec; # alternatives for pseudo inverse
     
     # residual error
-    wres = wfRec - dot(H,u);
+    wfDM = dot(H,u);
+    wfRes = wfRec - wfDM;
+    powerRes = (wfRes*wfRes).sum();
+    
+    print("Total power of wavefront error is %f  ", powerRes);
     
     # plot the deformable mirror (after wave front reconstruction)
     xgrid = linspace(0,(noApertx+1)*d,111);
@@ -112,5 +116,5 @@ def dm(actCom, paramsSens, paramsAct):
     ax.set_zlim3d(0, 0.055*10**-4);
 
     pl.show();
-    return zeros((paramsSens['numPupilx'],paramsSens['numPupily']))
+    return wfDM
 
