@@ -1,9 +1,10 @@
 from mainWFG import *
-#from main import *
 from numpy import *
 from scipy import *
 from zernike import *
-from nollMap import *
+import scipy.special as sp
+
+print sp.gamma(-1)
 
 #import pylab as p
 #import matplotlib.axes3d as p3
@@ -68,7 +69,7 @@ for n in range(1,81):
 # Test the total wfg routine here
 #   DO NOT USE RESULTS! It will always be ones
 #
-res = wfg(paramt)
+res = wfg(paramt,[2,4,21],[0.5,0.25,-0.6],True)
 print "\nWave Front Generation:"
 print "%r" %res
 
