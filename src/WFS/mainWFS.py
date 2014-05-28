@@ -1,4 +1,5 @@
-#Current Status for Single Lens System May 19, 2014
+#Single Lens System 
+#Updated: May 28, 2014
 import math
 from numpy import *
 from scipy import *
@@ -10,7 +11,7 @@ from mpl_toolkits.mplot3d import Axes3D
 
 def wfs(phase, pS):
 	# start parameter mapping (for now)
-	D = pS['numPupilx']           # Diameter pupil[m], nominal value 300e-6
+	D = pS['Diam']    # Diameter pupil[m], nominal value 300e-6
 	f = pS['F']            # Focal length [m], nominal value 18e-3
 	lam = pS['lam']        # Wavelength [m], nominal value 630e-9
 	N_x = pS['numPupilx']  # Number of samples
@@ -37,15 +38,7 @@ def wfs(phase, pS):
 	# Create grid of the pupil function
 	P = sqrt(X**2 + Y**2) <= D/2  # circle
 	#P = logical_and(logical_and(X <= D, X >= -D), logical_and(Y <= D,  Y >= -D)) # square of width 2D
-
-
-	# TBD: Should each lenslet get only the WF in front of its aperture? 
-	#     or get the WHOLE (or all neighbours) Wavefront?
 	
-	# ---------------------------------------------------------------------------------------------
-	# Loop from here across each lenslet
-	
-	# keep this only until loop ready (& change variable names)
 	#U_i = phase at current lenslet		  
 	U_i = 1			# Unit input
 	
@@ -64,14 +57,6 @@ def wfs(phase, pS):
 	X_i = F_x*lam*f
 	Y_i = F_y*lam*f
 	
-	# end of needed loop
-	# ---------------------------------------------------------------------------------------------
-
-	
 	# Return variable: I_i
 	
-	# sytnax: ones(shape, dtype=None, order='C')
-	# Phase may not be of same dimension as Intensities, I believe
-	# 	Phase is related to wf which comes from the pupil plane sample #
-	#	Intensities are related to the # samples in the imaging plane
-	return ones(phase.shape)
+	return I_i
