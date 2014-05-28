@@ -23,7 +23,13 @@ def setup_params():
 	Returns:
 		Multiple dicts, containing the parameters and their values.
 	"""
-
+        paramsWavefront = {
+        # Scalar or array containing the zernike modes 
+        'zernikeModes' : [2,4,21],
+        # Scalar or array containing the zernike weights, with respect to the modes 
+        'zernikeWeights' : [0.5,0.25,-0.6]
+        }    
+        
 	paramsSensor = {
 	# number of samples in the pupil plane
 	'numPupilx' : 100,
@@ -53,6 +59,7 @@ def setup_params():
 
 	# Encapsulate all the parameter dicts
 	parameters = {
+	'Wavefront' : paramsWavefront,
 	'Sensor' : paramsSensor,
 	'Actuator' : paramsActuator,
 	'Simulation' : simulationParameters
@@ -78,6 +85,7 @@ def runClosedLoop():
 	"""
 	# Get parameters.
 	parameters = setup_params()
+	wavefrontParameters = parameters['Wavefront'];
 	sensorParameters = parameters['Sensor'];
 	actuatorParameters = parameters['Actuator'];
 	simulationParameters = parameters['Simulation'];
@@ -90,7 +98,7 @@ def runClosedLoop():
 	
 	for i in range(0, iterations):
 		print("Running simulation step %d" % (i));
-		wf = wfg(sensorParameters);
+		wf = wfg(sensorParameters, wavefrontParameters['zernikeModes'], wavefrontParameters['zernikeWeights'])
 		wfRes = wf-wfDM
 		intensities = wfs(wfRes)
 		centroids = centroid(intensities, sensorParameters)
@@ -100,10 +108,10 @@ def runClosedLoop():
 	return
 
 def runOpenLoop():
-	paramsSensor, paramsActuator = setup_params()
+	paramsWavefront, paramsSensor, paramsActuator = setup_params()
 	print("Running open loop simulation");
 	# Generate wavefront
-	wf = wfg(paramsSensor)
+	wf = wfg(paramsSensor,paramsWavefront['zernikeModes'], paramsWavefront['zernikeWeights'])
 	#pl.imshow(wf), pl.show(), pl.title('Incoming wavefront')
 	# Generate intensity measurements
 	intensities = wfs(wf)
