@@ -21,7 +21,9 @@ def wfr(centroids, params):
 	G = create_G(centroids, phase_num, teller, x_dim, y_dim)
 	print('G = \n{}'.format(G))	
 	
-	#TODO inversion
+	#Inversion
+	G_inverse = pseudo_inverse(G)
+	print('G_inverse = \n{}'.format(G_inverse))
 	
 	# syntax: ones(shape, dtype=None, order='C')
 	return ones((params['numPupilx'],params['numPupily']))
@@ -74,3 +76,8 @@ def create_G(centroids, phase_num, teller, x_dim, y_dim):
 				G[counter+number_slopes, phase_num[i+1,j+1]] = 1
 				counter += 1
 	return G
+
+def pseudo_inverse(A):
+	A_inverse = linalg.pinv(A)
+	return A_inverse
+	
