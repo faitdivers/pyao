@@ -1,7 +1,7 @@
 from scipy import *
 import numpy
 from math import *
-#from nollMap import *
+
 from supportWFG import *
 
 import pylab as p
