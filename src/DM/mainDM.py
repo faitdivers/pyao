@@ -1,9 +1,11 @@
 from numpy import *
 import numpy
 import matplotlib.pyplot as pl
+from matplotlib import cm
 from mpl_toolkits.mplot3d import Axes3D
 
 def dm(actCom, paramsSens, paramsAct):
+
 
     noApertx= paramsSens['noApertx'];
     noAperty= paramsSens['noAperty'];
@@ -79,23 +81,36 @@ def dm(actCom, paramsSens, paramsAct):
     wres = wfRec - dot(H,u);
     
     # plot the deformable mirror (after wave front reconstruction)
-    xgrid = linspace(0,(noApertx)*d,101);
-    ygrid = linspace(0,(noAperty)*d,101); 
+    xgrid = linspace(0,(noApertx+1)*d,111);
+    ygrid = linspace(0,(noAperty+1)*d,111); 
     X, Y = numpy.meshgrid(xgrid, ygrid)
     #xgridt = xgrid.T;
     #xgrids = tile(xgridt,[1,xgrid.T.size]);
     #ygrids = tile(ygrid,[ygrid.size,1]);
     
-    S = zeros([numAct+1, numAct+1]);
+    S = zeros([111, 111]);
     for i in range(0,xgrid.size):
         for j in range(0,ygrid.size):
             sum = 0;
             for k in range(0, numAct):
-                Sval = (w1/(2*pi*power(sig1,2))*exp(-(power((xgrid[i]-posAct[k][0]),2)+ power((xgrid[i]-posAct[k][0]),2))/(2*power(sig1,2)))+ w2/(2*pi*power(sig2,2))*exp(-(power((xgrid[i]-posAct[k][0]),2)+power((ygrid[j]- posAct[k][1]),2))/(2*power(sig2,2))))*u[k];      					
+                Sval = (w1/(2*pi*power(sig1,2))*exp(-(power((xgrid[i]-posAct[k][0]),2)+ 
+                power((ygrid[j]-posAct[k][1]),2))/(2*power(sig1,2)))+ w2/(2*pi*power(sig2,2))
+                *exp(-(power((xgrid[i]-posAct[k][0]),2)+power((ygrid[j]- 
+    			posAct[k][1]),2))/(2*power(sig2,2))))*u[k]*10**-6;      					
                 sum = sum + Sval;
-                S[i,j] = sum;
+            S[i,j] = sum;
     fig = pl.figure();
-    ax = fig.gca(projection='3d')
-    surf = ax.plot_surface(X, Y, S);#, rstride=1, cstride=1, cmap=cm.coolwarm,linewidth=0, antialiased=False)			
+    ax = fig.gca(projection='3d');
+    surf = ax.plot_surface(X, Y, S, rstride=1, cstride=1, cmap=cm.coolwarm,linewidth=0, antialiased=True);
+    
+    #ax.zaxis.set_major_locator(LinearLocator(10));
+    #ax.zaxis.set_major_formatter(FormatStrFormatter('%.02f'));
+    
+    fig.colorbar(surf, shrink=0.5, aspect=5);
+    ax.set_xlim3d(0, 1.1*10**-4);
+    ax.set_ylim3d(0, 1.1*10**-4);
+    ax.set_zlim3d(0, 0.055*10**-4);
+
+    pl.show();
     return zeros((paramsSens['numPupilx'],paramsSens['numPupily']))
 
