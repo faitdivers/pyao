@@ -130,8 +130,8 @@ Lets take a look at the way the Hudgin geometry is defined. First we start with 
 \end{figure}
 From this we can easily derive the slope approximation in x and y direction. These are given by the following equations:
 $$ \sigma_x = \frac{\phi(2,1)-\phi(1,1)}{Dl}$$
-$$ \sigma_x = \frac{\phi(1,2)-\phi(1,1)}{Dl}$$
-From these equations we can derive the geometry matrix, just as we have done with the Fried geometry. But if we look closer to Figure 2, we see that slopes $\sigma_x$ and $\sigma_y$ aren`t defined in the same point, as with the Fried geometry. Due to our sensor, the Shack-Hartmann sensor, and it`s centroid algorithm, we only the 2 slopes in the same point. As this geometry requires the slopes at 2 different pionts, we have to conclude that we cannot use the Hudgin geometry. But fortunatly, we can alter the Hudgin geometry slightly, and use it on a Shack-Hartmann snesor. This is called the `Modified` Hudgin geometry.
+$$ \sigma_y = \frac{\phi(1,2)-\phi(1,1)}{Dl}$$
+From these equations we can derive the geometry matrix, just as we have done with the Fried geometry. But if we look closer to Figure 2, we see that slopes $\sigma_x$ and $\sigma_y$ aren`t defined in the same point, as with the Fried geometry. Due to our sensor, the Shack-Hartmann sensor, and it`s centroid algorithm, we only have the 2 slopes in the same point. As this geometry requires the slopes at 2 different pionts, we have to conclude that we cannot use the Hudgin geometry. But fortunatly, we can alter the Hudgin geometry slightly, and use it on a Shack-Hartmann snesor. This is called the `Modified` Hudgin geometry.
 \newline
 \newline
 The Modified Hudgin geometry uses the same theory as the Hudgin geometry, but it makes it capable for being used in a Shack-Hartmann sensor. Let`s take a look at an overview of the slopes and phase points as they are used in the Modified Hudgin geometry.  
@@ -143,7 +143,7 @@ The Modified Hudgin geometry uses the same theory as the Hudgin geometry, but it
 \end{figure}
 \noindent Now we can see that we can use the slope information from the centroid algorithm to define four phase points to do the reconstruction. Now we can derive the equations that define the 2 slopes:
 $$ \sigma_x = \frac{\phi(1.5,2)-\phi(1.5,1)}{Dl}$$
-$$ \sigma_x = \frac{\phi(2,1.5)-\phi(1,1.5)}{Dl}$$
+$$ \sigma_y = \frac{\phi(2,1.5)-\phi(1,1.5)}{Dl}$$
 And just as we did with the Fried geometry, we can define a geometry matrix $G$:
 $$ 
 \begin{bmatrix}
