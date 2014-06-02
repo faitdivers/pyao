@@ -12,11 +12,11 @@ paramsSensor = {
 	'Nx' : 20.0,
 	'Ny' : 20.0,
 	# The lenslet configuration
-	'lensletConfig' : array([[1, 1, 1, 1, 1, 1],
-					  [1, 0, 1, 0, 1, 1],
-					  [1, 0, 0, 0, 1, 1],
-					  [1, 0, 1, 0, 1, 1],																					
-					  [1, 1, 1, 1, 1, 1]]),
+	'lensletConfig' : array([[1, 1, 1, 1, 1],
+					  [1, 1, 1, 1, 1],
+					  [1, 1, 1, 1, 1],
+					  [1, 1, 1, 1, 1],																					
+					  [1, 1, 1, 1, 1]]),
 	# Focal Length [m]
 	'f' : 18.0e-3,
 	# Diameter of aperture of single lenslet [m]	
@@ -119,16 +119,16 @@ def lensletArray(phaseIn, paramsSensor):
 
 	# Compute the intensity distribution on the image plane
 	tol = 1.0e-10 # Tolerance on equal function
-	for i in xrange(ny): # y-direction
-		for j in xrange(nx): # x-direction
-			if lensletConfig[i,j] == 0: # Skip lenslet if true
+	for yy in xrange(ny): # y-direction
+		for xx in xrange(nx): # x-direction
+			if lensletConfig[yy,xx] == 0: # Skip lenslet if true
 				continue
 
 			# Extract phase plate
-			indStx = where((xo > phPlateStx[j]) + (absolute(xo - phPlateStx[j]) < tol))[0][0]
-			indSty = where((yo > phPlateSty[i]) + (absolute(yo - phPlateSty[i]) < tol))[0][0]
-			indEndx = where((xo > phPlateEndx[j]) + (absolute(xo - phPlateEndx[j]) < tol))[0][0]
-			indEndy = where((yo > phPlateEndy[i]) + (absolute(yo - phPlateEndy[i]) < tol))[0][0]
+			indStx = where((xo > phPlateStx[xx]) + (absolute(xo - phPlateStx[xx]) < tol))[0][0]
+			indSty = where((yo > phPlateSty[yy]) + (absolute(yo - phPlateSty[yy]) < tol))[0][0]
+			indEndx = where((xo > phPlateEndx[xx]) + (absolute(xo - phPlateEndx[xx]) < tol))[0][0]
+			indEndy = where((yo > phPlateEndy[yy]) + (absolute(yo - phPlateEndy[yy]) < tol))[0][0]
 			phaseInfft = phaseIn[indSty:indEndy,indStx:indEndx] # Extracted phase plate
 			
 			# Create temporary spatial grid for the phase plate
@@ -166,8 +166,8 @@ def lensletArray(phaseIn, paramsSensor):
 			Fy = Fy[0:size(Ula,0),0:size(Ula,1)]
 			Ui = exp(1j*k*f)*exp(1j*k*((Fx + fxShift)**2 + (Fy + fyShift)**2)*lam**2*f/2)/(1j*lam*f)*Ula # Complex amplitude on the image plane
 			IiTemp = absolute(Ui)**2.0 # Intensity profile in the focal plane, numerically
-			Xifft = Fx*lam*f + xShift + lensCentx[j] # Adjust the x-axis
-			Yifft = Fy*lam*f	+ yShift + lensCenty[i] # Adjust the y-axis
+			Xifft = Fx*lam*f + xShift + lensCentx[xx] # Adjust the x-axis
+			Yifft = Fy*lam*f	+ yShift + lensCenty[yy] # Adjust the y-axis
 			IiIntpF = interpolate.interp2d(Xifft[0],Yifft[:,0],IiTemp) # Create interpolation function
 			IiTemp = IiIntpF(xi,yi) # Insert single pattern grid into the whole image plane grid
 			Ii = Ii + IiTemp # Collect single lens patterns
@@ -181,6 +181,7 @@ surf = ax.plot_surface(Xo,Yo,phaseIn, rstride=1, cstride=1, cmap='jet')
 ax.set_xlabel('x')
 ax.set_ylabel('y')
 ax.set_zlabel('Phase')
+pl.show()
 
 Xi,Yi,Ii = lensletArray(phaseIn, paramsSensor)
 
@@ -189,4 +190,4 @@ Yimm = Yi*1000.0
 figIi = pl.figure()
 conNum = pl.pcolor(Ximm,Yimm,Ii)
 pl.title('Numerical Solution (mm)')
-
+pl.show()
