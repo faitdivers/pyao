@@ -41,6 +41,11 @@ def setup_params():
 	'noApertx': 10,
 	'noAperty': 10,
 	# focal distance, pixel length, sizes/diameters of the apertures, ...
+	'F': 18e-3,    		# Focal Length [m]
+	'Diam': 300e-6, 	# Diameter of pupil [m] - of system or lenslet?
+	'lam': 630e-9, 		# Wavelength [m]
+	'Lx': 4000e-6, 		# Support Width in x dimension (real space) [m]
+	'Ly': 4000e-6, 		# Support Width in y dimension (real space) [m]
 	}
 
 	paramsActuator = {
@@ -100,7 +105,7 @@ def runClosedLoop():
 		print("Running simulation step %d" % (i));
 		wf = wfg(sensorParameters, wavefrontParameters['zernikeModes'], wavefrontParameters['zernikeWeights'])
 		wfRes = wf-wfDM
-		intensities = wfs(wfRes)
+		intensities = wfs(wfRes, sensorParameters)
 		centroids = centroid(intensities, sensorParameters)
 		wfRec = wfr(centroids, sensorParameters)
 		actCommands = control(wfRec, actuatorParameters)
@@ -114,7 +119,7 @@ def runOpenLoop():
 	wf = wfg(paramsSensor,paramsWavefront['zernikeModes'], paramsWavefront['zernikeWeights'])
 	#pl.imshow(wf), pl.show(), pl.title('Incoming wavefront')
 	# Generate intensity measurements
-	intensities = wfs(wf)
+	intensities = wfs(wf, paramsSensor)
 	# Compute centroids (this step is not needed if we are to use focal
 	# plane reconstruction techniques)
 	centroids = centroid(intensities, paramsSensor)
