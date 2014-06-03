@@ -55,7 +55,8 @@ def setup_params():
 
     simulationParameters = {
     'frequency': 10,       # Frequency of the simulation in Hertz
-    'time': 10             # Simulated time in seconds
+    'time': 10,             # Simulated time in seconds
+    'is_closed_loop': False
     }
 
     # other sets of parameters may be defined if necessary
@@ -71,8 +72,8 @@ def setup_params():
     return parameters
 
 
-def runClosedLoop():
-    """ Run a closed loop simulation
+def runClosedLoop(parameters, iterations):
+    """ Run a closed-loop simulation
 
     The closed-loop simulation consists of
     1. generating the wafe-front
@@ -87,15 +88,9 @@ def runClosedLoop():
     The stop condition is the simulation time.
     """
     # Get parameters.
-    parameters = setup_params()
     wavefrontParameters = parameters['Wavefront']
     sensorParameters = parameters['Sensor']
     actuatorParameters = parameters['Actuator']
-    simulationParameters = parameters['Simulation']
-
-    # Calculate number of simulation steps
-    iterations = (simulationParameters['time'] *
-                  simulationParameters['frequency'])
 
     # The first deformable mirror effect: (No effect)
     wfDM = dm(0, sensorParameters)
@@ -113,31 +108,53 @@ def runClosedLoop():
     return
 
 
-def runOpenLoop():
-    parameters = setup_params()
+def runOpenLoop(parameters, iterations):
+    """ Run an open-loop simulation
+
+    The open-loop simulation consists of
+    1. generating the wafe-front
+    2. applying the deformable mirror to the wafe-front
+    3. a) measuring intensities
+    3. b) determining centroids
+    4. reconstructing the wafe-front
+    5. actuate the mirror
+    6. continue from step 1
+
+    The stop condition is the simulation time.
+    """
     wavefrontParameters = parameters['Wavefront']
     sensorParameters = parameters['Sensor']
     actuatorParameters = parameters['Actuator']
 
     print("Running open loop simulation")
-    # Generate wavefront
-    wf = wfg(sensorParameters, wavefrontParameters['zernikeModes'],
-             wavefrontParameters['zernikeWeights'])
-    #pl.imshow(wf), pl.show(), pl.title('Incoming wavefront')
-    # Generate intensity measurements
-    intensities = wfs(wf, sensorParameters)
-    # Compute centroids (this step is not needed if we are to use focal
-    # plane reconstruction techniques)
-    centroids = centroid(intensities, sensorParameters)
-    #print centroids.shape
-    # Reconstruct the wavefront
-    wfRec = wfr(centroids, sensorParameters)
-    # Compute the actuator commands via a control technique
-    actCommands = control(wfRec, actuatorParameters)
-    # Deformable mirror
-    wfDM = dm(actCommands, sensorParameters)
-    # Compute the residual wavefront
-    wfRes = wf - wfDM
+    # The first deformable mirror effect: (No effect)
+    wfDM = dm(0, sensorParameters)
+
+    for i in range(0, iterations):
+        print("Running simulation step %d" % (i))
+        wf = wfg(sensorParameters, wavefrontParameters['zernikeModes'],
+                 wavefrontParameters['zernikeWeights'])
+        wfRes = wf - wfDM
+        intensities = wfs(wfRes, sensorParameters)
+        centroids = centroid(intensities, sensorParameters)
+        wfRec = wfr(centroids, sensorParameters)
+        wfDM = dm(0, sensorParameters)
     return
 
-runClosedLoop()
+
+def run_simulation(parameters):
+    """ Runs the configured simulation. Either an open or closed loop.
+
+    """
+    simulation_parameters = parameters['Simulation']
+    iterations = (simulation_parameters['frequency'] *
+                  simulation_parameters['time'])
+
+    if simulation_parameters['is_closed_loop']:
+        runClosedLoop(parameters, iterations)
+    else:
+        runOpenLoop(parameters, iterations)
+
+
+parameters = setup_params()
+run_simulation(parameters)
