@@ -19,11 +19,15 @@ def wfr(centroids, params):
 	phase_num, teller = create_phase_num(phase_id,x_dim,y_dim)
 	#Create G matrix
 	G = create_G(centroids, phase_num, teller, x_dim, y_dim)
-	print('G = \n{}'.format(G))	
 	
-	#Inversion
-	G_inverse = pseudo_inverse(G)
-	print('G_inverse = \n{}'.format(G_inverse))
+	#Solve the least-squares problem
+	# phi = (G^T G)^-1 G^T centroids
+	F = dot(G.T,G) #G.T*G
+	F_inv = pseudo_inverse(F)
+	H = dot(F_inv,G.T)
+	phi = dot(H,centroids)
+	
+	print phi.shape
 	
 	# syntax: ones(shape, dtype=None, order='C')
 	return ones((params['numPupilx'],params['numPupily']))
