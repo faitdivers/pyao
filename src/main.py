@@ -32,15 +32,29 @@ def setup_params():
         
 	paramsSensor = {
 	# number of samples in the pupil plane
-	'numPupilx' : 100,
-	'numPupily' : 100,
+	'numPupilx' : 100, # Not used in WFS
+	'numPupily' : 100, # Not used in WFS
 	# number of samples in the imaging plane(s)
-	'numImagx' : 100,
-	'numImagy' : 100,
+	'numImagx' : 100, # Not used in WFS
+	'numImagy' : 100, # Not used in WFS
 	# number of apertures in the wfs
-	'noApertx': 10,
-	'noAperty': 10,
-	# focal distance, pixel length, sizes/diameters of the apertures, ...
+	'noApertx': 10, # Not used in WFS
+	'noAperty': 10, # Not used in WFS
+	# Number of samples of the incoming phase
+	'Nx' : 100,
+	'Ny' : 100,
+	# Focal Length [m]
+	'f' : 18.0e-3,
+	# Diameter of aperture of single lenslet [m]	
+	'D' : 300.0e-6, 
+	# Wavelength [m]	
+	'lam' : 630.0e-9, 	
+	# Width of the lenslet array [m]
+	'lx' : 1.54e-3,
+	'ly' : 1.54e-3,
+	# Lenslet centers [m]
+	'lensCentx' : [ 0.00015,  0.00046,  0.00077,  0.00108,  0.00139],
+	'lensCentx' : [ 0.00015,  0.00046,  0.00077,  0.00108,  0.00139],
 	}
 
 	paramsActuator = {
@@ -100,7 +114,7 @@ def runClosedLoop():
 		print("Running simulation step %d" % (i));
 		wf = wfg(sensorParameters, wavefrontParameters['zernikeModes'], wavefrontParameters['zernikeWeights'])
 		wfRes = wf-wfDM
-		intensities = wfs(wfRes)
+		intensities = wfs(wfRes, sensorParameters)
 		centroids = centroid(intensities, sensorParameters)
 		wfRec = wfr(centroids, sensorParameters)
 		actCommands = control(wfRec, actuatorParameters)
@@ -114,7 +128,7 @@ def runOpenLoop():
 	wf = wfg(paramsSensor,paramsWavefront['zernikeModes'], paramsWavefront['zernikeWeights'])
 	#pl.imshow(wf), pl.show(), pl.title('Incoming wavefront')
 	# Generate intensity measurements
-	intensities = wfs(wf)
+	intensities = wfs(wf, paramsSensor)
 	# Compute centroids (this step is not needed if we are to use focal
 	# plane reconstruction techniques)
 	centroids = centroid(intensities, paramsSensor)

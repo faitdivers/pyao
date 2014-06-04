@@ -230,4 +230,80 @@ And this leads to the following G:
 $$
 G = A^{-1}B = 
 $$
+
+\newpage
+\subsection{Least squares estimations}
+No matter what geometry we choose, we always can write our reconstruction problem as followed:
+$$ S=G\phi +n$$
+As we have a overdefined set of equations, we need to estimate the solution to this problem. For this, we can use the least squares estimation. We are first going to look at a regular least squares problem
+\newline
+\newline
+We first start with inconsistent set of equations:
+$$ y=Fx $$
+We would like to find the optimal solution $\hat{x}$, which we can write as:
+\newline
+\newline
+$ min_x \ \ \epsilon^T \epsilon $, subjected to $ y=Fx + \epsilon$
+\newline
+\newline
+Where $\epsilon$ is the residual vector. We can rewrite the equation above in a more standard problem:
+$$ min_x\|Fx-y\|_2^2$$ 
+After expanding the above expression, computing the gradient and setting the gradient to 0, we derive the following equation:
+$$ F^TF\hat{x}=F^Ty $$
+which gives us the least squares estimator $\hat{x}$
+$$ \hat{x} = (F^TF)^{-1}F^Ty $$
+In this case, the matrix $(F^TF)^{-1}F^T$ is called a pseudoinverse, namely the Moore-Penrose inverse.
+When using this estimator, the reconstruction problem can be solved by:
+$$ \hat{\phi} = (G^TG)^{-1}G^TS  $$
+\newline
+\newline
+Unfortunatly, our problem is defined slightly different. We need to think about the fact that we also have noise in our equations, which means that we cannot take $\phi$ as a determinstic vector. In that case, we need to formulate the stochastic least squares problem. We would like to minimize the following equation:
+$$ y=Fx+L\epsilon$$
+From which we know that x has a mean of $\bar{x}$ and the covariance matrix P, which we consider to be positive-definite.
+$\epsilon$ is consider white and is not correlated to x. We know that the solution to this problem has to be unbiased and have a minimum-variance. We first specify our linear estimator as:
+$$ \tilde{x} = 
+\begin{bmatrix}
+M & N \\
+\end{bmatrix}
+\begin{bmatrix}
+y \\
+\bar{x}
+\end{bmatrix}
+$$
+We first start from the fact that the solution must be unbiased. This means that the following must hold.
+$$ E[\tilde{x}]=MF\bar{x} + N\bar{x}=(MF+N)\bar{x}$$
+Which means:
+$$MF+N=I$$  
+Now we are going to look at the variance:
+$$x-\tilde{x}=(I-MF)(x-\tilde{x})-ML\epsilon$$
+And the expected value:
+$$ E[(x-\tilde{x})(x-\tilde{x})^T] = (I-MF)P(I-MF)^T - M(LL^T)M^T$$
+This equations can be expended to:
+$$ E[(x-\tilde{x})(x-\tilde{x})^T] =
+\begin{bmatrix}
+I & -M \\
+\end{bmatrix}
+\begin{bmatrix}
+P  & PF^T \\
+FP & FPF^T+(LL^T)
+\end{bmatrix}
+\begin{bmatrix}
+I  \\
+-m^T
+\end{bmatrix}
+$$ 
+Now the middle of this matrices can be expanded by using the Schur complement and next substituted back into the equation. After completing the squares, we can derive the matrix M that mimimizes the variance.
+$$ M = PF^T(FPF^T+(LL^T))^{-1}$$
+Which gives the solution to the stochastic least squares problem.
+$$\tilde{x} = PF^T(FPF^T+(LL^T))^{-1}y$$
+Now we have a the tools to solve our reconstruction problem.
+\newline
+\newline
+$ min_x \ \ \epsilon^T \epsilon $, subjected to $ s=G\phi + L\epsilon$
+\newline
+\newline
+where $E[\phi\phi^T]=C_\phi$ and $LL^T=C_n$. The solution is given by:
+$$\hat{\phi} = C_\phi G^T(GC_\phi G^T + C_n)^{-1}S $$
+
+
 \end{document}
