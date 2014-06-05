@@ -23,7 +23,7 @@ def findCentroid(matrix,trshld):
                 Sum += 1
                 
     # Compute the centroid using mean    
-    Centroid = ((float(Mx)/Sum),(float(My)/Sum))
+    Centroid = ([float(Mx)/Sum,float(My)/Sum])
     
     # return of function
     return Centroid
