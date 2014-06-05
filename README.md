@@ -6,7 +6,9 @@ There are some general rules that you should follow in this project:
 
 2. Really, communicate!
 
-3. Do not “push” buggy code to the remote server; always do extensive testing before pushing a major upgrade in the code. — always ask for someone to cross-check your code when uploading major changes; you can do that via the Issue tracking system in Git.
+3. Do not “push” buggy code to the remote master branch; always do extensive testing before pushing a major upgrade in the code. — always ask for someone to cross-check your code when uploading major changes by making a pull-request. After the pull request has been made, the reviewer is responsible for merging the branch into the master.
+
+3. a) if the code can not be automatically merged, the creator of the pull request should resolve all the conflicts, first.
 
 4. Ensure modularity of your code.
 
