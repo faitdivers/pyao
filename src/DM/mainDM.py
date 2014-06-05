@@ -24,8 +24,8 @@ def dm(actCom, paramsSens, paramsAct):
     nwfRec = (noApertx+1)*(noAperty+1);
     
     
-    d = 10.0*10.0**(-6);  # spacing between actuators [m]
-    subAperture = d; # radius of subaperture is assumed to be equal to d
+    rad = 10.0*10.0**(-6);  # spacing between actuators [m]
+    subAperture = rad; # radius of subaperture is assumed to be equal to rad
     
     # parameters to characterize influence function
     w1= 2;
@@ -35,19 +35,19 @@ def dm(actCom, paramsSens, paramsAct):
     
     #calculate the position of the actuators
     posAct = numpy.zeros([numActx*numActy,2]);
-    x = linspace(d,(noApertx)*d,noApertx);  # discretize the square
-    y = linspace(d,(noAperty)*d,noAperty);
+    x = linspace(rad,(noApertx)*rad,noApertx);  # discretize the square
+    y = linspace(rad,(noAperty)*rad,noAperty);
     for i in range (0, numActx):
         for j in range (0,numActy):
             posAct[i*numActx+j][0] = x[i];
             posAct[i*numActy+j][1] = y[j];
     
     pl.plot(posAct[:,0], posAct[:,1], '+');
-    pl.axis([0, x.max()+d, 0, y.max()+d]);
+    pl.axis([0, x.max()+rad, 0, y.max()+rad]);
     
     # calculate the position of the wavefronts
     posWr = numpy.zeros([(numActx+2)*(numActy+2),2]);
-    max_X = (noApertx+1)*d;
+    max_X = (noApertx+1)*rad;
     dwf = max_X/(noApertx+3); # wavefront spacing
     xwr = linspace(dwf,(noApertx+2)*dwf,noApertx+2);
     ywr = linspace(dwf,(noAperty+2)*dwf,noApertx+2);    
@@ -58,7 +58,7 @@ def dm(actCom, paramsSens, paramsAct):
     
     # hold on;
     pl.plot(posWr[:,0], posWr[:,1], 'r+');
-    pl.axis([0, x.max()+d, 0, y.max()+d]);
+    pl.axis([0, x.max()+rad, 0, y.max()+rad]);
     
     # length of wavefront reconstruction vector
     nwfRec = xwr.size*ywr.size;    
@@ -86,8 +86,8 @@ def dm(actCom, paramsSens, paramsAct):
     print("RMS power of wavefront error is %f  ", powerRes);
     
     # plot the deformable mirror (after wave front reconstruction)
-    xgrid = linspace(0,(noApertx+1)*d,111);
-    ygrid = linspace(0,(noAperty+1)*d,111); 
+    xgrid = linspace(0,(noApertx+1)*rad,111);
+    ygrid = linspace(0,(noAperty+1)*rad,111); 
     X, Y = numpy.meshgrid(xgrid, ygrid);
     
     S = zeros([111, 111]);
