@@ -86,7 +86,9 @@ where $f$ is the distance between the aperture array and the detector array \cit
 
 \section{Choice of Appertures Mechanism}
 
-blablabla
+Sometimes it is needed to throw away some information(s) of some apertures due to the lack of lighting or the centroid spot cannot be found in the neighborhood of its ideal position. Lack of lighting can make the centroid calculation not accurate, since it means we got low signal to noise ratio. The lighting is so low so that it is difficult to differentiate it to the noise. Based on that, we should throw away information of some apertures with low lighting. To do that we can normalize the intensity values so that its value between 0 and 1. Then specify a certain parameter (also between 0 and 1) as a threshold, which all the intensity(s) bellow that threshold shold be thrown away due to lack of illumination
+
+The centroid calculation can result in a very big error from the ideal spot. This is due to the noise. If the noise is to big, which results in a very big error from ideal spot, it is better to throw it away. 
 
 
 \begin{thebibliography}{9}
