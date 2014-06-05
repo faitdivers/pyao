@@ -13,8 +13,8 @@ def dm(actCom, paramsSens, paramsAct):
     numImagy= paramsSens['numImagy'];
     numPupilx=paramsSens['numPupilx'];
     numPupily=paramsSens['numPupily'];		
-    numActx=noApertx;      
-    numActy=noAperty;
+    numActx=paramsAct['numActx'];      
+    numActy=paramsAct['numActy'];
     
     noApert = noApertx*noAperty; # number of subapertures
      
@@ -24,7 +24,7 @@ def dm(actCom, paramsSens, paramsAct):
     nwfRec = (noApertx+1)*(noAperty+1);
     
     
-    d = 10.0*power(10.0,-6);  # spacing between actuators [m]
+    d = 10.0*10.0**(-6);  # spacing between actuators [m]
     subAperture = d; # radius of subaperture is assumed to be equal to d
     
     # parameters to characterize influence function
@@ -69,7 +69,7 @@ def dm(actCom, paramsSens, paramsAct):
     H = zeros([nwfRec,numAct]);
     for i in range (0, nwfRec):
         for j in range ( 0, numAct):
-            H[i][j] = w1/(2*pi*power(sig1,2))*exp(-(power((posWr[i][0]-posAct[j][0]),2)+ power((posWr[i][1]- posAct[j][1]),2))/(2*power(sig1,2)))+ w2/(2*pi*power(sig2,2))*exp(-(power((posWr[i][0]-posAct[j][0]),2)+power((posWr[i][1]-posAct[j][1]),2))/(2*power(sig2,2)));            
+            H[i][j] = w1/(2*pi*sig1**2)*exp(-((posWr[i][0]-posAct[j][0])**2+ (posWr[i][1]- posAct[j][1])**2)/(2*sig1**2))+ w2/(2*pi*sig2**2)*exp(-((posWr[i][0]-posAct[j][0])**2+(posWr[i][1]-posAct[j][1])**2)/(2*sig2**2));            
             
     wfRec = 0.5+0.01*random.randn(nwfRec,1); # dummy wavefront reconstruction vector
     
@@ -80,35 +80,31 @@ def dm(actCom, paramsSens, paramsAct):
     # residual error
     wfDM = dot(H,u);
     wfRes = wfRec - wfDM;
-    powerRes = (wfRes*wfRes).mean();
+    powerRes = sqrt((wfRes*wfRes).mean());
+
     
     print("RMS power of wavefront error is %f  ", powerRes);
     
     # plot the deformable mirror (after wave front reconstruction)
     xgrid = linspace(0,(noApertx+1)*d,111);
     ygrid = linspace(0,(noAperty+1)*d,111); 
-    X, Y = numpy.meshgrid(xgrid, ygrid)
-    #xgridt = xgrid.T;
-    #xgrids = tile(xgridt,[1,xgrid.T.size]);
-    #ygrids = tile(ygrid,[ygrid.size,1]);
+    X, Y = numpy.meshgrid(xgrid, ygrid);
     
     S = zeros([111, 111]);
     for i in range(0,xgrid.size):
         for j in range(0,ygrid.size):
             sum = 0;
             for k in range(0, numAct):
-                Sval = (w1/(2*pi*power(sig1,2))*exp(-(power((xgrid[i]-posAct[k][0]),2)+ 
-                power((ygrid[j]-posAct[k][1]),2))/(2*power(sig1,2)))+ w2/(2*pi*power(sig2,2))
-                *exp(-(power((xgrid[i]-posAct[k][0]),2)+power((ygrid[j]- 
-    			posAct[k][1]),2))/(2*power(sig2,2))))*u[k]*10**-6;      					
+                Sval = (w1/(2*pi*sig1**2)*exp(-((xgrid[i]-posAct[k][0])**2+ 
+                (ygrid[j]-posAct[k][1])**2)/(2*sig1**2))+ w2/(2*pi*sig2**2)
+                *exp(-((xgrid[i]-posAct[k][0])**2+(ygrid[j]- 
+    			posAct[k][1])**2)/(2*sig2**2)))*u[k]*10**-6;      					
                 sum = sum + Sval;
             S[i,j] = sum;
     fig = pl.figure();
     ax = fig.gca(projection='3d');
     surf = ax.plot_surface(X, Y, S, rstride=1, cstride=1, cmap=cm.coolwarm,linewidth=0, antialiased=True);
     
-    #ax.zaxis.set_major_locator(LinearLocator(10));
-    #ax.zaxis.set_major_formatter(FormatStrFormatter('%.02f'));
     
     fig.colorbar(surf, shrink=0.5, aspect=5);
     ax.set_xlim3d(0, 1.1*10**-4);

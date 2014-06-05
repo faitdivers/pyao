@@ -28,8 +28,8 @@ def setup_params():
 	}
 	paramsActuator = {
 	# number of actuators
-	'numActx' : 8,
-	'numActy' : 8,
+	'numActx' : 10,
+	'numActy' : 10,
 	# parameters to characterize influence function
 	# ...
 
@@ -69,8 +69,5 @@ wfDM = dm(actCommands, paramsSensor, paramsActuator)
 # Compute the residual wavefront
 #wfRes = wf-wfDM
 
-
-# Plot the results
-#print("Coba - coba")
 
 
