@@ -106,7 +106,7 @@ def centroid(intensities, paramsSensor):
         # calculating centroid
         centroid = findCentroid(intensityComp,trshld)
         centroidvector[h] = centroid
-            
+             
     centroidvector = np.transpose(centroidvector)
     # Calculating the slope vector:
     slopevector = findSlope(centroidvector,idealCenter,f)
