@@ -9,7 +9,10 @@ There are some general rules that you should follow in this project:
 3. Do not “push” buggy code to the remote master branch; always do extensive testing before pushing a major upgrade in the code. — always ask for someone to cross-check your code when uploading major changes by making a pull-request. After the pull request has been made, the reviewer is responsible for merging the branch into the master.
 
   3.a) if the code can not be automatically merged, the creator of the pull request should resolve all the conflicts, first.
-
+  
+  3.b) try to create an automated test file that benchmarks your code with a pre-defined reference; it's very helpful for debugging and to ensure modularity.
+  
+  
 4. Ensure modularity of your code.
 
 5. Ensure scalability: do not hardcode any parts of your code.
