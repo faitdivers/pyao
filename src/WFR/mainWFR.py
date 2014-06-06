@@ -12,13 +12,16 @@ def wfr(centroids, params):
 	#Get dimensions
 	x_dim = params['noApertx']
 	y_dim = params['noAperty']
+
+	#Get the size of the subaperture
+	Dl = params['D']
 	
 	#Create phase_id matrix
 	phase_id = create_phase_id(centroids,x_dim,y_dim)
 	#Create phase_num matrix
 	phase_num, teller = create_phase_num(phase_id,x_dim,y_dim)
 	#Create G matrix
-	G = create_G(centroids, phase_num, teller, x_dim, y_dim)
+	G = create_G(centroids, phase_num, teller, x_dim, y_dim, Dl)
 	
 	#Solve the least-squares problem
 	# phi = (G^T G)^-1 G^T centroids
@@ -59,7 +62,7 @@ def create_phase_num(phase_id, x_dim, y_dim):
 				teller += 1
 	return phase_num, teller
 
-def create_G(centroids, phase_num, teller, x_dim, y_dim):
+def create_G(centroids, phase_num, teller, x_dim, y_dim, Dl):
 	#Create G matrix
 	#For clarity an actual matrix shape is used
 	number_slopes = x_dim*y_dim
@@ -69,15 +72,15 @@ def create_G(centroids, phase_num, teller, x_dim, y_dim):
 		for j in range(0,y_dim):
 			if centroids[i*x_dim+j,0] != 0 or centroids[i*x_dim+j+number_slopes,0] != 0:
 				#For s_x
-				G[counter, phase_num[i,j]] = -1
-				G[counter, phase_num[i,j+1]] = -1
-				G[counter, phase_num[i+1,j]] = 1
-				G[counter, phase_num[i+1,j+1]] = 1
+				G[counter, phase_num[i,j]] = -1/(2*Dl)
+				G[counter, phase_num[i,j+1]] = -1/(2*Dl)
+				G[counter, phase_num[i+1,j]] = 1/(2*Dl)
+				G[counter, phase_num[i+1,j+1]] = 1/(2*Dl)
 				#For s_y
-				G[counter+number_slopes, phase_num[i,j]] = -1
-				G[counter+number_slopes, phase_num[i+1,j]] = -1
-				G[counter+number_slopes, phase_num[i,j+1]] = 1
-				G[counter+number_slopes, phase_num[i+1,j+1]] = 1
+				G[counter+number_slopes, phase_num[i,j]] = -1/(2*Dl)
+				G[counter+number_slopes, phase_num[i+1,j]] = -1/(2*Dl)
+				G[counter+number_slopes, phase_num[i,j+1]] = 1/(2*Dl)
+				G[counter+number_slopes, phase_num[i+1,j+1]] = 1/(2*Dl)
 				counter += 1
 	return G
 
