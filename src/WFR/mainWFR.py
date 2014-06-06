@@ -30,10 +30,11 @@ def wfr(centroids, params):
 	H = dot(F_inv,G.T)
 	phi = dot(H,centroids)
 	
-	print phi.shape
+	#print phi.shape
 	
 	# syntax: ones(shape, dtype=None, order='C')
-	return ones((params['numPupilx'],params['numPupily']))
+	#return ones((params['numPupilx'],params['numPupily']))
+	return phi
 
 def create_phase_id(centroids, x_dim, y_dim):
 	#Create a phase_id matrix
