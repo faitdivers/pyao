@@ -4,7 +4,7 @@ Created on Thu Jun 05 23:00:47 2014
 
 @author: Herminarto
 """
-#from mainCentroid import *
+from mainCentroid import *
 
 def setup_params():
         
@@ -42,13 +42,13 @@ def setup_params():
     return parameters
     
 def test_centroid():
-    	# Get parameters.
+    # Get parameters.
     parameters = setup_params()
     sensorParameters = parameters['Sensor'];
     
     intensities = ones((100,100))
-    centroid = centroid(intensities, sensorParameters)
-    return
-    
-test_centroid()
+    centroids = centroid(intensities, sensorParameters)
+    return centroids
+ 
+slopevector = test_centroid()
 
