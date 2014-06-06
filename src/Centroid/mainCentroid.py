@@ -129,4 +129,3 @@ def centroid(intensities, paramsSensor):
     ans = slopevector
 	
     return ans
-    
