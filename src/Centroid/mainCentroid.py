@@ -9,124 +9,98 @@ from numpy import *
 import numpy as np
 import matplotlib.pyplot as pl
 
-from findCentroid import *
-from findSlope import *
-
-#from WFG.mainWFG import *
-#from WFS.mainWFS import *
-#from Centroid.mainCentroid import *
-#from WFR.mainWFR import *
-#from Control.mainControl import *
-#from DM.mainDM import *
-
-# Calculate the centroids of an intensity distribution yielded by Shack-Hartmann  
-# wavefront sensor.
-# Given the priory knowledge of the number of lenslet/apertures and the ideal
-# spot position.
+# Calculate the centroids of an intensity distribution yielded by Shack-Hartmann wavefront sensor.
+# Given the priory knowledge of the number of lenslet/apertures and the ideal spot position.
 
 def centroid(intensities, paramsSensor):
     # parameters for centroid:
-    threshold = 0.1
+    threshold = 0.3
+    
     # Unwrap paramsSensor
-    Nx = paramsSensor['Nx'] # Samples on the x-axis per lenslet
-    Ny = paramsSensor['Ny'] # Samples on the y_axis per lenslet
     lx = paramsSensor['lx'] # Width of the lenslet array in the x-direction [m]
     ly = paramsSensor['ly'] # Width of the lenslet array in the y-direction [m]
     lensCentx = paramsSensor['lensCentx'] # Lenslet centers on x-axis [m]
     lensCenty = paramsSensor['lensCenty'] # Lenslet centers on y-axis [m]
     f = paramsSensor['f'] # Focal length [m]
+    noApertx = paramsSensor['noApertx'] # number of apertures in x axis
+    noAperty = paramsSensor['noAperty'] # number of apertures in y axis
+    Nx = paramsSensor['Nx'] # Samples on the x-axis per lenslet
+    Ny = paramsSensor['Ny'] # Samples on the y_axis per lenslet
     
     # defining the threshold for centroid algorithm method
     maxintensity = intensities.max()
     trshld = maxintensity*threshold
-    
-    # number of pixel in image:
-    pixX = intensities.shape[1]     # number of pixel in x direction
-    pixY = intensities.shape[0]     # number of pixel in y direction
-    
-    # pixel size:
-    x = lx/pixX                     # pixel size in x direction
-    y = ly/pixY                     # pixel size in y direction
-
-    # width of the region for 1 aperture
-    wx = 0.5*(lensCentx[2]-lensCentx[1])/x # distance between centroid to edge of region of each aperture
-    wy = 0.5*(lensCenty[2]-lensCenty[1])/y # distance between centroid to edge of region of each aperture
+      
+    # pixel size
+    # (Nx*noApertx) and (Ny*noAperty) = number of pixel for the whole image in x and y direction respt.
+    dx = lx/(Nx*noApertx)                       # pixel size in x direction
+    dy = ly/(Ny*noAperty)                       # pixel size in y direction
 
     # ideal centroid spot in pixel
-    pixlensCentx = [z/x for z in lensCentx]
-    pixlensCenty = [z/y for z in lensCenty]
+    pixlensCentx = [round(z/dx) for z in lensCentx] # round() is used because in pixel
+    pixlensCenty = [round(z/dy) for z in lensCenty] # round() is used because in pixel
     idealCenter = [pixlensCentx,pixlensCenty]     # make a vector of pixlensCentx and pixlensCenty
     idealCenter = np.asarray(idealCenter)
-    idealCenter = idealCenter.reshape((2,Nx))
+    idealCenter = idealCenter.reshape((2,noApertx*noAperty))
     
-    # To calculate the centroid for each apertures, we need to calculate the intensities
-    # within a specified region of interest. To do so, we should create mask matrix
-    # which has value 1 at those region of interest and 0 otherwise.
-    # The mask matrix then multiplied with the intencities matrix, results in
-    # a new matrix which only has intensity value in the region of interest.    
+    # The centroid of each aperture will be calculated individually based on region of interest.
+    # The region of interest of matrix intensities is determined in a loop process.    
     
-    # initialize the matrix mask
-    mask = zeros((len(intensities),len(intensities)))
+    # initialize the centroidvector
+    centroidvector = zeros((noApertx*noAperty,2))
+    # Loop process for defining region of interest and calculating centroid
+    for q in range(noAperty): 
+        for r in range(noApertx):
+            IntensitiesofInterst = intensities[range((Ny*q),(Ny*(q+1))),(r*Nx):(Nx*(r+1))]
+            #IntensitiesofInterst = np.asarray(IntensitiesofInterst)
+            centroid = findCentroid(IntensitiesofInterst,trshld)
+            centroid[0]=centroid[0]+r*Nx
+            centroid[1]=centroid[1]+q*Ny
+            centroidvector[(q*noAperty)+r] = centroid
     
-    # initialize the array of matrix mask
-    maskmatrix = np.empty([0,len(intensities)])
-    
-    # crating matix mask
-    for a in range(len(lensCentx)):
-        centX = pixlensCentx[a]     # ideal centroid x coordinate
-        beginx = int(centX-wx)      # begining of the region of interest in x-axis
-        endx = int(centX+wx)        # end of the region of interest in x-axis
-        
-        centY = pixlensCenty[a]     # ideal centroid y coordinate
-        beginy = int(centY-wx)      # begining of the region of interest in y-axis
-        endy = int(centY+wx)        # end of the region of interest in y-axis
-        
-        for i in range(len(intensities)):
-            for j in range(len(intensities)):
-                for k in range(beginy,endy):
-                    for m in range(beginx,endx):
-                        mask[k][m]=1    # creating 1 as value for mask
-                        
-        maskmatrix = np.append(maskmatrix, mask, axis=0)    # merge the current mask with previous mask
-        mask = zeros((len(intensities),len(intensities)))    # reset the mask
-
-    # Then we calculate the centroids and slopes.
-    # The centroids and slopes are represented as a vector consisting every
-    # centroid and slope for each apertures.   
-    
-    # initialize the centroidvector and slopevector
-    centroidvector = zeros((Nx,2))
-    slopevector = zeros((Nx,2))
-    
-    # doing iteration to calculate centroid for each apertures
-    for h in range(Nx):
-        maskh = maskmatrix[range(int(len(intensities)*h),int(len(intensities)*(h+1))),0:len(intensities)]
-        # defining which internsity is calculated
-        intensityComp = intensities*maskh
-        # calculating centroid
-        centroid = findCentroid(intensityComp,trshld)
-        centroidvector[h] = centroid
-             
+    # Transpose of centroidvector to make the dimension same as idealCenter matrix
     centroidvector = np.transpose(centroidvector)
     # Calculating the slope vector:
     slopevector = findSlope(centroidvector,idealCenter,f)
-        
-    # the output of centroid function is a vector of centroids and slopes
-    # in the form of :
-    # [s_x(0,0),.,s_x(0,N),.,s_x(M,0),.,s_x(M,N),s_y(0,0),.,s_y(0,N),.,s_y(M,0),.,s_y(M,N)]^T
+            
+    # The output of centroid function is a vector of centroids and slopes in the form of :
+    # [s_x(0,0),.,s_x(0,N),.,s_x(M,0),.,s_x(M,N),s_y(0,0),.,s_y(0,N),.,s_y(M,0),.,s_y(M,N)]
     # to do that we have to reshape the matrix slopevector and centroidvector
-    
     slopevector = zip(*slopevector)
     slopevector = np.asarray(slopevector)
     slopevector = np.transpose(slopevector)
-    slopevector = slopevector.reshape((1,2*Nx))
-    
-    centroidvector = zip(*centroidvector)
-    centroidvector = np.asarray(centroidvector)
-    centroidvector = np.transpose(centroidvector)
-    centroidvector = centroidvector.reshape((1,2*Nx))
-    
-    ans = slopevector
+    slopevector = slopevector.reshape((1,2*noApertx*noAperty))
 	
-    return ans
+    return slopevector  
+
+def findCentroid(matrix,trshld):
+    # Initialization
+    Mx  = 0
+    My  = 0
+    Sum = 0
     
+    # Looking at the value for each pixel coordinate
+    for i in range(len(matrix)):
+        for j in range(len(matrix[i])):
+            if matrix[i][j]>=trshld:
+                # Calculate the sum of each value from every pixel
+                Mx  += j
+                My  += i
+                # Calculate total pixel
+                Sum += 1
+                
+    # Compute the centroid using mean    
+    Centroid = ([float(Mx)/Sum,float(My)/Sum])
+    
+    # return of function
+    return Centroid
+   
+def findSlope(Centroid,idealCenter,f):
+    # f is the distance between the aperture array and the detector array.
+    # delta is the error between centroid and ideal spot    
+    delta = Centroid-idealCenter
+    
+    # Slope calculation
+    slope =  [z/f for z in delta]   
+    
+    return slope

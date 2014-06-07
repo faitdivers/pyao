@@ -4,7 +4,7 @@ Created on Thu Jun 05 23:00:47 2014
 
 @author: Herminarto
 """
-from mainCentroid import *
+from mainCentroid_trial import *
 
 def setup_params():
         
@@ -19,8 +19,8 @@ def setup_params():
     'noApertx': 5, # Not used in WFS
     'noAperty': 5, # Not used in WFS
     # Number of samples of the incoming phase
-    'Nx' : 25,
-    'Ny' : 25,
+    'Nx' : 20,
+    'Ny' : 20,
     # Focal Length [m]
     'f' : 18.0e-3,
     # Diameter of aperture of single lenslet [m]
@@ -51,4 +51,3 @@ def test_centroid():
     return centroids
  
 slopevector = test_centroid()
-
