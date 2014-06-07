@@ -32,29 +32,20 @@ def setup_params():
         
 	paramsSensor = {
 	# number of samples in the pupil plane
-	'numPupilx' : 100, # Not used in WFS
-	'numPupily' : 100, # Not used in WFS
+	'numPupilx' : 100,
+	'numPupily' : 100,
 	# number of samples in the imaging plane(s)
-	'numImagx' : 100, # Not used in WFS
-	'numImagy' : 100, # Not used in WFS
+	'numImagx' : 100,
+	'numImagy' : 100,
 	# number of apertures in the wfs
-	'noApertx': 10, # Not used in WFS
-	'noAperty': 10, # Not used in WFS
-	# Number of samples of the incoming phase
-	'Nx' : 100,
-	'Ny' : 100,
-	# Focal Length [m]
-	'f' : 18.0e-3,
-	# Diameter of aperture of single lenslet [m]	
-	'D' : 300.0e-6, 
-	# Wavelength [m]	
-	'lam' : 630.0e-9, 	
-	# Width of the lenslet array [m]
-	'lx' : 1.54e-3,
-	'ly' : 1.54e-3,
-	# Lenslet centers [m]
-	'lensCentx' : [ 0.00015,  0.00046,  0.00077,  0.00108,  0.00139],
-	'lensCenty' : [ 0.00015,  0.00046,  0.00077,  0.00108,  0.00139],
+	'noApertx': 10,
+	'noAperty': 10,
+	# focal distance, pixel length, sizes/diameters of the apertures, ...
+	'F': 18e-3,    		# Focal Length [m]
+	'Diam': 300e-6, 	# Diameter of pupil [m] - of system or lenslet?
+	'lam': 630e-9, 		# Wavelength [m]
+	'Lx': 4000e-6, 		# Support Width in x dimension (real space) [m]
+	'Ly': 4000e-6, 		# Support Width in y dimension (real space) [m]
 	}
 
 	paramsActuator = {
