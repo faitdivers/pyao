@@ -92,7 +92,6 @@ def findCentroid(matrix,trshld):
     # Compute the centroid using mean    
     Centroid = ([float(Mx)/Sum,float(My)/Sum])
     
-<<<<<<< HEAD
     # return of function
     return Centroid
    
@@ -105,8 +104,6 @@ def findSlope(Centroid,idealCenter,f):
     slope =  [z/f for z in delta]   
     
     return slope
-=======
     ans = slopevector
 	
     return ans
->>>>>>> 0e21806e52e2a629631fe630bb0c25dba72fe03a
