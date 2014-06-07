@@ -76,14 +76,14 @@ def runClosedLoop(parameters, iterations):
     """ Run a closed-loop simulation
 
     The closed-loop simulation consists of
-    1. generating the wafe-front
-    2. applying the deformable mirror to the wafe-front
+    1. generating the wave-front
+    2. applying the deformable mirror to the wave-front
     3. a) measuring intensities
     3. b) determining centroids
-    4. reconstructing the wafe-front
+    4. reconstructing the wave-front
     5. calculate the control values for the actuators,
     6. actuate the mirror
-    7. continue from step 1
+    7. repeat from step 1
 
     The stop condition is the simulation time.
     """
@@ -112,13 +112,13 @@ def runOpenLoop(parameters, iterations):
     """ Run an open-loop simulation
 
     The open-loop simulation consists of
-    1. generating the wafe-front
-    2. applying the deformable mirror to the wafe-front
+    1. generating the wave-front
+    2. applying the deformable mirror to the wave-front
     3. a) measuring intensities
     3. b) determining centroids
-    4. reconstructing the wafe-front
+    4. reconstructing the wave-front
     5. actuate the mirror
-    6. continue from step 1
+    6. repeat from step 1
 
     The stop condition is the simulation time.
     """
