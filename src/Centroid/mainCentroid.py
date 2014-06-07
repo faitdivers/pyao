@@ -104,6 +104,3 @@ def findSlope(Centroid,idealCenter,f):
     slope =  [z/f for z in delta]   
     
     return slope
-    ans = slopevector
-	
-    return ans

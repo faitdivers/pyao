@@ -4,7 +4,7 @@ Created on Thu Jun 05 23:00:47 2014
 
 @author: Herminarto
 """
-from mainCentroid_trial import *
+from mainCentroid import *
 
 def setup_params():
         

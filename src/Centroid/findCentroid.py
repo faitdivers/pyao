@@ -26,9 +26,3 @@ def findCentroid(matrix,trshld):
     
     # return of function
     return Centroid
-
-
-    
-
-    
-    
