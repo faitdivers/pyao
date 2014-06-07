@@ -13,7 +13,9 @@ def wfs(phaseIn, paramsSensor):
 	lx = paramsSensor['lx'] # Width of the lenslet array in the x-direction [m]
 	ly = paramsSensor['ly'] # Width of the lenslet array in the y-direction [m]
 	lensCentx = paramsSensor['lensCentx'] # Lenslet centers on x-axis [m]
+	lensCentx = asarray(lensCentx)
 	lensCenty = paramsSensor['lensCenty'] # Lenslet centers on y-axis [m]
+	lensCenty  = asarray(lensCenty)
 	f = paramsSensor['f'] # Focal length [m]
 	D = paramsSensor['D'] # Lens diameter [m]
 	lam = paramsSensor['lam'] # Wavelength [m]
