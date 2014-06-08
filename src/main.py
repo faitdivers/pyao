@@ -31,18 +31,15 @@ def setup_params():
         }    
         
 	paramsSensor = {
-	# number of samples in the pupil plane
-	'numPupilx' : 100, # Not used in WFS
-	'numPupily' : 100, # Not used in WFS
+	# Number of samples of the incoming phase
+	'numPupilx' : 100,
+	'numPupily' : 100,
 	# number of samples in the imaging plane(s)
-	'numImagx' : 100, # Not used in WFS
-	'numImagy' : 100, # Not used in WFS
+	'numImagx' : 100,
+	'numImagy' : 100,
 	# number of apertures in the wfs
 	'noApertx': 10, # Not used in WFS
 	'noAperty': 10, # Not used in WFS
-	# Number of samples of the incoming phase
-	'Nx' : 100,
-	'Ny' : 100,
 	# Focal Length [m]
 	'f' : 18.0e-3,
 	# Diameter of aperture of single lenslet [m]	
@@ -143,6 +140,6 @@ def runOpenLoop():
 	wfRes = wf-wfDM
 	return
 
-runClosedLoop()
+#runClosedLoop()
 
 #runOpenLoop()
