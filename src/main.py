@@ -31,15 +31,15 @@ def setup_params():
         }    
         
 	paramsSensor = {
-	# Number of samples of the incoming phase
+	# Number of samples of the incoming phase on the pupil plane
 	'numPupilx' : 100,
 	'numPupily' : 100,
-	# number of samples in the imaging plane(s)
-	'numImagx' : 100,
-	'numImagy' : 100,
+	# number of samples in the imaging plane
+	'numImagx' : 300,
+	'numImagy' : 300,
 	# number of apertures in the wfs
-	'noApertx': 10, # Not used in WFS
-	'noAperty': 10, # Not used in WFS
+	'noApertx': 10, # Not used in WFS will be removed use lensCent instead
+	'noAperty': 10, # Not used in WFS will be removed use lensCent instead
 	# Focal Length [m]
 	'f' : 18.0e-3,
 	# Diameter of aperture of single lenslet [m]	
