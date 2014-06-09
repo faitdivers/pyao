@@ -8,10 +8,8 @@ from scipy import interpolate
 
 def wfs(phaseIn, paramsSensor):
 	# Unwrap paramsSensor
-	Nxo = paramsSensor['numPupilx'] # Samples on the x-axis pupil plane
-	Nyo = paramsSensor['numPupily'] # Samples on the y_axis pupil plane
-	Nxi = paramsSensor['numImagx'] # Samples on the x-axis image plane
-	Nyi = paramsSensor['numImagy'] # Samples on the y_axis image plane
+	Nx = paramsSensor['numPupilx'] # Samples on the x-axis
+	Ny = paramsSensor['numPupily'] # Samples on the y_axis
 	lx = paramsSensor['lx'] # Width of the lenslet array in the x-direction [m]
 	ly = paramsSensor['ly'] # Width of the lenslet array in the y-direction [m]
 	lensCentx = paramsSensor['lensCentx'] # Lenslet centers on x-axis [m]
@@ -22,15 +20,15 @@ def wfs(phaseIn, paramsSensor):
 	k = 2*pi/lam # Wavenumber
 	
 	# Create grid in the pupil plane
-	dxo = lx/(Nxo - 1.0) # Sample length on x-axis [m]
-	dyo = ly/(Nyo - 1.0) # Sample length on y-axis [m]
+	dxo = lx/(Nx - 1.0) # Sample length on x-axis [m]
+	dyo = ly/(Ny - 1.0) # Sample length on y-axis [m]
 	xo = arange(0.0,lx + dxo,dxo) # Sample positions on x-axis [m]
 	yo = arange(0.0,ly + dyo,dyo) # Sample positions on y-axis [m]
 	Xo, Yo = meshgrid(xo,yo) # Create spatial grid
 
 	# Create grid for the Fast Fourier Transform (fft)
-	Lx = dxo*Nxo # Support length for the fft over the x-axis [m]
-	Ly = dyo*Nyo # Support length for the fft over the y-axis [m]
+	Lx = dxo*Nx # Support length for the fft over the x-axis [m]
+	Ly = dyo*Ny # Support length for the fft over the y-axis [m]
 	xfft = arange(-Lx/2.0,Lx/2.0,dxo) # Sample positions on x-axis [m]
 	yfft = arange(-Ly/2.0,Ly/2.0,dyo) # Sample positions on y-axis [m]
 	Xfft,Yfft = meshgrid(xfft,yfft) # Create spatial grid
@@ -41,16 +39,9 @@ def wfs(phaseIn, paramsSensor):
 	Fx, Fy = meshgrid(fx,fy) # Create spatial frequency grid [rad/m]
 	
 	# Create grid in the image plane
-	# Sampling based on the fft
-#	dxi = dfx*lam*f # Sample length on x-axis [m]
-#	dyi = dfx*lam*f # Sample length on y-axis [m]
-#	xi = arange(0.0,lx + dxi,dxi) # Sample positions on x-axis [m]
-#	yi = arange(0.0,ly + dyi,dyi) # Sample positions on y-axis [m]
-#	Xi, Yi = meshgrid(xi,yi) # Create spatial grid
-#	Ii = zeros((size(Xi,0),size(Xi,1))) # Intensity distribution
 	# Sampling based on the sensor parameters
-	dxi = lx/(Nxi - 1.0) # Sample length on x-axis [m]
-	dyi = ly/(Nyi - 1.0) # Sample length on y-axis [m]
+	dxi = lx/(Nx - 1.0) # Sample length on x-axis [m]
+	dyi = ly/(Ny - 1.0) # Sample length on y-axis [m]
 	xi = arange(0.0,lx + dxi,dxi) # Sample positions on x-axis [m]
 	yi = arange(0.0,ly + dyi,dyi) # Sample positions on y-axis [m]
 	Xi, Yi = meshgrid(xi,yi) # Create spatial grid

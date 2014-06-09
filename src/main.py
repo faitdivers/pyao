@@ -35,11 +35,11 @@ def setup_params():
 	'numPupilx' : 100,
 	'numPupily' : 100,
 	# number of samples in the imaging plane
-	'numImagx' : 300,
-	'numImagy' : 300,
+	'numImagx' : 100,
+	'numImagy' : 100,
 	# number of apertures in the wfs
-	'noApertx': 10, # Not used in WFS will be removed use lensCent instead
-	'noAperty': 10, # Not used in WFS will be removed use lensCent instead
+	'noApertx': 10,
+	'noAperty': 10,
 	# Focal Length [m]
 	'f' : 18.0e-3,
 	# Diameter of aperture of single lenslet [m]	
@@ -140,6 +140,6 @@ def runOpenLoop():
 	wfRes = wf-wfDM
 	return
 
-#runClosedLoop()
+runClosedLoop()
 
 #runOpenLoop()
