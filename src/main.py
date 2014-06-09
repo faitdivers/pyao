@@ -1,7 +1,6 @@
 # Main file for PyAO toolbox
 
-from numpy import *
-import matplotlib.pyplot as pl
+import numpy
 
 from WFG.mainWFG import *
 from WFS.mainWFS import *
@@ -29,28 +28,28 @@ def setup_params():
     }
 
     paramsSensor = {
-	# number of samples in the pupil plane
-	'numPupilx' : 100,
-	'numPupily' : 100,
-	# number of samples in the imaging plane(s)
-	'numImagx' : 100,
-	'numImagy' : 100,
-	# number of apertures in the wfs
-	'noApertx': 10,
-	'noAperty': 10,
-	# Focal Length [m]
-	'f' : 18.0e-3,
-	# Diameter of aperture of single lenslet [m]	
-	'D' : 300.0e-6, 
-	# Wavelength [m]	
-	'lam' : 630.0e-9, 	
-	# Width of the lenslet array [m]
-	'lx' : 1.54e-3,
-	'ly' : 1.54e-3,
-	# Lenslet centers [m]
-	'lensCentx' : array([ 0.00015,  0.00046,  0.00077,  0.00108,  0.00139]),
-	'lensCenty' : array([ 0.00015,  0.00046,  0.00077,  0.00108,  0.00139]),
-	}
+    # number of samples in the pupil plane
+    'numPupilx': 100,
+    'numPupily': 100,
+    # number of samples in the imaging plane(s)
+    'numImagx': 100,
+    'numImagy': 100,
+    # number of apertures in the wfs
+    'noApertx': 10,
+    'noAperty': 10,
+    # Focal Length [m]
+    'f': 18.0e-3,
+    # Diameter of aperture of single lenslet [m]
+    'D': 300.0e-6,
+    # Wavelength [m]
+    'lam': 630.0e-9,
+    # Width of the lenslet array [m]
+    'lx': 1.54e-3,
+    'ly': 1.54e-3,
+    # Lenslet centers [m]
+    'lensCentx': array([0.00015,  0.00046,  0.00077,  0.00108,  0.00139]),
+    'lensCenty': array([0.00015,  0.00046,  0.00077,  0.00108,  0.00139]),
+    }
 
     paramsActuator = {
     # number of actuators
@@ -62,7 +61,7 @@ def setup_params():
     simulationParameters = {
     'frequency': 10,       # Frequency of the simulation in Hertz
     'time': 10,             # Simulated time in seconds
-    'is_closed_loop': False
+    'is_closed_loop': True
     }
 
     # other sets of parameters may be defined if necessary
@@ -98,6 +97,11 @@ def runClosedLoop(parameters, iterations):
     sensorParameters = parameters['Sensor']
     actuatorParameters = parameters['Actuator']
 
+    wf_buffer = []
+    intensities_buffer = []
+    centroids_buffer = []
+    reconstructed_buffer = []
+    wf_dm_buffer = []
     # The first deformable mirror effect: (No effect)
     wfDM = dm(0, sensorParameters)
 
@@ -111,7 +115,17 @@ def runClosedLoop(parameters, iterations):
         wfRec = wfr(centroids, sensorParameters)
         actCommands = control(wfRec, actuatorParameters)
         wfDM = dm(actCommands, sensorParameters)
-    return
+
+        wf_buffer.append(wf)
+        intensities_buffer.append(intensities)
+        centroids_buffer.append(centroids)
+        reconstructed_buffer.append(wfRec)
+        wf_dm_buffer.append(wfDM)
+
+    results = pack_simulation_results(wf_buffer, intensities_buffer,
+                                    centroids_buffer, reconstructed_buffer,
+                                    wf_dm_buffer)
+    return results
 
 
 def runOpenLoop(parameters, iterations):
@@ -132,6 +146,12 @@ def runOpenLoop(parameters, iterations):
     sensorParameters = parameters['Sensor']
     actuatorParameters = parameters['Actuator']
 
+    wf_buffer = []
+    intensities_buffer = []
+    centroids_buffer = []
+    reconstructed_buffer = []
+    wf_dm_buffer = []
+
     print("Running open loop simulation")
     # The first deformable mirror effect: (No effect)
     wfDM = dm(0, sensorParameters)
@@ -145,7 +165,29 @@ def runOpenLoop(parameters, iterations):
         centroids = centroid(intensities, sensorParameters)
         wfRec = wfr(centroids, sensorParameters)
         wfDM = dm(0, sensorParameters)
-    return
+
+        wf_buffer.append(wf)
+        intensities_buffer.append(intensities)
+        centroids_buffer.append(centroids)
+        reconstructed_buffer.append(wfRec)
+        wf_dm_buffer.append(wfDM)
+
+    results = pack_simulation_results(wf_buffer, intensities_buffer,
+                                    centroids_buffer, reconstructed_buffer,
+                                    wf_dm_buffer)
+    return results
+
+
+def pack_simulation_results(wf, intensities, centroids, reconstructed, wf_dm):
+    simulation_results = {
+    'wf': wf,
+    'intensities': intensities,
+    'centroids': centroids,
+    'reconstructed': reconstructed,
+    'wf_dm': wf_dm
+    }
+
+    return simulation_results
 
 
 def run_simulation(parameters):
