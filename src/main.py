@@ -102,6 +102,8 @@ def runClosedLoop(parameters, iterations):
     centroids_buffer = []
     reconstructed_buffer = []
     wf_dm_buffer = []
+    
+    print("Running closed-loop simulation")
     # The first deformable mirror effect: (No effect)
     wfDM = dm(0, sensorParameters)
 
@@ -152,7 +154,7 @@ def runOpenLoop(parameters, iterations):
     reconstructed_buffer = []
     wf_dm_buffer = []
 
-    print("Running open loop simulation")
+    print("Running open-loop simulation")
     # The first deformable mirror effect: (No effect)
     wfDM = dm(0, sensorParameters)
 
