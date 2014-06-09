@@ -1,34 +1,69 @@
-from mainWFG import * 
+from numpy import allclose, load
+from zernike import *
 
-def setup_params() :
-	paramsSensor = {
-	# number of samples in the pupil plane
-	'numPupilx' : 100,
-	'numPupily' : 100,
-	# number of samples in the imaging plane(s)
-	'numImagx' : 100,
-	'numImagy' : 100,
-	# number of apertures in the wfs
-	'noApertx': 10,
-	'noAperty': 10,
-	# focal distance, pixel length, sizes/diameters of the apertures, ...
-	}
-	paramsActuator = {
-	# number of actuators
-	'numActx' : 8,
-	'numActy' : 8,
-	# parameters to characterize influence function
-	# ...
-	}
-	return paramsSensor,paramsActuator
-	
-params,paramsAct = setup_params()	
-count = 0
-print "Check properties:"
-for obj in params :
-    print "\tprop(%d) | %r = %d" %(count,obj,params[obj])
-    count += 1
-    
-res = wfg(params)
-print "\nWave Front Generation:"
-print "%r" %res
+import unittest
+import os
+
+#unittest.TestCase
+class TestZernikeWavefront():
+    def testConstructor(self):
+        zernikeModes = [2,4,21]
+        zernikeWeights = [0.5,0.25,-0.6]        
+       
+        zw = ZernikeWave()
+        zw.addMode(zernikeModes, zernikeWeights)
+        
+	self.assertTrue(zernikeModes,zw.getModes())
+	self.assertTrue(zernikeWeights, zw.getWeights())
+
+    def testWavefront(self):
+        data = load(os.getcwd()+'\Documents\GitHub\pyao\src\WFG\defocusTestData.npy')
+
+        paramt = {
+        'numPupilx' : 11,
+        'numPupily' : 11,
+        'numImagx' : 50,
+        'numImagy' : 50,
+        'noApertx': 5,
+        'noAperty': 5
+        }
+        zernikeModes = [2,4,21]
+        zernikeWeights = [0.5,0.25,-0.6]
+        
+        zw = ZernikeWave()
+        zw.addMode(zernikeModes, zernikeWeights)
+        wf = zw.createWavefront(paramt['numImagx'],paramt['numImagy'])
+        
+        self.assertEqual(data,wf)
+
+    def testWavefrontDecomposition(self):
+        paramt = {
+        'numPupilx' : 11,
+        'numPupily' : 11,
+        'numImagx' : 50,
+        'numImagy' : 50,
+        'noApertx': 5,
+        'noAperty': 5
+        }
+        zernikeModes = [2,4,21]
+        zernikeWeights = [0.5,0.25,-0.6]
+        
+        zw = ZernikeWave()
+        zw.addMode(zernikeModes, zernikeWeights)
+        wf = zw.createWavefront(paramt['numImagx'],paramt['numImagy'])
+        Z,A = zw.decomposeWavefront(wf)
+        
+        testResult = allclose(reshape(A,(1,len(A))), zw.getWeights())
+        self.assertTrue(testResult)
+        
+    def testNollMapping(self):
+        data = load(os.getcwd()+'\Documents\GitHub\pyao\src\WFG\indexTestData.npy')
+        datastr = ""
+        for n in range(1,81):
+            u,v = zernikeIndex(n)
+            datastr = datastr + "%d: (%d,%d) " %(n,u,v)
+        
+        self.assertEqual(data,datastr)
+
+if __name__ == "__main__":
+    unittest.main()
