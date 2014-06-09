@@ -31,10 +31,10 @@ def setup_params():
         }    
         
 	paramsSensor = {
-	# Number of samples of the incoming phase on the pupil plane
+	# number of samples in the pupil plane
 	'numPupilx' : 100,
 	'numPupily' : 100,
-	# number of samples in the imaging plane
+	# number of samples in the imaging plane(s)
 	'numImagx' : 100,
 	'numImagy' : 100,
 	# number of apertures in the wfs
