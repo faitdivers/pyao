@@ -50,6 +50,8 @@ def setup_params():
 	# Lenslet centers [m]
 	'lensCentx' : array([ 0.00015,  0.00046,  0.00077,  0.00108,  0.00139]),
 	'lensCenty' : array([ 0.00015,  0.00046,  0.00077,  0.00108,  0.00139]),
+	# Support factor used for support size [m] = support factor x diameter lenslet
+	'supportFactor' : 6,	
 	}
 
     paramsActuator = {

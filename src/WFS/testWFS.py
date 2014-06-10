@@ -7,8 +7,32 @@ import matplotlib.pyplot as pl
 from mpl_toolkits.mplot3d import Axes3D
 from scipy import interpolate
 from mainWFS import * 
-import sys; sys.path.insert(0, '../')
-from main import setup_params
+
+paramsSensor = {
+	# number of samples in the pupil plane
+	'numPupilx' : 200,
+	'numPupily' : 200,
+	# number of samples in the imaging plane(s)
+	'numImagx' : 200,
+	'numImagy' : 200,
+	# number of apertures in the wfs
+	'noApertx': 10,
+	'noAperty': 10,
+	# Focal Length [m]
+	'f' : 18.0e-3,
+	# Diameter of aperture of single lenslet [m]	
+	'D' : 300.0e-6, 
+	# Wavelength [m]	
+	'lam' : 630.0e-9, 	
+	# Width of the lenslet array [m]
+	'lx' : 1.54e-3,
+	'ly' : 1.54e-3,
+	# Lenslet centers [m]
+	'lensCentx' : array([ 0.00015,  0.00046,  0.00077,  0.00108,  0.00139]),
+	'lensCenty' : array([ 0.00015,  0.00046,  0.00077,  0.00108,  0.00139]),
+	# Support factor used for support size [m] = support factor x diameter lenslet
+	'supportFactor' : 5,
+	}
 	
 def createTestPhase(paramsSensor):
 	# Unwrap paramsSensor
@@ -45,9 +69,6 @@ def createTestPhase(paramsSensor):
 	return Xo,Yo,phaseIn
 
 # Run test
-# Get parameters.
-parameters = setup_params()
-paramsSensor = parameters['Sensor'];
 # Create a icident phase
 Xo,Yo,phaseIn = createTestPhase(paramsSensor)
 # Plot the incident pahse
@@ -59,11 +80,11 @@ ax.set_ylabel('y')
 ax.set_zlabel('Phase')
 pl.show()
 # Create the intensity distribution
-Xi,Yi,Ii = wfs(phaseIn, paramsSensor)
+X,Y,Ii = wfs(phaseIn, paramsSensor)
 # Plot the intensity distribution
-Ximm = Xi*1000.0
-Yimm = Yi*1000.0
+Xmm = X*1000.0
+Ymm = Y*1000.0
 figIi = pl.figure()
-conNum = pl.pcolor(Ximm,Yimm,Ii)
+conNum = pl.pcolor(Xmm,Ymm,Ii)
 pl.title('Numerical Solution (mm)')
 pl.show()
