@@ -17,16 +17,6 @@ from phaseScreen import *
 # in order to make a discretization of the wavefront. Further the parameter debug can be specified
 # if a plot of the constructed wavefront is desired. 
 
-def wfg(params, zernikeModes, zernikeWeights, debug=False):
-	zw = ZernikeWave()
-	zw.addMode(zernikeModes, zernikeWeights)
-	waveFrontPhi = zw.createWavefront(params['Nx'],params['Ny'])
-	
-	# When calling with debug = true, plot the created wavefront if desired, so you can see what is done.
-	if debug:
-		zw.plotWavefront(params['Nx'],params['Ny'])
-
-	return waveFrontPhi
 def wfg(params, wavefrontParams,debug = False):
     waveFrontPhi = numpy.zeros((params['Nx'],params['Ny']))
     
