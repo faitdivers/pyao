@@ -1,0 +1,73 @@
+\documentclass[]{article}
+
+% Package
+\usepackage{amsmath}
+\usepackage{breqn}
+\usepackage[english]{babel}
+\usepackage{graphicx}
+%\graphicspath{figures/}
+
+%opening
+\title{SC4045: Deformable Mirror}
+\author{Yudha Prawira Pane - 4321499}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+
+\end{abstract}
+
+\section{Constructing H Matrix}
+The $ H $ matrix is constructed by calculating the influence function $ S(x,y) $ for each of its element. The function is formulated as follows:
+\begin{dmath}
+S(x,y) = \left\lbrace \frac{w_1}{2\pi \sigma^2_1}exp\left[\frac{-((x-x_{act}[i])^2 + (x-y_{act}[i])^2)}{2\sigma^2_1} \right]  +  \frac{w_2}{2\pi \sigma^2_2}exp\left[\frac{-((x-x_{act}[i])^2 + (x-y_{act}[i])^2)}{2\sigma^2_2} \right] \right\rbrace 0.470 \mu m
+\end{dmath}
+
+$ x_{act}[i] $ and $ y_{act}[i] $ is $ x $ and $ y $ coordinate $ i $-th actuator. This function basically looks like a 2D gaussian distribution whose mean is the position of the actuators (assuming position as a point) and variance are $ \sigma_1 $ and $ \sigma_2 $. To get an insight about the mirror's shape, figure  is what the mirror looks like when one of the actuators is "poked".
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.7\linewidth]{figures/fig1}
+\caption{Mirror shape when one actuator is "poked'}
+\label{fig1}
+\end{figure}
+
+\section{Estimating the Best Actuators Input}
+The deformable mirror's phase $ \phi_{\text{DM}} $ and actuator inputs u is related according the following equation:
+\begin{equation}
+\phi_{\text{DM}} = Hu
+\label{eqdm}
+\end{equation}
+where $ \phi_{\text{DM}} \in \mathcal{R}^m $, $ u = \in \mathcal{R}^n $, $ H \in \mathcal{R}^{mxn} $ and $ m>n $.
+
+Now, given an estimated $ \hat{\phi} $ from the wavefront reconstruction, calculate $u$ that best approximates this wavefront using linear least square principle.
+
+\begin{equation}
+u = (H^\top H)^{-1}H^\top \hat{\phi}
+\end{equation}
+
+Therefore, $ \phi_{\text{DM}} $ is then obtained by  \eqref{eqdm}.
+
+\section{Hard-coded Example}
+
+To demonstrate that the method above indeed works, the following scenario is hard-programmed. First, the number of wavefront samples and its spacing is determined as 144 and 8.46$ \mu $m respectively. Second, the wavefront is generated based on a random function and fed to the DM block. The number of wavefront samples (144) is larger than the number of actuators (100). The incoming wavefront and actuators are positioned as shown in figure \ref{fig2} by assuming that the mirror has a rectangular shape or is rectangular shaped.
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.7\linewidth]{figures/fig2}
+\caption{Position of actuators (blue) and wavefront sensors (red)}.
+\label{fig2}
+\end{figure}
+
+The optimal estimate for the actuators input according to least square sense is then calculated. Subsequently, this value is used to calculate $ \phi_{\text{DM}} $. The surface of the deformable mirror which approximates the wavefront is shown in figure below.
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=1\linewidth]{figures/fig3}
+\caption{Deformable mirror shape as an estimate of reconstructed wavefront}.
+\label{fig3}
+\end{figure}
+
+\end{document}
