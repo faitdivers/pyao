@@ -303,6 +303,57 @@ $ min_x \ \ \epsilon^T \epsilon $, subjected to $ s=G\phi + L\epsilon$
 where $E[\phi\phi^T]=C_\phi$ and $LL^T=C_n$. The solution is given by:
 $$\hat{\phi} = C_\phi G^T(GC_\phi G^T + C_n)^{-1}S $$
 
+\newpage
+\section{Modal reconstruction}
+In the previous chapter we have tried to reconstruct the wavefront using the zonal approach. Now we view another techinque, the modal wavefront reconstruction. In modal reconstruction, we use a linear combination of basis polynomials over the entire apertue. These basis polynomials can be Zernike polynomials, Karhunen-Loeve functions, Legendre polynomials and Fourier series. In this report we will stick to the use of Zernike polynomials, as they are also used in the wavefront generation part. 
 
+\subsection{Zernike polynomials}
+In the case of modal reconstruction, we can express the wavefront as followed:
+$$
+\phi (x,y) = \sum_{k=0}^{M}a_kZ_k(x,y), 
+$$
+Where $a_k$ is the coeffecient that needs to be calculated and $Z_k$ is the basis polynomial, in our case the Zernike polynomial. THe Zernike polynomial is defined as followed:
+$$
+Z_u^v(\rho,\theta) = \sqrt{\frac{2(u+1)}{1+\delta(v,0)}}\sum_{s=0}^{\frac{u-v}{2}}\frac{(-1)^s(u-s)!}{s!(\frac{u+v}{2}-s)!(\frac{u-v}{2}-s)!}
+\rho^{u-2s}cos(v\theta),
+$$
+with $\delta(v,0)$ the Kronecker Delta that is equal to 1 if v = 0 and zero otherwise. In the definition above, we used polar notation but with a slight abuse of notation, we can represent the wavefront as:
+$$
+\phi (x,y,\xi) = \sum_{u=0}^{u_{max}}\sum_{v=0}^{v_{max}}z_{uv}Z_u^v(x,y),
+$$
+with $\xi$ the vector containing all the coefficients $z_{uv}$.
+Now we can represent the wavefront in terms of a polynomial, but the only information that is given by the wavefront sensor is the slope. Therefor we need to take a look at the spatial derivates of the Zernike polynomials:
+$$
+\frac{\partial \phi(x,y)}{\partial x} = \sum_{u,v}z_{u,v}\frac{\partial Z_u^v(x,y)}{\partial x},
+$$
+$$
+\frac{\partial \phi(x,y)}{\partial y} = \sum_{u,v}z_{u,v}\frac{\partial Z_u^v(x,y)}{\partial y}.
+$$
+Again, we can write this set of equations more effectivly into the following matrix notation:
+$$
+\begin{bmatrix}
+\sigma_x(i,j) \\
+\sigma_y(i,j)
+\end{bmatrix}
+=
+\begin{bmatrix}
+\sum_{u,v}z_{u,v}\frac{\partial Z_u^v(x,y)}{\partial x} \\
+\sum_{u,v}z_{u,v}\frac{\partial Z_u^v(x,y)}{\partial y}
+\end{bmatrix}
++
+\begin{bmatrix}
+\eta_x(i,j) \\
+\eta_y(i,j)
+\end{bmatrix}
+$$
+Or we write in matrix notation:
+$$
+S = B\xi + \eta
+$$
+\subsection{Least squares estimations}
+The set of equations which are obtained, are quiet similat to those derived from the zonal reconstruction. In that view, we can use the same technique to approximate the wavefront. This gives us the following solution to the least squares problem:
+$$
+\hat{\xi} = (B^TB)^{-1}B^TS 
+$$
 
 \end{document}
