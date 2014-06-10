@@ -1,6 +1,7 @@
 from numpy import *
 from scipy import *
 from zernike import *
+from phaseScreen import *
 
 # Create a wavefront, comprising of a sum of zernike modes, with their respective weithings.
 # Syntax:
@@ -19,10 +20,46 @@ from zernike import *
 def wfg(params, zernikeModes, zernikeWeights, debug=False):
 	zw = ZernikeWave()
 	zw.addMode(zernikeModes, zernikeWeights)
-	waveFrontPhi = zw.createWavefront(params['numImagx'],params['numImagy'])
+	waveFrontPhi = zw.createWavefront(params['Nx'],params['Ny'])
 	
 	# When calling with debug = true, plot the created wavefront if desired, so you can see what is done.
 	if debug:
-		zw.plotWavefront(params['numImagx'],params['numImagy'])
+		zw.plotWavefront(params['Nx'],params['Ny'])
 
 	return waveFrontPhi
+def wfg(params, wavefrontParams,debug = False):
+    waveFrontPhi = numpy.zeros((params['Nx'],params['Ny']))
+    
+    #Zernike
+    if 'zernike' in wavefrontParams:
+        zernikeModes = wavefrontParams['zernikeModes']
+        zernikeWeights = wavefrontParams['zernikeWeights']
+        
+        zw = ZernikeWave()
+	zw.addMode(zernikeModes, zernikeWeights)
+	waveFrontPhi = waveFrontPhi + zw.createWavefront(params['Nx'],params['Ny'])
+        
+        if debug:
+	   zw.plotWavefront(params['Nx'],params['Ny'])
+    
+    if 'Kolmogorov' in wavefrontParams:
+        phaseScreenParams = wavefrontParams['phaseScreenParams']
+        ps = PhaseScreen()
+        ps.setType('Kolmogorov')
+        ps.setParams(phaseScreenParams)
+        waveFrontPhi = waveFrontPhi + ps.createWavefront(params['Nx'],params['Ny'])
+        
+        if debug:
+	   ps.plotWavefront(params['Nx'],params['Ny'])
+
+    if 'vonKarman' in wavefrontParams:
+        phaseScreenParams = wavefrontParams['phaseScreenParams']
+        ps = PhaseScreen()
+        ps.setType('vanKarman')
+        ps.setParams(phaseScreenParams)
+        waveFrontPhi = waveFrontPhi + ps.createWavefront(params['Nx'],params['Ny'])
+        
+        if debug:
+	   ps.plotWavefront(params['Nx'],params['Ny'])
+        				
+    return waveFrontPhi
