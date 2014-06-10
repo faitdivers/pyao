@@ -62,8 +62,9 @@ def setup_params():
 
     simulationParameters = {
     'frequency': 10,       # Frequency of the simulation in Hertz
-    'time': 10,             # Simulated time in seconds
-    'is_closed_loop': False
+    'time': 10,            # Simulated time in seconds
+    'delay': 0,  # Delay in number of samples
+    'is_closed_loop': True
     }
 
     # other sets of parameters may be defined if necessary
@@ -79,7 +80,7 @@ def setup_params():
     return parameters
 
 
-def runClosedLoop(parameters, iterations):
+def runClosedLoop(parameters, iterations, buffer_size):
     """ Run a closed-loop simulation
 
     The closed-loop simulation consists of
@@ -102,8 +103,8 @@ def runClosedLoop(parameters, iterations):
     # The first deformable mirror effect: (No effect)
     wfDM = dm(0, sensorParameters)
 
-    delay_buffer = LatencyBuffer(1, [sensorParameters['numPupilx'],
-                                     sensorParameters['numPupilx']])
+    delay_buffer = LatencyBuffer(buffer_size, (sensorParameters['numPupilx'],
+                                     sensorParameters['numPupilx']))
     for i in range(0, iterations):
         print("Running simulation step %d" % (i))
         wf = wfg(sensorParameters, wavefrontParameters['zernikeModes'],
@@ -118,7 +119,7 @@ def runClosedLoop(parameters, iterations):
     return
 
 
-def runOpenLoop(parameters, iterations):
+def runOpenLoop(parameters, iterations, buffer_size):
     """ Run an open-loop simulation
 
     The open-loop simulation consists of
@@ -136,6 +137,8 @@ def runOpenLoop(parameters, iterations):
     sensorParameters = parameters['Sensor']
     actuatorParameters = parameters['Actuator']
 
+    delay_buffer = LatencyBuffer(buffer_size, (sensorParameters['numPupilx'],
+                                     sensorParameters['numPupilx']))
     print("Running open loop simulation")
     # The first deformable mirror effect: (No effect)
     wfDM = dm(0, sensorParameters)
@@ -148,7 +151,7 @@ def runOpenLoop(parameters, iterations):
         intensities = wfs(wfRes, sensorParameters)
         centroids = centroid(intensities, sensorParameters)
         wfRec = wfr(centroids, sensorParameters)
-        
+        wfRec = delay_buffer.update(wfRec)
         wfDM = dm(0, sensorParameters)
     return
 
@@ -161,10 +164,12 @@ def run_simulation(parameters):
     iterations = (simulation_parameters['frequency'] *
                   simulation_parameters['time'])
 
+    delay_buffer_size = simulation_parameters['delay'] + 1
+
     if simulation_parameters['is_closed_loop']:
-        runClosedLoop(parameters, iterations)
+        runClosedLoop(parameters, iterations, delay_buffer_size)
     else:
-        runOpenLoop(parameters, iterations)
+        runOpenLoop(parameters, iterations, delay_buffer_size)
 
 
 parameters = setup_params()
