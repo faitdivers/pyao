@@ -97,11 +97,9 @@ class PhaseScreen:
             Fx, Fy = np.meshgrid(fx,fx)
             Rf, Tf = supp.cart2pol(Fx,Fy)
             
-            print Rf
-            print r0
-            
             # Kolmogorov
-            PSD_phi = 0.023*r0**(-5/3) * Rf**(-11/3)
+            Rf[1,1] = 1 # To prevent divide by zero error messages, not used anyways
+            PSD_phi = 0.023*r0**(-5./3.) * Rf**(-11./3.)
             PSD_phi[1,1] = 0
                                     
             cn = (np.array(np.random.randn(3,3)) + np.array(np.random.randn(3,3))*1j) * np.sqrt(PSD_phi) * delta_f
@@ -135,7 +133,8 @@ class PhaseScreen:
             Rf, Tf = supp.cart2pol(Fx,Fy)
                     
             #von Karman
-            PSD_phi = (0.023*r0**(-5/3)* np.exp(-(Rf/fm)**2)) / ((Rf**2 + f0**2)**(11/6))
+            Rf[1,1] = 1 # To prevent divide by zero error messages, not used anyways
+            PSD_phi = (0.023*r0**(-5./3.)* np.exp(-(Rf/fm)**2)) / ((Rf**2 + f0**2)**(11./6.))
             PSD_phi[1,1] = 0
                                     
             cn = (np.array(np.random.randn(3,3)) + np.array(np.random.randn(3,3))*1j) * np.sqrt(PSD_phi) * delta_f

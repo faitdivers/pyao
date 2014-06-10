@@ -18,38 +18,38 @@ from phaseScreen import *
 # if a plot of the constructed wavefront is desired. 
 
 def wfg(params, wavefrontParams,debug = False):
-    waveFrontPhi = numpy.zeros((params['Nx'],params['Ny']))
+    waveFrontPhi = numpy.zeros((params['numPupilx'],params['numPupily']))
     
     #Zernike
     if 'zernike' in wavefrontParams:
-        zernikeModes = wavefrontParams['zernikeModes']
-        zernikeWeights = wavefrontParams['zernikeWeights']
+        zernikeModes = wavefrontParams['zernike']['zernikeModes']
+        zernikeWeights = wavefrontParams['zernike']['zernikeWeights']
         
         zw = ZernikeWave()
 	zw.addMode(zernikeModes, zernikeWeights)
-	waveFrontPhi = waveFrontPhi + zw.createWavefront(params['Nx'],params['Ny'])
+	waveFrontPhi = waveFrontPhi + zw.createWavefront(params['numPupilx'],params['numPupily'])
         
         if debug:
-	   zw.plotWavefront(params['Nx'],params['Ny'])
+	   zw.plotWavefront(params['numPupilx'],params['numPupily'])
     
-    if 'Kolmogorov' in wavefrontParams:
-        phaseScreenParams = wavefrontParams['phaseScreenParams']
+    if 'kolmogorov' in wavefrontParams:
+        phaseScreenParams = wavefrontParams['kolmogorov']
         ps = PhaseScreen()
         ps.setType('Kolmogorov')
         ps.setParams(phaseScreenParams)
-        waveFrontPhi = waveFrontPhi + ps.createWavefront(params['Nx'],params['Ny'])
+        waveFrontPhi = waveFrontPhi + ps.createWavefront(params['numPupilx'],params['numPupily'])
         
         if debug:
-	   ps.plotWavefront(params['Nx'],params['Ny'])
+	   ps.plotWavefront(params['numPupilx'],params['numPupily'])
 
-    if 'vonKarman' in wavefrontParams:
-        phaseScreenParams = wavefrontParams['phaseScreenParams']
+    if 'vonkarman' in wavefrontParams:
+        phaseScreenParams = wavefrontParams['vonkarman']
         ps = PhaseScreen()
-        ps.setType('vanKarman')
+        ps.setType('vonKarman')
         ps.setParams(phaseScreenParams)
-        waveFrontPhi = waveFrontPhi + ps.createWavefront(params['Nx'],params['Ny'])
+        waveFrontPhi = waveFrontPhi + ps.createWavefront(params['numPupilx'],params['numPupily'])
         
         if debug:
-	   ps.plotWavefront(params['Nx'],params['Ny'])
+	   ps.plotWavefront(params['numPupilx'],params['numPupily'])
         				
     return waveFrontPhi
