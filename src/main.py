@@ -9,6 +9,7 @@ from Centroid.mainCentroid import *
 from WFR.mainWFR import *
 from Control.mainControl import *
 from DM.mainDM import *
+from Simulation.LatencyBuffer import LatencyBuffer
 
 
 def setup_params():
@@ -101,6 +102,8 @@ def runClosedLoop(parameters, iterations):
     # The first deformable mirror effect: (No effect)
     wfDM = dm(0, sensorParameters)
 
+    delay_buffer = LatencyBuffer(1, [sensorParameters['numPupilx'],
+                                     sensorParameters['numPupilx']])
     for i in range(0, iterations):
         print("Running simulation step %d" % (i))
         wf = wfg(sensorParameters, wavefrontParameters['zernikeModes'],
@@ -109,6 +112,7 @@ def runClosedLoop(parameters, iterations):
         intensities = wfs(wfRes, sensorParameters)
         centroids = centroid(intensities, sensorParameters)
         wfRec = wfr(centroids, sensorParameters)
+        wfRec = delay_buffer.update(wfRec)
         actCommands = control(wfRec, actuatorParameters)
         wfDM = dm(actCommands, sensorParameters)
     return
@@ -144,6 +148,7 @@ def runOpenLoop(parameters, iterations):
         intensities = wfs(wfRes, sensorParameters)
         centroids = centroid(intensities, sensorParameters)
         wfRec = wfr(centroids, sensorParameters)
+        
         wfDM = dm(0, sensorParameters)
     return
 
