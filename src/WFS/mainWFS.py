@@ -31,8 +31,7 @@ def wfs(phaseIn, paramsSensor):
 	dy = ly/(Ny - 1.0) # Sample length on y-axis [m]
 	x = arange(0.0, lx + dx, dx) # Sample positions on x-axis [m]
 	y = arange(0.0, ly + dy, dy) # Sample positions on y-axis [m]
-	X, Y = meshgrid(x, y) # Create spatial grid
-	Ii = zeros((size(X, 0),size(X, 1))) # Intensity distribution
+	Ii = zeros((size(x),size(y))) # Intensity distribution
 
 	# Create support grid in the pupil plane for each lens
 	xSup = arange(-supD/2,supD/2 + dx, dx) # Sample positions on x-axis [m]
@@ -42,18 +41,20 @@ def wfs(phaseIn, paramsSensor):
 	dfft = lam*f/supD # Sample length [m]
 	xfft = arange(-lam*f/2.0/dx, lam*f/2.0/dx + dfft, dfft) # Sample positions[m]
 	Xfft, Yfft = meshgrid(xfft, xfft) # Create spatial grid
-
+	
+	# Calculate pupil function
+	P = sqrt(XSup**2.0 + YSup**2.0) <= D/2.0 # Pupil function
+	
 	# Compute the intensity distribution on the image plane
 	for ii in xrange(size(lensCentx)): # Run through lenslet array
 		# Extract phase plate and get corresponding spatial coordinates
-		phasePlate, xPhase, yPhase, XPhase, YPhase = extractPhasePlate(lensCentx[ii],
+		phasePlate, xPhase, yPhase = extractPhasePlate(lensCentx[ii],
 			lensCenty[ii], D, phaseIn, x, y, dx, dy)	
 		
 		# Calculate the average phase tilt and preproces the phase plate
-		phasePlate, xShift, yShift = tiltPhasePlate(phasePlate, k, f, XPhase, YPhase, dx, dy)
+		phasePlate, xShift, yShift = tiltPhasePlate(phasePlate, k, f, xPhase, yPhase, dx, dy)
 		
-		# Calculate the pupil function and the fft
-		P = sqrt(XSup**2.0 + YSup**2.0) <= D/2.0 # Pupil function
+		# Calculate the fft of the complex amplitude behind the lens
 		phaseInterp = interpolate.interp2d(xPhase, yPhase, phasePlate, kind='cubic') # Create interpolation function
 		phasePlate = phaseInterp(xSup, xSup) # Insert phase grid into the support grid
 		Uin = exp(1j*phasePlate) # Caculate the complex amplitude from the phase 
@@ -69,7 +70,7 @@ def wfs(phaseIn, paramsSensor):
 		IiPlate = IiInterp(x, y) # Insert support grid into the image plane grid
 		Ii = Ii + IiPlate # Collect single lens patterns
 	Ii = Ii/amax(absolute(Ii)) # Normalize intensity distribution
-	return X, Y, Ii
+	return x, y, Ii
  
 	
 def extractPhasePlate(lensCentx, lensCenty, D, phaseIn, x, y, dx, dy):
@@ -84,14 +85,13 @@ def extractPhasePlate(lensCentx, lensCenty, D, phaseIn, x, y, dx, dy):
       # Extract phase plate
 	xPhase = arange(phPlateStx,phPlateEndx + dx, dx) # Sample positions on x-axis [m]
 	yPhase = arange(phPlateSty,phPlateEndy + dy, dy) # Sample positions on y-axis [m]
-	XPhase, YPhase = meshgrid(xPhase, yPhase) # Create spatial grid
 	phaseInterp = interpolate.interp2d(x,y,phaseIn,kind='cubic') # Create interpolation function
 	phasePlate = phaseInterp(xPhase,yPhase) # Create phase plate for individual lenslet
 	
-	return phasePlate, xPhase, yPhase, XPhase, YPhase
+	return phasePlate, xPhase, yPhase
 	
 	
-def tiltPhasePlate(phasePlate, k, f, XPhase, YPhase, dx, dy):
+def tiltPhasePlate(phasePlate, k, f, xPhase, yPhase, dx, dy):
 	# Compesates tilt in the phase plate and gives the postion shifts for the diffraction pattern	
 	
 	# Calculate the average phase tilt and preproces the phase plate
@@ -102,6 +102,7 @@ def tiltPhasePlate(phasePlate, k, f, XPhase, YPhase, dx, dy):
 	phi = arctan(Gy/k) # Incident angle with respect to the y-axis [rad]
 	xShift = tan(theta)*f # The spatial shift caused by the incident angle over the x-axis [m]
 	yShift = tan(phi)*f # The spatial shift caused by the incident angle over the y-axis [m]
+	XPhase, YPhase = meshgrid(xPhase, yPhase) # Create spatial grid
 	phaseTilt = (Gx*XPhase + Gy*YPhase) # The phase that causes the tilt
 	phasePlate = phasePlate - phaseTilt # Preprocessed phase plate
 	
