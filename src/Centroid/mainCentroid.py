@@ -24,21 +24,20 @@ def centroid(intensities, paramsSensor):
     f = paramsSensor['f'] # Focal length [m]
     noApertx = paramsSensor['noApertx'] # number of apertures in x axis
     noAperty = paramsSensor['noAperty'] # number of apertures in y axis
-    Nx = paramsSensor['Nx'] # Samples on the x-axis per lenslet
-    Ny = paramsSensor['Ny'] # Samples on the y_axis per lenslet
+    numImagx = paramsSensor['numImagx'] # Samples on the x-axis per lenslet
+    numImagy = paramsSensor['numImagy'] # Samples on the y_axis per lenslet
     
     # defining the threshold for centroid algorithm method
     maxintensity = intensities.max()
     trshld = maxintensity*threshold
       
     # pixel size
-    # (Nx*noApertx) and (Ny*noAperty) = number of pixel for the whole image in x and y direction respt.
-    dx = lx/(Nx*noApertx)                       # pixel size in x direction
-    dy = ly/(Ny*noAperty)                       # pixel size in y direction
+    dx = lx/numImagx                      # pixel size in x direction
+    dy = ly/numImagy                      # pixel size in y direction
 
     # ideal centroid spot in pixel
-    pixlensCentx = [round(z/dx) for z in lensCentx] # round() is used because in pixel
-    pixlensCenty = [round(z/dy) for z in lensCenty] # round() is used because in pixel
+    pixlensCentx = [(round(z/dx)-1) for z in lensCentx] # round() is used because in pixel, -1 used as the index in python starts at 0
+    pixlensCenty = [(round(z/dy)-1) for z in lensCenty] # round() is used because in pixel, -1 used as the index in python starts at 0
     idealCenter = [pixlensCentx,pixlensCenty]     # make a vector of pixlensCentx and pixlensCenty
     idealCenter = np.asarray(idealCenter)
     idealCenter = idealCenter.reshape((2,noApertx*noAperty))
@@ -47,16 +46,32 @@ def centroid(intensities, paramsSensor):
     # The region of interest of matrix intensities is determined in a loop process.    
     
     # initialize the centroidvector
-    centroidvector = zeros((noApertx*noAperty,2))
-    # Loop process for defining region of interest and calculating centroid
-    for q in range(noAperty): 
-        for r in range(noApertx):
-            IntensitiesofInterst = intensities[range((Ny*q),(Ny*(q+1))),(r*Nx):(Nx*(r+1))]
-            #IntensitiesofInterst = np.asarray(IntensitiesofInterst)
-            centroid = findCentroid(IntensitiesofInterst,trshld)
-            centroid[0]=centroid[0]+r*Nx
-            centroid[1]=centroid[1]+q*Ny
-            centroidvector[(q*noAperty)+r] = centroid
+    centroidvector = zeros((len(pixlensCentx),2))
+    
+    noApertures =  int(len(idealCenter[0])) 
+    
+    # Finding the width of region of interest
+    # With the assumsion distance between center to its nearest center are all same
+    # If function is used to distinguish whether the center is on the edge of the geometry
+    if (pixlensCentx[2]-pixlensCentx[1])==(pixlensCentx[3]-pixlensCentx[2]):
+        width = int(pixlensCentx[2]-pixlensCentx[1])
+    else:
+        width = int(pixlensCentx[3]-pixlensCentx[2])
+    
+    # The iteration for center in each aperture
+    for k in range(noApertures):
+        # Region of Interest:
+        xbegin = int(pixlensCentx[k]-(width/2)+1)
+        xend = int(pixlensCentx[k]+(width/2)+1)
+        ybegin = int(pixlensCenty[k]-(width/2)+1)
+        yend = int(pixlensCenty[k]+(width/2)+1)
+        # Matrix of Interest
+        IntensitiesofInterst = intensities[range(int(xbegin),int(xend)),ybegin:yend]
+        # Calculating centroid
+        centroid = findCentroid(IntensitiesofInterst,trshld)
+        centroid[0]=centroid[0]+xbegin
+        centroid[1]=centroid[1]+ybegin
+        centroidvector[k] = centroid
     
     # Transpose of centroidvector to make the dimension same as idealCenter matrix
     centroidvector = np.transpose(centroidvector)
@@ -70,7 +85,7 @@ def centroid(intensities, paramsSensor):
     slopevector = np.asarray(slopevector)
     slopevector = np.transpose(slopevector)
     slopevector = slopevector.reshape((1,2*noApertx*noAperty))
-	
+            
     return slopevector  
 
 def findCentroid(matrix,trshld):
@@ -90,7 +105,7 @@ def findCentroid(matrix,trshld):
                 Sum += 1
                 
     # Compute the centroid using mean    
-    Centroid = ([float(Mx)/Sum,float(My)/Sum])
+    Centroid = ([Mx/Sum,My/Sum])
     
     # return of function
     return Centroid

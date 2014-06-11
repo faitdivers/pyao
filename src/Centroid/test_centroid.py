@@ -10,11 +10,11 @@ def setup_params():
         
     paramsSensor = {
     # number of samples in the pupil plane
-    'numPupilx' : 25, # Not used in WFS
-    'numPupily' : 25, # Not used in WFS
+    'numPupilx' : 100, # Not used in WFS
+    'numPupily' : 100, # Not used in WFS
     # number of samples in the imaging plane(s)
-    'numImagx' : 25, # Not used in WFS
-    'numImagy' : 25, # Not used in WFS
+    'numImagx' : 100, # Not used in WFS
+    'numImagy' : 100, # Not used in WFS
     # number of apertures in the wfs
     'noApertx': 5, # Not used in WFS
     'noAperty': 5, # Not used in WFS
@@ -51,3 +51,4 @@ def test_centroid():
     return centroids
  
 slopevector = test_centroid()
+
