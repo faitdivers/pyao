@@ -1,0 +1,3 @@
+\section{The Intensity Distribution of a Lenslet Array}
+Every intensity distribution of a lenslet is calculated separately by the procedure discussed above in Sections \ref{sec:FrApprox} and \ref{sec:DFT}.
+If the incident rays enter on a to big angle, the FFT will be incorrect. To solve this, the average tilt of the incident phase on a lenslet is calculated. From this tilt a shift of the intensity distribution can be calculated. Putting this into a loop we calculate every intensity distribution of every lenslet with the correct coordinates. Then the distributions are interpolated on a grid that represent the Charge-Couple Device (CCD) giving the complete intensity distribution. 
