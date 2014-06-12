@@ -22,6 +22,7 @@ In short the procedure is:
 	\item doing a DFT on this matrix and multiplying it with the sample spacings $\Delta x$ and $\Delta y$,
 	\item plotting the resulting matrix of size $(N_x,N_y)$ at points $(f_k,f_l)$ in the spatial frequency space.
 \end{enumerate}
+The numerical calculation of the diffraction pattern is now easily done by applying the FFT to $U_i(\xi,\eta)P(\xi,\eta)$ adding the multiplicative factor as seen in Equation \eqref{eq:fresnel} and setting $(f_k=\frac{x_k}{\lambda z},f_l=\frac{y_l}{\lambda z})$. The intensity distribution is then found by taking the modulus squared.
 
 \subsection{Analytic and Numerical Solutions}
 In figure \ref{fig:num_vs_an} the difference is seen between the numerical solved diffraction pattern and the analytically solved diffraction pattern. Clearly the two are almost identically except for the outer rings where the flaws of numerical computation are seen through the not disk like shape in the airy function. Because only the first few orders of the airy disk are important this is a good approximation to be used for calculating the centroids. 

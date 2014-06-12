@@ -32,7 +32,8 @@ P(\xi,\eta)= \begin{cases} 1 & \text{inside the aperture} \\ 0 & \text{otherwise
 \end{equation}
 Moreover the exponential function in Equation \eqref{eq:dis_behind_lens}, is the phase change introduced by the lens with focal length $f$. Using the Fresnel diffraction formula the field distribution in the back focal plane of the lens can be found as
 \begin{equation}
-U_f(x,y)=\frac{e^{jkf}e^{j\frac{k}{2f}(x^2+y^2)}}{j\lambda f}\iint\limits_{-\infty}^{~~~\infty} \left. U_i(\xi,\eta)P(\xi,\eta)e^{-j2\pi(f_X\xi+f_Y\eta)}d\xi d\eta \right|_{f_X=\frac{x}{\lambda z},f_Y=\frac{y}{\lambda z}}.
+U_f(x,y)=\frac{e^{jkf}e^{j\frac{k}{2f}(x^2+y^2)}}{j\lambda f}\iint\limits_{-\infty}^{~~~\infty} \left. U_i(\xi,\eta)P(\xi,\eta)e^{-j2\pi(f_X\xi+f_Y\eta)}d\xi d\eta \right|_{f_X=\frac{x}{\lambda f},f_Y=\frac{y}{\lambda f}}.
+\label{eq:fresnel}
 \end{equation}
 Hence the complex amplitude field distribution in the back focal plane of the lens is simply the Fraunhofer diffraction pattern seen in Equation \eqref{eq:fraunhofer}, but with the propagation distance $f$ instead of $z$. Thus the Fraunhofer diffraction patterns can be observed although not satisfying the before discussed conditions \eqref{eq:strong_con} and \eqref{eq:normal_con}. The real interest is the intensity across the focal plane and is computed by
 \begin{equation}

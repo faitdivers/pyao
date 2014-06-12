@@ -1,3 +1,46 @@
 \section{The Intensity Distribution of a Lenslet Array}
 Every intensity distribution of a lenslet is calculated separately by the procedure discussed above in Sections \ref{sec:FrApprox} and \ref{sec:DFT}.
 If the incident rays enter on a to big angle, the FFT will be incorrect. To solve this, the average tilt of the incident phase on a lenslet is calculated. From this tilt a shift of the intensity distribution can be calculated. Putting this into a loop we calculate every intensity distribution of every lenslet with the correct coordinates. Then the distributions are interpolated on a grid that represent the Charge-Couple Device (CCD) giving the complete intensity distribution. 
+
+The precise procedure for the calculation of the normalized intensity distribution of a lenslet array goes as followed:
+\begin{enumerate}
+	\item 
+	A spatial grid ($x_t,y_t$)  with the dimension $l_x \times l_y$ of the lenslet array is created to contain the intensity distribution in the focal plane. This grid has the same sample spacings $\Delta x$ and $\Delta y$ as the incident wavefront on the lenslet array.
+	\item
+	A spatial support gird ($\xi_{sup},\eta_{sup}$) with the dimension $L\times L$ is created, where $L$ can be adjusted to get a high enough sampled diffraction spot per lenslet. The sample spacing is taken as $\Delta x$ because it is a square grid.
+	\item
+	A spatial grid ($x_{sup},y_{sup}$) with the dimension $\frac{\lambda f}{\Delta x} \times \frac{\lambda f}{\Delta x}$ is created to contain the FFT needed for the calculation of the diffraction spots. The sample spacing can be obtained by $\Delta x_{sup} = \lambda f/L$.  
+	\item
+	Now for every lenslet the corresponding phase plate $\phi_n(\xi,\eta)$, for $n = 1,2,...,N_{lens}$ where $N_{lens}$ is the number of lenslets, is extracted form the incident phase $\phi(\xi,\eta)$ over the whole lenslet array.
+	\item
+	To avoid problems with aliasing we want the capture the main dynamics of the diffraction pattern in the middle of the grid ($x_{sup},y_{sup}$). This can be done by removing the average phase tilt $\overline{\nabla \phi_n}(\xi,\eta)$ of the phase $\phi_n(\xi,\eta)$, thus the processed phase plate is
+	\begin{equation}
+	\hat{\phi}_n(\xi,\eta) = \phi_n(\xi,\eta) - \overline{\nabla \phi_n}(\xi,\eta).
+	\end{equation}
+	\item
+	Still the shift in the focal plane that is caused by the tilt of the phase has to be applied to the spatial grid ($x_{sup},y_{sup}$). To do this the spatial shifts $\sigma_x$ and $\sigma_y$ needs to be computed from the average phase tilt $\overline{\nabla \phi_i}(\xi,\eta)$. This can be done by
+	\begin{equation}
+	\sigma_x = \frac{\overline{\nabla \phi_n}(\xi,0)}{k}f,~~~\text{and}~~~\sigma_y = \frac{\overline{\nabla \phi_n}(0,\eta)}{k}f.
+	\end{equation}
+	This relation can be confirmed by the calculation of Equation \eqref{eq:fresnel} with oblique incident wavefronts, which applies as long as the incident angles are small.
+	\item
+	Now calculate the complex amplitude of each lenslet in the focal plane. This is done by taking the FFT of $P(\xi,\eta)U_i(\xi,\eta)$, where in this case
+	\begin{equation}
+	U_i(\xi,\eta) = e^{j\hat{\phi}_n(\xi,\eta)}
+	\end{equation}
+	and $P(\xi,\eta)$ is the pupil function. Then multiplying this by the multiplicative factor from Equation \eqref{eq:fresnel}.
+	\item 
+	The complex amplitude $U_f(x_{sup},y_{sup})$ is now known in its relative dimensions for every lenslet and the intensity distribution in the right absolute spatial dimensions per lenslet is now calculated by 
+	\begin{equation}
+	I_f(x,y)=|U_f(x_{sup} - \sigma_x - l_{centre,x},y_{sup} - \sigma_y - l_{centre,y})|^2,
+	\end{equation}
+	where $l_{centre,x}$ and $l_{centre,y}$ is the center position of the lenslet on the x and y-axis respectively.  
+	\item 
+	By interpolation the intensity distributions of every lenslet is collected into the spatial grid ($x_t,y_t$) and normalized as
+	\begin{equation}
+	\tilde{I_t}(x_t,y_t) = \frac{I_t(x_t,y_t)}{||I_t(x_t,y_t)||_\infty}
+	\end{equation}
+	
+\end{enumerate}
+
+
