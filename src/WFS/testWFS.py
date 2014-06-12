@@ -7,6 +7,7 @@ import matplotlib.pyplot as pl
 from mpl_toolkits.mplot3d import Axes3D
 from scipy import interpolate
 from mainWFS import * 
+from lensArrayConfig import *
 
 paramsSensor = {
 	# number of samples in the pupil plane
@@ -32,69 +33,14 @@ paramsSensor = {
 	# Support factor used for support size [m] = support factor x diameter lenslet
 	'supportFactor' : 4,
 	}
-	
-def lensletCentres(paramsSensor):
-	# Unwrap paramsSensor
-	numPupilx = paramsSensor['numPupilx'] # Samples on the x-axis
-	numPupily = paramsSensor['numPupily'] # Samples on the y_axis
-	lx = paramsSensor['lx'] # Width of the lenslet array in the x-direction [m]
-	ly = paramsSensor['ly'] # Width of the lenslet array in the y-direction [m]
-	f = paramsSensor['f'] # Focal length [m]
-	D = paramsSensor['D'] # Lens diameter [m]
-	lam = paramsSensor['lam'] # Wavelength [m]
-	supportFactor = paramsSensor['supportFactor'] # Support factor
-	D = paramsSensor['D'] # Lens diameter [m]
-	dl = paramsSensor['dl'] # Distance between lenslets [m]
-	noApertx = paramsSensor['noApertx'] # number of apertures in the x-direction
-	noAperty = paramsSensor['noAperty'] # number of apertures in the y-direction
-	numImagx = paramsSensor['numImagx'] # Samples on the x-axis
-	numImagy = paramsSensor['numImagy'] # Samples on the y_axis	
-	
-	# Calculated missing parameters in paramsSensor	
-	lensCentx = arange(noApertx)*(dl + D) + D/2 # Centers on x-axis [m]
-	lensCenty = arange(noAperty)*(dl + D) + D/2 # Centers on y-axis [m]
-	lensCentX, lensCentY = meshgrid(lensCentx, lensCenty) # Create rectangular grids for centres [m]
-	lensCentx = hstack(lensCentX) # Stack the rectangular grids [m]
-	lensCenty = hstack(lensCentY) # Stack the rectangular grids [m]
-	lCalx = (noApertx - 1.0)*(dl + D) + D # Calculated length of array in x-direction [m]
-	lCaly = (noAperty - 1.0)*(dl + D) + D # Calculated length of array in y-direction [m]
-	
-	# Set supplied array size to calculated array size if supplied array size
-	# is smaller then the calculated array size
-	if lx < lCalx: 
-		lx = lCalx
-	if ly < lCaly:
-		ly = lCaly
-	
-	# Set new paramsSensor	
-	paramsSensor = {
-		# number of samples in the pupil plane
-		'numPupilx' : numPupilx,
-		'numPupily' : numPupily,
-		# number of samples in the imaging plane(s)
-		'numImagx' : numImagx,
-		'numImagy' : numImagy,
-		# number of apertures in the wfs
-		'noApertx': noApertx,
-		'noAperty': noAperty,
-		# Focal Length [m]
-		'f' : f,
-		# Diameter of aperture of single lenslet [m]	
-		'D' : D, 
-		# Wavelength [m]	
-		'lam' : lam, 	
-		# Width of the lenslet array [m]
-		'lx' : lx,
-		'ly' : ly,
-		# Distance between lenslets [m]	
-		'dl' : dl,	
-		# Normalized lenslet centers
-		'lensCentx' : lensCentx/lx,
-		'lensCenty' : lensCenty/ly,
-		# Support factor used for support size [m] = support factor x diameter lenslet
-		'supportFactor' : supportFactor,
-	}
-	return paramsSensor
+# Compute lenslet centres and check minimal array widths 
+lx, ly, lensCentx, lensCenty = lensletCentres(paramsSensor)
+# Normalized lenslet centers
+paramsSensor['lensCentx'] = lensCentx
+paramsSensor['lensCenty'] = lensCenty
+# Set correct array widths
+paramsSensor['lx'] = lx
+paramsSensor['ly'] = ly
 	
 def createTestPhase(paramsSensor):
 	# Unwrap paramsSensor
@@ -132,7 +78,6 @@ def createTestPhase(paramsSensor):
 
 # Run test
 # Create a icident phase
-paramsSensor = lensletCentres(paramsSensor)
 Xo,Yo,phaseIn = createTestPhase(paramsSensor)
 # Plot the incident pahse
 figPhaseIn = pl.figure()
