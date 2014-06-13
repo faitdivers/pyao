@@ -171,6 +171,190 @@ G
 \end{bmatrix}
 $$
 
+\subsection{Southwell Geometries}
+The last geometry which will be examined is the Southwell geometry. In the case of Southwell geometry, the phase points lie in the same place as the points where the slopes are defined. If we take a look at an overview where these points are defined, we can then define a relationship between the phase points and the slopes.
+\newpage
+\begin{figure}[h!]
+  \centering
+  \includegraphics[scale=0.6]{figures/southwell}
+  \caption{slope approximation, Southwell}
+\end{figure}
+\noindent From our first look at the overview, we can see slopes are placed exactly the same as with the Fried and Modified Hudgin geometries. This means that we can use Southwell geometry in our Shack-Hartmann sensor. 
+\newline
+\newline
+Now it is time to look at how we define the relation between the slopes and the phase points. 
+$$ \frac{\sigma_x(2,1)-\sigma_x(1,1)}{2} = \frac{\phi(2,1)-\phi(1,1)}{Dl}$$
+$$ \frac{\sigma_y(1,2)-\sigma_y(1,1)}{2} = \frac{\phi(1,2)-\phi(1,1)}{Dl}$$
+We can see that this geometry takes the average of the two slopes, in x and y-direction, and uses that to approximate the phase points. For our simple 2x2 example, we can add the following equations:
+$$ \frac{\sigma_x(2,2)-\sigma_x(1,2)}{2} = \frac{\phi(2,2)-\phi(1,2)}{Dl}$$
+$$ \frac{\sigma_y(2,2)-\sigma_y(2,1)}{2} = \frac{\phi(2,2)-\phi(2,1)}{Dl}$$
+Again, we can rewrite this set of equations in a matrix, where we can define a geometry matrix. 
+Unforntunatly, due to the nature of the equations posted above, it is not that straightforward to define the geometry matrix. For this geometry we need to take another step. We first start to add a dummy variable $\varSigma$ to the equations above. We means we get:
+$$ \frac{\sigma_x(2,1)-\sigma_x(1,1)}{2} = \frac{\phi(2,1)-\phi(1,1)}{Dl} = \varSigma_{x1}$$
+$$ \frac{\sigma_x(2,2)-\sigma_x(1,2)}{2} = \frac{\phi(2,2)-\phi(1,2)}{Dl} = \varSigma_{x2}$$
+$$ \frac{\sigma_y(1,2)-\sigma_y(1,1)}{2} = \frac{\phi(1,2)-\phi(1,1)}{Dl} = \varSigma_{y1}$$
+$$ \frac{\sigma_y(2,2)-\sigma_y(2,1)}{2} = \frac{\phi(2,2)-\phi(2,1)}{Dl} = \varSigma_{y2}$$
+Now we break this equation in two parts, for both the slopes and the phase points.
+$$ \varSigma = AS$$
+and
+$$ \varSigma = B\phi$$ 
+Which we can substitute:
+$$ AS = B\phi $$
+and get the geometry matrix which maps S and $\phi$:
+$$ S = A^{-1}B\phi $$
+In our simple 2x2 case, we can define the following A and B matrices:
+\newline
+\newline
+$ A=
+\begin{bmatrix}
+-1 & 1 & 0 & 0 & 0 & 0 & 0 & 0  \\
+ 0 & 0 & -1& 1 & 0 & 0 & 0 & 0  \\
+ 0 & 0 & 0 & 0 & -1& 1 & 0 & 0  \\
+ 0 & 0 & 0 & 0 & 0 & 0 & -1& 1  \\
+\end{bmatrix}
+$
+$
+B = 
+\begin{bmatrix}
+-1 & 1 & 0 & 0 \\
+ 0 & 0 & -1& 1 \\
+-1 & 0 & 1 & 0 \\
+ 0 & -1& 0 & 1 \\
+\end{bmatrix}
+$
+\newline
+\newline
+And this leads to the following G:
+$$
+G = A^{-1}B = 
+$$
+
+\newpage
+\subsection{Least squares estimations}
+No matter what geometry we choose, we always can write our reconstruction problem as followed:
+$$ S=G\phi +n$$
+As we have a overdefined set of equations, we need to estimate the solution to this problem. For this, we can use the least squares estimation. We are first going to look at a regular least squares problem
+\newline
+\newline
+We first start with inconsistent set of equations:
+$$ y=Fx $$
+We would like to find the optimal solution $\hat{x}$, which we can write as:
+\newline
+\newline
+$ min_x \ \ \epsilon^T \epsilon $, subjected to $ y=Fx + \epsilon$
+\newline
+\newline
+Where $\epsilon$ is the residual vector. We can rewrite the equation above in a more standard problem:
+$$ min_x\|Fx-y\|_2^2$$ 
+After expanding the above expression, computing the gradient and setting the gradient to 0, we derive the following equation:
+$$ F^TF\hat{x}=F^Ty $$
+which gives us the least squares estimator $\hat{x}$
+$$ \hat{x} = (F^TF)^{-1}F^Ty $$
+In this case, the matrix $(F^TF)^{-1}F^T$ is called a pseudoinverse, namely the Moore-Penrose inverse.
+When using this estimator, the reconstruction problem can be solved by:
+$$ \hat{\phi} = (G^TG)^{-1}G^TS  $$
+\newline
+\newline
+Unfortunatly, our problem is defined slightly different. We need to think about the fact that we also have noise in our equations, which means that we cannot take $\phi$ as a determinstic vector. In that case, we need to formulate the stochastic least squares problem. We would like to minimize the following equation:
+$$ y=Fx+L\epsilon$$
+From which we know that x has a mean of $\bar{x}$ and the covariance matrix P, which we consider to be positive-definite.
+$\epsilon$ is consider white and is not correlated to x. We know that the solution to this problem has to be unbiased and have a minimum-variance. We first specify our linear estimator as:
+$$ \tilde{x} = 
+\begin{bmatrix}
+M & N \\
+\end{bmatrix}
+\begin{bmatrix}
+y \\
+\bar{x}
+\end{bmatrix}
+$$
+We first start from the fact that the solution must be unbiased. This means that the following must hold.
+$$ E[\tilde{x}]=MF\bar{x} + N\bar{x}=(MF+N)\bar{x}$$
+Which means:
+$$MF+N=I$$  
+Now we are going to look at the variance:
+$$x-\tilde{x}=(I-MF)(x-\tilde{x})-ML\epsilon$$
+And the expected value:
+$$ E[(x-\tilde{x})(x-\tilde{x})^T] = (I-MF)P(I-MF)^T - M(LL^T)M^T$$
+This equations can be expended to:
+$$ E[(x-\tilde{x})(x-\tilde{x})^T] =
+\begin{bmatrix}
+I & -M \\
+\end{bmatrix}
+\begin{bmatrix}
+P  & PF^T \\
+FP & FPF^T+(LL^T)
+\end{bmatrix}
+\begin{bmatrix}
+I  \\
+-m^T
+\end{bmatrix}
+$$ 
+Now the middle of this matrices can be expanded by using the Schur complement and next substituted back into the equation. After completing the squares, we can derive the matrix M that mimimizes the variance.
+$$ M = PF^T(FPF^T+(LL^T))^{-1}$$
+Which gives the solution to the stochastic least squares problem.
+$$\tilde{x} = PF^T(FPF^T+(LL^T))^{-1}y$$
+Now we have a the tools to solve our reconstruction problem.
+\newline
+\newline
+$ min_x \ \ \epsilon^T \epsilon $, subjected to $ s=G\phi + L\epsilon$
+\newline
+\newline
+where $E[\phi\phi^T]=C_\phi$ and $LL^T=C_n$. The solution is given by:
+$$\hat{\phi} = C_\phi G^T(GC_\phi G^T + C_n)^{-1}S $$
+
+\newpage
+\section{Modal reconstruction}
+In the previous chapter we have tried to reconstruct the wavefront using the zonal approach. Now we view another techinque, the modal wavefront reconstruction. In modal reconstruction, we use a linear combination of basis polynomials over the entire apertue. These basis polynomials can be Zernike polynomials, Karhunen-Loeve functions, Legendre polynomials and Fourier series. In this report we will stick to the use of Zernike polynomials, as they are also used in the wavefront generation part. 
+
+\subsection{Zernike polynomials}
+In the case of modal reconstruction, we can express the wavefront as followed:
+$$
+\phi (x,y) = \sum_{k=0}^{M}a_kZ_k(x,y), 
+$$
+Where $a_k$ is the coeffecient that needs to be calculated and $Z_k$ is the basis polynomial, in our case the Zernike polynomial. THe Zernike polynomial is defined as followed:
+$$
+Z_u^v(\rho,\theta) = \sqrt{\frac{2(u+1)}{1+\delta(v,0)}}\sum_{s=0}^{\frac{u-v}{2}}\frac{(-1)^s(u-s)!}{s!(\frac{u+v}{2}-s)!(\frac{u-v}{2}-s)!}
+\rho^{u-2s}cos(v\theta),
+$$
+with $\delta(v,0)$ the Kronecker Delta that is equal to 1 if v = 0 and zero otherwise. In the definition above, we used polar notation but with a slight abuse of notation, we can represent the wavefront as:
+$$
+\phi (x,y,\xi) = \sum_{u=0}^{u_{max}}\sum_{v=0}^{v_{max}}z_{uv}Z_u^v(x,y),
+$$
+with $\xi$ the vector containing all the coefficients $z_{uv}$.
+Now we can represent the wavefront in terms of a polynomial, but the only information that is given by the wavefront sensor is the slope. Therefor we need to take a look at the spatial derivates of the Zernike polynomials:
+$$
+\frac{\partial \phi(x,y)}{\partial x} = \sum_{u,v}z_{u,v}\frac{\partial Z_u^v(x,y)}{\partial x},
+$$
+$$
+\frac{\partial \phi(x,y)}{\partial y} = \sum_{u,v}z_{u,v}\frac{\partial Z_u^v(x,y)}{\partial y}.
+$$
+Again, we can write this set of equations more effectivly into the following matrix notation:
+$$
+\begin{bmatrix}
+\sigma_x(i,j) \\
+\sigma_y(i,j)
+\end{bmatrix}
+=
+\begin{bmatrix}
+\sum_{u,v}z_{u,v}\frac{\partial Z_u^v(x,y)}{\partial x} \\
+\sum_{u,v}z_{u,v}\frac{\partial Z_u^v(x,y)}{\partial y}
+\end{bmatrix}
++
+\begin{bmatrix}
+\eta_x(i,j) \\
+\eta_y(i,j)
+\end{bmatrix}
+$$
+Or we write in matrix notation:
+$$
+S = B\xi + \eta
+$$
+\subsection{Least squares estimations}
+The set of equations which are obtained, are quiet similat to those derived from the zonal reconstruction. In that view, we can use the same technique to approximate the wavefront. This gives us the following solution to the least squares problem:
+$$
+\hat{\xi} = (B^TB)^{-1}B^TS 
+$$
 
 
 \subsection{Southwell Geometries}
