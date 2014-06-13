@@ -41,10 +41,7 @@ def centroid(intensities, paramsSensor):
     idealCenter = [pixlensCentx,pixlensCenty]     # make a vector of pixlensCentx and pixlensCenty
     idealCenter = np.asarray(idealCenter)
     idealCenter = idealCenter.reshape((2,noApertx*noAperty))
-    
-    # The centroid of each aperture will be calculated individually based on region of interest.
-    # The region of interest of matrix intensities is determined in a loop process.    
-    
+      
     # initialize the centroidvector
     centroidvector = zeros((len(pixlensCentx),2))
     
@@ -57,7 +54,9 @@ def centroid(intensities, paramsSensor):
         width = int(pixlensCentx[2]-pixlensCentx[1])
     else:
         width = int(pixlensCentx[3]-pixlensCentx[2])
-    
+    # The centroid of each aperture will be calculated individually based on region of interest.
+    # The region of interest of matrix intensities is determined in a loop process.
+        
     # The iteration for center in each aperture
     for k in range(noApertures):
         # Region of Interest:
