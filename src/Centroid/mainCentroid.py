@@ -77,10 +77,6 @@ def centroid(intensities, paramsSensor):
         if (yend > numImagy-1):
             yend = numImagy-1;
 
-        print "lensCentx", lensCentx
-        print "pixlensCentx", pixlensCentx
-        print "width", width
-        print "xbegin: ", xbegin,"; ", "xend: ", xend,"; ","ybegin: ", ybegin,"; ","yend: ", yend,"; "
         # Matrix of Interest
         IntensitiesofInterst = intensities[range(int(xbegin),int(xend)),ybegin:yend]
         # Calculating centroid
