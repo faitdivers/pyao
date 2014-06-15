@@ -39,6 +39,8 @@ def setup_params():
     'dl' : 10.0e-6, 
     # Support factor used for support size [m] = support factor x diameter lenslet
     'supportFactor' : 4,
+    # Illumination threshold (fractional flux threshold)
+    'illumThreshold' : 0.3,
     }
 
     lx, ly, lensCentx, lensCenty = lensletCentres(paramsSensor)
