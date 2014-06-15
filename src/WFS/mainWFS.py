@@ -8,8 +8,8 @@ from scipy import interpolate
 
 def wfs(phaseIn, paramsSensor):
 	# Unwrap paramsSensor
-	Nx = paramsSensor['Nx'] # Samples on the x-axis per lenslet
-	Ny = paramsSensor['Ny'] # Samples on the y_axis per lenslet
+	Nx = paramsSensor['numPupilx'] # Samples on the x-axis
+	Ny = paramsSensor['numPupily'] # Samples on the y_axis
 	lx = paramsSensor['lx'] # Width of the lenslet array in the x-direction [m]
 	ly = paramsSensor['ly'] # Width of the lenslet array in the y-direction [m]
 	lensCentx = paramsSensor['lensCentx'] # Lenslet centers on x-axis [m]
@@ -23,7 +23,7 @@ def wfs(phaseIn, paramsSensor):
 	dxo = lx/(Nx - 1.0) # Sample length on x-axis [m]
 	dyo = ly/(Ny - 1.0) # Sample length on y-axis [m]
 	xo = arange(0.0,lx + dxo,dxo) # Sample positions on x-axis [m]
-	yo = arange(0.0,ly + dxo,dyo) # Sample positions on y-axis [m]
+	yo = arange(0.0,ly + dyo,dyo) # Sample positions on y-axis [m]
 	Xo, Yo = meshgrid(xo,yo) # Create spatial grid
 
 	# Create grid for the Fast Fourier Transform (fft)
@@ -39,12 +39,13 @@ def wfs(phaseIn, paramsSensor):
 	Fx, Fy = meshgrid(fx,fy) # Create spatial frequency grid [rad/m]
 	
 	# Create grid in the image plane
-	dxi = dfx*lam*f # Sample length on x-axis [m]
-	dyi = dfx*lam*f # Sample length on y-axis [m]
+	# Sampling based on the sensor parameters
+	dxi = lx/(Nx - 1.0) # Sample length on x-axis [m]
+	dyi = ly/(Ny - 1.0) # Sample length on y-axis [m]
 	xi = arange(0.0,lx + dxi,dxi) # Sample positions on x-axis [m]
 	yi = arange(0.0,ly + dyi,dyi) # Sample positions on y-axis [m]
 	Xi, Yi = meshgrid(xi,yi) # Create spatial grid
-	Ii = 	zeros((size(Xi,0),size(Xi,1))) # Intensity distribution
+	Ii = zeros((size(Xi,0),size(Xi,1))) # Intensity distribution	
 	
 	# Create coordinates for the phase plates
 	phPlateStx = lensCentx - D/2 # Start postions of each lenslet on x-axis [m]
@@ -99,7 +100,7 @@ def wfs(phaseIn, paramsSensor):
 		IiTemp = absolute(Ui)**2.0 # Intensity profile in the focal plane, numerically
 		Xifft = Fx*lam*f + xShift + lensCentx[ii] # Adjust the x-axis
 		Yifft = Fy*lam*f	+ yShift + lensCenty[ii] # Adjust the y-axis
-		IiIntpF = interpolate.interp2d(Xifft[0],Yifft[:,0],IiTemp) # Create interpolation function
+		IiIntpF = interpolate.interp2d(Xifft[0],Yifft[:,0],IiTemp,kind='cubic') # Create interpolation function
 		IiTemp = IiIntpF(xi,yi) # Insert single pattern grid into the whole image plane grid
 		Ii = Ii + IiTemp # Collect single lens patterns
 	return Xi,Yi,Ii
