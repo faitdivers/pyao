@@ -206,7 +206,7 @@ def run_simulation(parameters):
 
     """
     simulation_parameters = parameters['Simulation']
-    iterations = (simulation_parameters['frequency'] *
+    iterations = int(simulation_parameters['frequency'] *
                   simulation_parameters['time'])
 
     delay_buffer_size = simulation_parameters['delay'] + 1
