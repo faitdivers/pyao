@@ -14,7 +14,7 @@ import matplotlib.pyplot as pl
 
 def centroid(intensities, paramsSensor):
     # parameters for centroid:
-    threshold = 0.3
+    threshold = paramsSensor['illumThreshold']
     
     # Unwrap paramsSensor
     lx = paramsSensor['lx'] # Width of the lenslet array in the x-direction [m]
