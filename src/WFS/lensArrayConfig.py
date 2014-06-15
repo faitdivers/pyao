@@ -24,9 +24,11 @@ def lensletCentres(paramsSensor):
     # is smaller then the calculated array size
     if lx < lCalx: 
         lx = lCalx
+        print "WARNING: the supplied array size in the x direction will be overwritten. Its size does not accommodate all the lenslets of the system. \nSupplied size: ", lx, "\nCalculated size: ", lCalx
     if ly < lCaly:
         ly = lCaly
-    
+        print "WARNING: the supplied array size in the y direction will be overwritten. Its size does not accommodate all the lenslets of the system. \nSupplied size: ", ly, "\nCalculated size: ", lCaly
+
     # Normalize lenslet centres
     lensCentx = lensCentx/lx
     lensCenty = lensCenty/ly    
