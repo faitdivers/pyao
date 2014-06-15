@@ -1,7 +1,6 @@
 # Main file for PyAO toolbox
 
-from numpy import *
-import matplotlib.pyplot as pl
+import numpy
 
 from WFG.mainWFG import *
 from WFS.mainWFS import *
@@ -10,6 +9,7 @@ from Centroid.mainCentroid import *
 from WFR.mainWFR import *
 from Control.mainControl import *
 from DM.mainDM import *
+from Simulation.LatencyBuffer import LatencyBuffer
 
 
 def setup_params():
@@ -62,6 +62,7 @@ def setup_params():
     paramsSensor['lx'] = lx
     paramsSensor['ly'] = ly
     
+
     paramsActuator = {
     # number of actuators
     'numActx': 8,
@@ -71,8 +72,9 @@ def setup_params():
 
     simulationParameters = {
     'frequency': 10,       # Frequency of the simulation in Hertz
-    'time': 10,             # Simulated time in seconds
-    'is_closed_loop': False
+    'time': 10,            # Simulated time in seconds
+    'delay': 0,  # Delay in number of samples
+    'is_closed_loop': True
     }
 
     # other sets of parameters may be defined if necessary
@@ -87,7 +89,8 @@ def setup_params():
 
     return parameters
 
-def runClosedLoop(parameters, iterations):
+
+def runClosedLoop(parameters, iterations, buffer_size):
     """ Run a closed-loop simulation
 
     The closed-loop simulation consists of
@@ -107,9 +110,18 @@ def runClosedLoop(parameters, iterations):
     sensorParameters = parameters['Sensor']
     actuatorParameters = parameters['Actuator']
 
+    wf_buffer = []
+    intensities_buffer = []
+    centroids_buffer = []
+    reconstructed_buffer = []
+    wf_dm_buffer = []
+    
+    print("Running closed-loop simulation")
     # The first deformable mirror effect: (No effect)
     wfDM = dm(0, sensorParameters)
 
+    delay_buffer = LatencyBuffer(buffer_size, (sensorParameters['numPupilx'],
+                                     sensorParameters['numPupilx']))
     for i in range(0, iterations):
         print("Running simulation step %d" % (i))
         wf = wfg(sensorParameters, wavefrontParameters['zernikeModes'],
@@ -118,12 +130,23 @@ def runClosedLoop(parameters, iterations):
         intensities = wfs(wfRes, sensorParameters)
         centroids = centroid(intensities, sensorParameters)
         wfRec = wfr(centroids, sensorParameters)
+        wfRec = delay_buffer.update(wfRec)
         actCommands = control(wfRec, actuatorParameters)
         wfDM = dm(actCommands, sensorParameters)
-    return
+
+        wf_buffer.append(wf)
+        intensities_buffer.append(intensities)
+        centroids_buffer.append(centroids)
+        reconstructed_buffer.append(wfRec)
+        wf_dm_buffer.append(wfDM)
+
+    results = pack_simulation_results(wf_buffer, intensities_buffer,
+                                    centroids_buffer, reconstructed_buffer,
+                                    wf_dm_buffer)
+    return results
 
 
-def runOpenLoop(parameters, iterations):
+def runOpenLoop(parameters, iterations, buffer_size):
     """ Run an open-loop simulation
 
     The open-loop simulation consists of
@@ -141,7 +164,16 @@ def runOpenLoop(parameters, iterations):
     sensorParameters = parameters['Sensor']
     actuatorParameters = parameters['Actuator']
 
-    print("Running open loop simulation")
+    delay_buffer = LatencyBuffer(buffer_size, (sensorParameters['numPupilx'],
+                                     sensorParameters['numPupilx']))
+
+    wf_buffer = []
+    intensities_buffer = []
+    centroids_buffer = []
+    reconstructed_buffer = []
+    wf_dm_buffer = []
+
+    print("Running open-loop simulation")
     # The first deformable mirror effect: (No effect)
     wfDM = dm(0, sensorParameters)
 
@@ -153,8 +185,31 @@ def runOpenLoop(parameters, iterations):
         intensities = wfs(wfRes, sensorParameters)
         centroids = centroid(intensities, sensorParameters)
         wfRec = wfr(centroids, sensorParameters)
+        wfRec = delay_buffer.update(wfRec)
         wfDM = dm(0, sensorParameters)
-    return
+
+        wf_buffer.append(wf)
+        intensities_buffer.append(intensities)
+        centroids_buffer.append(centroids)
+        reconstructed_buffer.append(wfRec)
+        wf_dm_buffer.append(wfDM)
+
+    results = pack_simulation_results(wf_buffer, intensities_buffer,
+                                    centroids_buffer, reconstructed_buffer,
+                                    wf_dm_buffer)
+    return results
+
+
+def pack_simulation_results(wf, intensities, centroids, reconstructed, wf_dm):
+    simulation_results = {
+    'wf': wf,
+    'intensities': intensities,
+    'centroids': centroids,
+    'reconstructed': reconstructed,
+    'wf_dm': wf_dm
+    }
+
+    return simulation_results
 
 
 def run_simulation(parameters):
@@ -162,13 +217,15 @@ def run_simulation(parameters):
 
     """
     simulation_parameters = parameters['Simulation']
-    iterations = (simulation_parameters['frequency'] *
+    iterations = int(simulation_parameters['frequency'] *
                   simulation_parameters['time'])
 
+    delay_buffer_size = simulation_parameters['delay'] + 1
+
     if simulation_parameters['is_closed_loop']:
-        runClosedLoop(parameters, iterations)
+        runClosedLoop(parameters, iterations, delay_buffer_size)
     else:
-        runOpenLoop(parameters, iterations)
+        runOpenLoop(parameters, iterations, delay_buffer_size)
 
 
 parameters = setup_params()
