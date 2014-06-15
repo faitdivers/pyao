@@ -52,6 +52,8 @@ def setup_params():
     'dl' : 10.0e-6,	
     # Support factor used for support size [m] = support factor x diameter lenslet
     'supportFactor' : 4,
+    # Illumination threshold (fractional flux threshold)
+    'illumThreshold' : 0.3,
     }
     # Compute lenslet centres and check minimal array widths 
     lx, ly, lensCentx, lensCenty = lensletCentres(paramsSensor)
@@ -127,7 +129,7 @@ def runClosedLoop(parameters, iterations, buffer_size):
         wf = wfg(sensorParameters, wavefrontParameters['zernikeModes'],
                  wavefrontParameters['zernikeWeights'])
         wfRes = wf - wfDM
-        intensities = wfs(wfRes, sensorParameters)
+        xInt, yInt, intensities = wfs(wfRes, sensorParameters)
         centroids = centroid(intensities, sensorParameters)
         wfRec = wfr(centroids, sensorParameters)
         wfRec = delay_buffer.update(wfRec)
@@ -182,7 +184,7 @@ def runOpenLoop(parameters, iterations, buffer_size):
         wf = wfg(sensorParameters, wavefrontParameters['zernikeModes'],
                  wavefrontParameters['zernikeWeights'])
         wfRes = wf - wfDM
-        intensities = wfs(wfRes, sensorParameters)
+        xInt, yInt, intensities = wfs(wfRes, sensorParameters)
         centroids = centroid(intensities, sensorParameters)
         wfRec = wfr(centroids, sensorParameters)
         wfRec = delay_buffer.update(wfRec)
