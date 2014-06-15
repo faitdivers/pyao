@@ -5,6 +5,11 @@ Created on Thu Jun 05 23:00:47 2014
 @author: Herminarto
 """
 from mainCentroid import *
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.realpath(__file__))+'/../')
+
+from WFS.lensArrayConfig import *
 
 def setup_params():
         
@@ -30,10 +35,20 @@ def setup_params():
     # Width of the lenslet array [m]
     'lx' : 1.54e-3,
     'ly' : 1.54e-3,
-    # Lenslet centers [m]
-    'lensCentx' : [ 0.00015, 0.00046, 0.00077, 0.00108, 0.00139, 0.00015, 0.00046, 0.00077, 0.00108, 0.00139, 0.00015, 0.00046, 0.00077, 0.00108, 0.00139, 0.00015, 0.00046, 0.00077, 0.00108, 0.00139, 0.00015, 0.00046, 0.00077, 0.00108, 0.00139],
-    'lensCenty' : [ 0.00015, 0.00015, 0.00015, 0.00015, 0.00015, 0.00046, 0.00046, 0.00046, 0.00046, 0.00046, 0.00077, 0.00077, 0.00077, 0.00077, 0.00077, 0.00108, 0.00108, 0.00108, 0.00108, 0.00108, 0.00139, 0.00139, 0.00139, 0.00139, 0.00139],
+    # Distance between lenslets [m] 
+    'dl' : 10.0e-6, 
+    # Support factor used for support size [m] = support factor x diameter lenslet
+    'supportFactor' : 4,
     }
+
+    lx, ly, lensCentx, lensCenty = lensletCentres(paramsSensor)
+    # Normalized lenslet centers
+    paramsSensor['lensCentx'] = lensCentx
+    paramsSensor['lensCenty'] = lensCenty
+    # Set correct array widths
+    paramsSensor['lx'] = lx
+    paramsSensor['ly'] = ly
+
 	# Encapsulate all the parameter dicts
     parameters = {
     'Sensor' : paramsSensor,
