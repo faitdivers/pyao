@@ -127,7 +127,7 @@ def runClosedLoop(parameters, iterations, buffer_size):
         wf = wfg(sensorParameters, wavefrontParameters['zernikeModes'],
                  wavefrontParameters['zernikeWeights'])
         wfRes = wf - wfDM
-        intensities = wfs(wfRes, sensorParameters)
+        xInt, yInt, intensities = wfs(wfRes, sensorParameters)
         centroids = centroid(intensities, sensorParameters)
         wfRec = wfr(centroids, sensorParameters)
         wfRec = delay_buffer.update(wfRec)
@@ -182,7 +182,7 @@ def runOpenLoop(parameters, iterations, buffer_size):
         wf = wfg(sensorParameters, wavefrontParameters['zernikeModes'],
                  wavefrontParameters['zernikeWeights'])
         wfRes = wf - wfDM
-        intensities = wfs(wfRes, sensorParameters)
+        xInt, yInt, intensities = wfs(wfRes, sensorParameters)
         centroids = centroid(intensities, sensorParameters)
         wfRec = wfr(centroids, sensorParameters)
         wfRec = delay_buffer.update(wfRec)
