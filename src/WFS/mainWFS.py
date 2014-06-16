@@ -1,10 +1,11 @@
 #Lenslet Array
-#Updated: Juni 11, 2014
+#Updated: Juni 17, 2014
 import math
 from numpy import *
 from scipy import *
 import numpy.fft
 from scipy import interpolate
+
 
 
 def wfs(phaseIn, paramsSensor):
@@ -25,6 +26,11 @@ def wfs(phaseIn, paramsSensor):
 	supFactor = paramsSensor['supportFactor'] # Support factor
 	supD = D*supFactor # Support diameter for each lenslet [m]
 	k = 2*pi/lam # Wavenumber
+	#Noise parameters
+	Noisy = paramsSensor['Noisy'] # True if noise should be included in Ii calculation
+	sigma_r = paramsSensor['sigma_readout'] # Standard Deviation for Readout Noise
+	mean_r = paramsSensor['mean_readout'] # Mean of Readout Noise
+	
 	
 	# Create grid for in the focal plane
 	dx = lx/(Nx - 1.0) # Sample length on x-axis [m]
@@ -70,8 +76,25 @@ def wfs(phaseIn, paramsSensor):
 		IiPlate = IiInterp(x, y) # Insert support grid into the image plane grid
 		Ii = Ii + IiPlate # Collect single lens patterns
 	Ii = Ii/amax(absolute(Ii)) # Normalize intensity distribution
+	
+	# Add noise to Ii
+	if Noisy == True:
+		Ii = addNoise(Ii, sigma_r, mean_r)
+	
 	return x, y, Ii
- 
+  
+
+def addNoise(Ii, sigma_r, mean_r):
+	# Readout noise: White Gaussian
+	N_r = numpy.random.normal(mean_r, sigma_r, (size(Ii[1]), size(Ii[2])))
+
+	# Photon noise: Poisson
+	lambda_p = mean(Ii)
+	N_p = lambda_p * numpy.random.poisson(lambda_p, (size(Ii[1]), size(Ii[2])))
+	
+	Ii = Ii + N_p + N_r 
+	return Ii
+	
 	
 def extractPhasePlate(lensCentx, lensCenty, D, phaseIn, x, y, dx, dy):
 	# Extracts phase plate from the entire incident phase for calculation of a single lenslet	
