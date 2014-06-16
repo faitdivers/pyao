@@ -41,8 +41,8 @@ class TestZernikeWavefront(unittest.TestCase):
         zw = ZernikeWave()
         zw.addMode(zernikeModes, zernikeWeights)
         wf = zw.createWavefront(paramt['numImagx'],paramt['numImagy'])
-        
-        self.assertEqual(data,wf)
+        test_result = allclose(wf, data)
+        self.assertTrue(test_result, 'Generated wave-front is different than expected.')
 
     def testWavefrontDecomposition(self):
         paramt = {
