@@ -65,7 +65,7 @@ class TestZernikeWavefront(unittest.TestCase):
         self.assertTrue(testResult)
         
     def testNollMapping(self):
-        data = load(os.getcwd()+'\Documents\GitHub\pyao\src\WFG\indexTestData.npy')
+        data = self.loadTestData('indexTestData.npy')
         datastr = ""
         for n in range(1,81):
             u,v = zernikeIndex(n)
