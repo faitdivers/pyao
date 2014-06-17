@@ -1,148 +1,234 @@
 # Main file for PyAO toolbox
 
-from numpy import *
-import matplotlib.pyplot as pl
+import numpy
 
 from WFG.mainWFG import *
 from WFS.mainWFS import *
+from WFS.lensArrayConfig import *
 from Centroid.mainCentroid import *
 from WFR.mainWFR import *
 from Control.mainControl import *
 from DM.mainDM import *
+from Simulation.LatencyBuffer import LatencyBuffer
 
 
-# --------------------------------------------------
-# Setting up the parameters
 def setup_params():
-	""" Set-up the simulation parameters
+    """ Set-up the simulation parameters
 
-	Setup the parameters used for all steps of the simulation.
-	This includes parameters for the sensor, for the actuator and
-	possibly other necessary simulation configuration.
+    Setup the parameters used for all steps of the simulation.
+    This includes parameters for the sensor, for the actuator and
+    possibly other necessary simulation configuration.
 
-	Returns:
-		Multiple dicts, containing the parameters and their values.
-	"""
-        paramsWavefront = {
-        # Scalar or array containing the zernike modes 
-        'zernikeModes' : [2,4,21],
-        # Scalar or array containing the zernike weights, with respect to the modes 
-        'zernikeWeights' : [0.5,0.25,-0.6]
-        }    
-        
-	paramsSensor = {
-	# number of samples in the pupil plane
-	'numPupilx' : 100, # Not used in WFS
-	'numPupily' : 100, # Not used in WFS
-	# number of samples in the imaging plane(s)
-	'numImagx' : 100, # Not used in WFS
-	'numImagy' : 100, # Not used in WFS
-	# number of apertures in the wfs
-	'noApertx': 10, # Not used in WFS
-	'noAperty': 10, # Not used in WFS
-	# Number of samples of the incoming phase
-	'Nx' : 100,
-	'Ny' : 100,
-	# Focal Length [m]
-	'f' : 18.0e-3,
-	# Diameter of aperture of single lenslet [m]	
-	'D' : 300.0e-6, 
-	# Wavelength [m]	
-	'lam' : 630.0e-9, 	
-	# Width of the lenslet array [m]
-	'lx' : 1.54e-3,
-	'ly' : 1.54e-3,
-	# Lenslet centers [m]
-	'lensCentx' : [ 0.00015,  0.00046,  0.00077,  0.00108,  0.00139],
-	'lensCentx' : [ 0.00015,  0.00046,  0.00077,  0.00108,  0.00139],
-	}
+    Returns:
+        Multiple dictionaries, containing the parameters and their values.
+    """
+    paramsWavefront = {
+    # Scalar or array containing the zernike modes
+    'zernikeModes': [2, 4, 21],
+    # Scalar or array containing the zernike weights, with respect to the modes
+    'zernikeWeights': [0.5, 0.25, -0.6]
+    }
 
-	paramsActuator = {
-	# number of actuators
-	'numActx' : 8,
-	'numActy' : 8,
-	# parameters to characterize influence function
-	}
+    paramsSensor = {
+    # number of samples in the pupil plane
+    'numPupilx' : 200,
+    'numPupily' : 200,
+    # number of samples in the imaging plane(s)
+    'numImagx' : 200,
+    'numImagy' : 200,
+    # number of apertures in the wfs
+    'noApertx': 4,
+    'noAperty': 4,
+    # Focal Length [m]
+    'f' : 18.0e-3,
+    # Diameter of aperture of single lenslet [m]	
+    'D' : 300.0e-6, 
+    # Wavelength [m]	
+    'lam' : 630.0e-9, 	
+    # Width of the lenslet array [m]
+    'lx' : 0.54e-3,
+    'ly' : 0.24e-3,
+    # Distance between lenslets [m]	
+    'dl' : 10.0e-6,	
+    # Support factor used for support size [m] = support factor x diameter lenslet
+    'supportFactor' : 4,
+    # Illumination threshold (fractional flux threshold)
+    'illumThreshold' : 0.3,
+    }
+    # Compute lenslet centres and check minimal array widths 
+    lx, ly, lensCentx, lensCenty = lensletCentres(paramsSensor)
+    # Normalized lenslet centers
+    paramsSensor['lensCentx'] = lensCentx
+    paramsSensor['lensCenty'] = lensCenty
+    # Set correct array widths
+    paramsSensor['lx'] = lx
+    paramsSensor['ly'] = ly
+    
 
-	simulationParameters = {
-	'frequency' : 10,       # Frequency of the simulation in Hertz
-	'time' : 10             # Simulated time in seconds
-	}
+    paramsActuator = {
+    # number of actuators
+    'numActx': 8,
+    'numActy': 8,
+    # parameters to characterize influence function
+    }
 
-	# other sets of parameters may be defined if necessary
+    simulationParameters = {
+    'frequency': 10,       # Frequency of the simulation in Hertz
+    'time': 10,            # Simulated time in seconds
+    'delay': 0,  # Delay in number of samples
+    'is_closed_loop': True
+    }
 
-	# Encapsulate all the parameter dicts
-	parameters = {
-	'Wavefront' : paramsWavefront,
-	'Sensor' : paramsSensor,
-	'Actuator' : paramsActuator,
-	'Simulation' : simulationParameters
-	}
+    # other sets of parameters may be defined if necessary
 
-	return parameters
+    # Encapsulate all the parameter dicts
+    parameters = {
+    'Wavefront': paramsWavefront,
+    'Sensor': paramsSensor,
+    'Actuator': paramsActuator,
+    'Simulation': simulationParameters
+    }
 
-def runClosedLoop():
+    return parameters
 
-	""" Run a closed loop simulation
 
-	The closed-loop simulation consists of
-	1. generating the wafe-front
-	2. applying the deformable mirror to the wafe-front
-	3. a) measuring intensities
-	3. b) determining centroids
-	4. reconstructing the wafe-front
-	5. calculate the control values for the actuators,
-	6. actuate the mirror
-	7. continue from step 1
+def runClosedLoop(parameters, iterations, buffer_size):
+    """ Run a closed-loop simulation
 
-	The stop condition is the simulation time.
-	"""
-	# Get parameters.
-	parameters = setup_params()
-	wavefrontParameters = parameters['Wavefront'];
-	sensorParameters = parameters['Sensor'];
-	actuatorParameters = parameters['Actuator'];
-	simulationParameters = parameters['Simulation'];
+    The closed-loop simulation consists of
+    1. generating the wave-front
+    2. applying the deformable mirror to the wave-front
+    3. a) measuring intensities
+    3. b) determining centroids
+    4. reconstructing the wave-front
+    5. calculate the control values for the actuators,
+    6. actuate the mirror
+    7. repeat from step 1
 
-	# Calculate number of simulation steps
-	iterations = simulationParameters['time']*simulationParameters['frequency'];
-	
-	# The first deformable mirror effect: (No effect)
-	wfDM = dm(0, sensorParameters);
-	
-	for i in range(0, iterations):
-		print("Running simulation step %d" % (i));
-		wf = wfg(sensorParameters, wavefrontParameters['zernikeModes'], wavefrontParameters['zernikeWeights'])
-		wfRes = wf-wfDM
-		intensities = wfs(wfRes, sensorParameters)
-		centroids = centroid(intensities, sensorParameters)
-		wfRec = wfr(centroids, sensorParameters)
-		actCommands = control(wfRec, actuatorParameters)
-		wfDM = dm(actCommands, sensorParameters)
-	return
+    The stop condition is the simulation time.
+    """
+    # Get parameters.
+    wavefrontParameters = parameters['Wavefront']
+    sensorParameters = parameters['Sensor']
+    actuatorParameters = parameters['Actuator']
 
-def runOpenLoop():
-	paramsWavefront, paramsSensor, paramsActuator = setup_params()
-	print("Running open loop simulation");
-	# Generate wavefront
-	wf = wfg(paramsSensor,paramsWavefront['zernikeModes'], paramsWavefront['zernikeWeights'])
-	#pl.imshow(wf), pl.show(), pl.title('Incoming wavefront')
-	# Generate intensity measurements
-	intensities = wfs(wf, paramsSensor)
-	# Compute centroids (this step is not needed if we are to use focal
-	# plane reconstruction techniques)
-	centroids = centroid(intensities, paramsSensor)
-	#print centroids.shape
-	# Reconstruct the wavefront
-	wfRec = wfr(centroids, paramsSensor)
-	# Compute the actuator commands via a control technique
-	actCommands = control(wfRec, paramsActuator)
-	# Deformable mirror
-	wfDM = dm(actCommands, paramsSensor)
-	# Compute the residual wavefront
-	wfRes = wf-wfDM
-	return
+    wf_buffer = []
+    intensities_buffer = []
+    centroids_buffer = []
+    reconstructed_buffer = []
+    wf_dm_buffer = []
+    
+    print("Running closed-loop simulation")
+    # The first deformable mirror effect: (No effect)
+    wfDM = dm(0, sensorParameters)
 
-runClosedLoop()
+    delay_buffer = LatencyBuffer(buffer_size, (sensorParameters['numPupilx'],
+                                     sensorParameters['numPupilx']))
+    for i in range(0, iterations):
+        print("Running simulation step %d" % (i))
+        wf = wfg(sensorParameters, wavefrontParameters['zernikeModes'],
+                 wavefrontParameters['zernikeWeights'])
+        wfRes = wf - wfDM
+        xInt, yInt, intensities = wfs(wfRes, sensorParameters)
+        centroids = centroid(intensities, sensorParameters)
+        wfRec = wfr(centroids, sensorParameters)
+        wfRec = delay_buffer.update(wfRec)
+        actCommands = control(wfRec, actuatorParameters)
+        wfDM = dm(actCommands, sensorParameters)
 
-#runOpenLoop()
+        wf_buffer.append(wf)
+        intensities_buffer.append(intensities)
+        centroids_buffer.append(centroids)
+        reconstructed_buffer.append(wfRec)
+        wf_dm_buffer.append(wfDM)
+
+    results = pack_simulation_results(wf_buffer, intensities_buffer,
+                                    centroids_buffer, reconstructed_buffer,
+                                    wf_dm_buffer)
+    return results
+
+
+def runOpenLoop(parameters, iterations, buffer_size):
+    """ Run an open-loop simulation
+
+    The open-loop simulation consists of
+    1. generating the wave-front
+    2. applying the deformable mirror to the wave-front
+    3. a) measuring intensities
+    3. b) determining centroids
+    4. reconstructing the wave-front
+    5. actuate the mirror
+    6. repeat from step 1
+
+    The stop condition is the simulation time.
+    """
+    wavefrontParameters = parameters['Wavefront']
+    sensorParameters = parameters['Sensor']
+    actuatorParameters = parameters['Actuator']
+
+    delay_buffer = LatencyBuffer(buffer_size, (sensorParameters['numPupilx'],
+                                     sensorParameters['numPupilx']))
+
+    wf_buffer = []
+    intensities_buffer = []
+    centroids_buffer = []
+    reconstructed_buffer = []
+    wf_dm_buffer = []
+
+    print("Running open-loop simulation")
+    # The first deformable mirror effect: (No effect)
+    wfDM = dm(0, sensorParameters)
+
+    for i in range(0, iterations):
+        print("Running simulation step %d" % (i))
+        wf = wfg(sensorParameters, wavefrontParameters['zernikeModes'],
+                 wavefrontParameters['zernikeWeights'])
+        wfRes = wf - wfDM
+        xInt, yInt, intensities = wfs(wfRes, sensorParameters)
+        centroids = centroid(intensities, sensorParameters)
+        wfRec = wfr(centroids, sensorParameters)
+        wfRec = delay_buffer.update(wfRec)
+        wfDM = dm(0, sensorParameters)
+
+        wf_buffer.append(wf)
+        intensities_buffer.append(intensities)
+        centroids_buffer.append(centroids)
+        reconstructed_buffer.append(wfRec)
+        wf_dm_buffer.append(wfDM)
+
+    results = pack_simulation_results(wf_buffer, intensities_buffer,
+                                    centroids_buffer, reconstructed_buffer,
+                                    wf_dm_buffer)
+    return results
+
+
+def pack_simulation_results(wf, intensities, centroids, reconstructed, wf_dm):
+    simulation_results = {
+    'wf': wf,
+    'intensities': intensities,
+    'centroids': centroids,
+    'reconstructed': reconstructed,
+    'wf_dm': wf_dm
+    }
+
+    return simulation_results
+
+
+def run_simulation(parameters):
+    """ Runs the configured simulation. Either an open or closed loop.
+
+    """
+    simulation_parameters = parameters['Simulation']
+    iterations = int(simulation_parameters['frequency'] *
+                  simulation_parameters['time'])
+
+    delay_buffer_size = simulation_parameters['delay'] + 1
+
+    if simulation_parameters['is_closed_loop']:
+        runClosedLoop(parameters, iterations, delay_buffer_size)
+    else:
+        runOpenLoop(parameters, iterations, delay_buffer_size)
+
+
+parameters = setup_params()
+run_simulation(parameters)
