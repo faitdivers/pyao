@@ -89,10 +89,13 @@ def addNoise(Ii, sigma_r, mean_r):
 	N_r = numpy.random.normal(mean_r, sigma_r, (size(Ii[1]), size(Ii[2])))
 
 	# Photon noise: Poisson
-	lambda_p = mean(Ii)
-	N_p = lambda_p * numpy.random.poisson(lambda_p, (size(Ii[1]), size(Ii[2])))
+	# Poisson distribution can only return integer values (# events), so here we assume 1000 events occur,
+	# then generate the corresponding noise for each pixel, then re-normalize back to a unit intensity distribution
+	lambda_p = mean(Ii)*1000
+	N_p = numpy.random.poisson(lambda_p, (size(Ii[1]), size(Ii[2])))
+	N_p = (N_p.astype(float))/1000
 	
-	Ii = Ii + N_p + N_r 
+	Ii = Ii + N_r + N_p 
 	return Ii
 	
 	

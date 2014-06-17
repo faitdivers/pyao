@@ -34,12 +34,13 @@ paramsSensor = {
 	'supportFactor' : 4,
 		
 	# Noise Parameters
-    # Include Measurement Noise in Intensity Sensing?
-    'Noisy': True,
-	# Readout Noise Parameters
-    'sigma_readout': 0.05, # should be a value from 0 to 5, based on CCD characteristics
+    # Include Measurement Noise
+    'Noisy': True, # True = include Readout, Photon noise, False = don't estimate measurement noise
+	# Readout Noise Parameters (Modelled as Gaussian): based on CCD characteristics
+    'sigma_readout': 0.005, # ratio of # readout noise electrons (nominally 0:5) to 
+							# mean signal brightness (nominally 1000 electrons)
 	'mean_readout': 0.0,   # should be 0 for white noise
-	# Photon Noise Parameters: based on expected value of Ii (no parameters here)
+	# Photon Noise Parameters (Modelled as Poisson): based only on expected value of Ii 
 	}
 # Compute lenslet centres and check minimal array widths 
 lx, ly, lensCentx, lensCenty = lensletCentres(paramsSensor)
@@ -77,11 +78,11 @@ def createTestPhase(paramsSensor):
 	d =  0 # random.uniform(-1.0,1.0)
 
 	# Create a planar wavefront
-	#phaseIn = zeros((size(yo),size(xo)))
+	phaseIn = zeros((size(yo),size(xo)))
 
 	# Create a random wavefront
-	phaseIn = k*((ax*Xo)**3.0 + (ay*Yo)**3.0 + (bx*Xo)**2.0 + 
-		(by*Yo)**2.0 + cx*Xo + cy*Yo + d + (ex*Xo)**4.0 + (ey*Yo)**4.0)
+	#phaseIn = k*((ax*Xo)**3.0 + (ay*Yo)**3.0 + (bx*Xo)**2.0 + 
+	#	(by*Yo)**2.0 + cx*Xo + cy*Yo + d + (ex*Xo)**4.0 + (ey*Yo)**4.0)
 	
 	
 	return Xo,Yo,phaseIn
