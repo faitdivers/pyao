@@ -80,16 +80,16 @@ class PhaseScreen:
         else: 
             print('ERROR: Some internal error occured.')
             WF = None
-            return
             
         return WF
                     
     def kolmogorov(self,N, r0, D = 2.):
-        delta = D / N        
+        delta = float(D) / float(N)        
         phi_l = np.zeros((N,N))
         
-        X,Y = supp.createGrid(N, N, [delta*(N/2), delta*((N/2) - 1)], [delta*(N/2), delta*((N/2) - 1)])
- 
+        X,Y = supp.createGrid(N, N, [-delta*(N/2), delta*((N/2) - 1)], [-delta*(N/2), delta*((N/2) - 1)])
+        phi_h = self.hfkolmogorov(N, r0, D)
+        
         for pp in range(1,4):
             delta_f = 1./(3**(pp*D))
             
@@ -109,18 +109,19 @@ class PhaseScreen:
             Fx = np.reshape(Fx,9,'F')
             Fy = np.reshape(Fy,9,'F')
             for s in range(0,9):
-                 SH = SH + cn[s] * np.exp(1j * 2 * np.pi * (Fx[s]*X * Fy[s]*Y))
+                 SH = SH + cn[s] * np.exp(1j * 2 * np.pi * (Fx[s]*X + Fy[s]*Y))
              
             phi_l  = phi_l + SH       
         phi_l = np.real(phi_l) - np.mean(np.real(phi_l))
         
-        return phi_l
+        return phi_l + phi_h
         
     def vonKarman(self,N, r0, l0, L0, D = 2):
-        delta = D / N        
+        delta = float(D) / float(N)        
         phi_l = np.zeros((N,N))
         
-        X,Y = supp.createGrid(N, N, [delta*(N/2), delta*((N/2) - 1)], [delta*(N/2), delta*((N/2) - 1)])
+        X,Y = supp.createGrid(N, N, [-delta*(N/2), delta*((N/2) - 1)], [-delta*(N/2), delta*((N/2) - 1)])
+        phi_h = self.hfvonKarman(N, r0, l0, L0, D)
         
         fm = 5.92/(2*np.pi*l0)
         f0 = 1/L0
@@ -144,13 +145,52 @@ class PhaseScreen:
             Fx = np.reshape(Fx,9,'F')
             Fy = np.reshape(Fy,9,'F')
             for s in range(0,9):
-                 SH = SH + cn[s] * np.exp(1j * 2 * np.pi * (Fx[s]*X * Fy[s]*Y))
+                 SH = SH + cn[s] * np.exp(1j * 2 * np.pi * (Fx[s]*X + Fy[s]*Y))
              
             phi_l  = phi_l + SH
                 
         phi_l = np.real(phi_l) - np.mean(np.real(phi_l))
         
-        return phi_l
+        return phi_l + phi_h
+    
+    #
+    #Add new phase screens here
+    #      
+         
+    def hfvonKarman(self,N, r0, l0, L0, D = 2):
+        delta = float(D) / float(N)
+        
+        df = 1 / (N*delta)        
+        Fx,Fy = supp.createGrid(N, N, [-df*(N/2), df*((N/2) - 1)], [-df*(N/2), df*((N/2) - 1)])
+        Rf, Tf = supp.cart2pol(Fx,Fy)
+        
+        fm = 5.92/(2*np.pi*l0)
+        f0 = 1/L0
+        
+        #Von Karman (Kolmogorov equivalent for high wavenumbers)
+        Rf[N/2,N/2] = 1e-9 # To prevent divide by zero error messages: MATHEMATICALLY UNDESIRABLE
+        PSD_phi = (0.023*r0**(-5./3.)* np.exp(-(Rf/fm)**2)) / ((Rf**2 + f0**2)**(11./6.))
+        PSD_phi[N/2,N/2] = 0
+        
+        cn = (np.random.randn(N,N) + 1j*np.random.randn(N,N))*np.sqrt(PSD_phi)*df
+        phi = np.real(supp.invsfft2(cn))
+        return phi
+        
+    def hfkolmogorov(self ,N ,r0, D=2):
+        delta = float(D) / float(N)
+        
+        df = 1 / (N*delta)        
+        Fx,Fy = supp.createGrid(N, N, [-df*(N/2), df*((N/2) - 1)], [-df*(N/2), df*((N/2) - 1)])
+        Rf, Tf = supp.cart2pol(Fx,Fy)
+        
+        #Kolmogorov
+        Rf[N/2,N/2] = 1e-9 # To prevent divide by zero error messages: MATHEMATICALLY UNDESIRABLE
+        PSD_phi = 0.023*r0**(-5./3.) * Rf**(-11./3.)
+        PSD_phi[N/2,N/2] = 0
+        
+        cn = (np.random.randn(N,N) + 1j*np.random.randn(N,N))*np.sqrt(PSD_phi)*df        
+        phi = np.real(supp.invsfft2(cn))
+        return phi
         
     def plotWavefront(self,nX,nY):
         X,Y = supp.createGrid(nX,nY)
