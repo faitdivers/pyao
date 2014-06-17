@@ -99,7 +99,7 @@ def runClosedLoop(parameters, iterations):
     actuatorParameters = parameters['Actuator']
 
     # The first deformable mirror effect: (No effect)
-    wfDM = dm(0, sensorParameters)
+    wfDM = dm(0, sensorParameters, actuatorParameters)
 
     for i in range(0, iterations):
         print("Running simulation step %d" % (i))
@@ -110,7 +110,7 @@ def runClosedLoop(parameters, iterations):
         centroids = centroid(intensities, sensorParameters)
         wfRec = wfr(centroids, sensorParameters)
         actCommands = control(wfRec, actuatorParameters)
-        wfDM = dm(actCommands, sensorParameters)
+        wfDM = dm(actCommands, sensorParameters, actuatorParameters)
     return
 
 
@@ -134,7 +134,7 @@ def runOpenLoop(parameters, iterations):
 
     print("Running open loop simulation")
     # The first deformable mirror effect: (No effect)
-    wfDM = dm(0, sensorParameters)
+    wfDM = dm(0, sensorParameters, actuatorParameters)
 
     for i in range(0, iterations):
         print("Running simulation step %d" % (i))
@@ -144,7 +144,7 @@ def runOpenLoop(parameters, iterations):
         intensities = wfs(wfRes, sensorParameters)
         centroids = centroid(intensities, sensorParameters)
         wfRec = wfr(centroids, sensorParameters)
-        wfDM = dm(0, sensorParameters)
+        wfDM = dm(0, sensorParameters, actuatorParameters)
     return
 
 
