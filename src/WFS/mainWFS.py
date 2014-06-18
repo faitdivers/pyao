@@ -1,5 +1,5 @@
 #Lenslet Array
-#Updated: Juni 17, 2014
+#Updated: June 18, 2014
 import math
 from numpy import *
 from scipy import *
@@ -9,7 +9,7 @@ from scipy import interpolate
 
 
 def wfs(phaseIn, paramsSensor):
-	# Calculates the normalized intensity distribution on the detecor plane of the sensor	
+	# Calculates the normalized intensity distribution on the detector plane of the sensor	
 	
 	# Unwrap paramsSensor
 	Nx = paramsSensor['numPupilx'] # Samples on the x-axis
@@ -57,13 +57,13 @@ def wfs(phaseIn, paramsSensor):
 		phasePlate, xPhase, yPhase = extractPhasePlate(lensCentx[ii],
 			lensCenty[ii], D, phaseIn, x, y, dx, dy)	
 		
-		# Calculate the average phase tilt and preproces the phase plate
+		# Calculate the average phase tilt and pre-process the phase plate
 		phasePlate, xShift, yShift = tiltPhasePlate(phasePlate, k, f, xPhase, yPhase, dx, dy)
 		
 		# Calculate the fft of the complex amplitude behind the lens
 		phaseInterp = interpolate.interp2d(xPhase, yPhase, phasePlate, kind='cubic') # Create interpolation function
 		phasePlate = phaseInterp(xSup, xSup) # Insert phase grid into the support grid
-		Uin = exp(1j*phasePlate) # Caculate the complex amplitude from the phase 
+		Uin = exp(1j*phasePlate) # Calculate the complex amplitude from the phase 
 		Ulb = P*Uin # Complex amplitude just before the lens
 		Ula = dx*dy*numpy.fft.fftshift(numpy.fft.fft2(Ulb)) # Complex amplitude just behind the lens
 		
@@ -86,16 +86,16 @@ def wfs(phaseIn, paramsSensor):
 
 def addNoise(Ii, sigma_r, mean_r):
 	# Readout noise: White Gaussian
-	N_r = numpy.random.normal(mean_r, sigma_r, (size(Ii[1]), size(Ii[2])))
+	N_r = random.normal(mean_r, sigma_r, (size(Ii[1]), size(Ii[2])))
 
 	# Photon noise: Poisson
 	# Poisson distribution can only return integer values (# events), so here we assume 1000 events occur,
 	# then generate the corresponding noise for each pixel, then re-normalize back to a unit intensity distribution
 	lambda_p = mean(Ii)*1000
-	N_p = numpy.random.poisson(lambda_p, (size(Ii[1]), size(Ii[2])))
+	N_p = random.poisson(lambda_p, (size(Ii[1]), size(Ii[2])))
 	N_p = (N_p.astype(float))/1000
 	
-	Ii = Ii + N_r + N_p 
+	Ii = Ii + N_p + N_r 
 	return Ii
 	
 	
@@ -103,10 +103,10 @@ def extractPhasePlate(lensCentx, lensCenty, D, phaseIn, x, y, dx, dy):
 	# Extracts phase plate from the entire incident phase for calculation of a single lenslet	
 	
      	# Create coordinates for the phase plates
-	phPlateStx = lensCentx - D/2 # Start postions of each lenslet on x-axis [m]
-	phPlateSty = lensCenty - D/2 # Start postions of each lenslet on y-axis [m]
-	phPlateEndx = lensCentx + D/2 # End postions of each lenslet on x-axis [m]
-	phPlateEndy = lensCenty + D/2 # End postions of each lenslet on y-axis [m]
+	phPlateStx = lensCentx - D/2 # Start positions of each lenslet on x-axis [m]
+	phPlateSty = lensCenty - D/2 # Start positions of each lenslet on y-axis [m]
+	phPlateEndx = lensCentx + D/2 # End positions of each lenslet on x-axis [m]
+	phPlateEndy = lensCenty + D/2 # End positions of each lenslet on y-axis [m]
  	
       # Extract phase plate
 	xPhase = arange(phPlateStx,phPlateEndx + dx, dx) # Sample positions on x-axis [m]
@@ -118,9 +118,9 @@ def extractPhasePlate(lensCentx, lensCenty, D, phaseIn, x, y, dx, dy):
 	
 	
 def tiltPhasePlate(phasePlate, k, f, xPhase, yPhase, dx, dy):
-	# Compesates tilt in the phase plate and gives the postion shifts for the diffraction pattern	
+	# Compensates tilt in the phase plate and gives the position shifts for the diffraction pattern	
 	
-	# Calculate the average phase tilt and preproces the phase plate
+	# Calculate the average phase tilt and pre-process the phase plate
 	Gx, Gy = gradient(phasePlate,dx,dy) # Determine the gradient of the phase plate
 	Gx = mean(Gx) # Determine the tilt in the x-direction
 	Gy = mean(Gy) # Determine the tilt in the y-direction

@@ -1,4 +1,6 @@
-#Current Status for Single Lens System May 19, 2014
+# PyAO Project Presentation: Demo Function
+# Updated: June 18, 2014.
+
 import math
 from numpy import *
 from scipy import *
@@ -42,6 +44,8 @@ paramsSensor = {
 	'mean_readout': 0.0,   # should be 0 for white noise
 	# Photon Noise Parameters (Modelled as Poisson): based only on expected value of Ii 
 	}
+	
+	
 # Compute lenslet centres and check minimal array widths 
 lx, ly, lensCentx, lensCenty = lensletCentres(paramsSensor)
 # Normalized lenslet centers
@@ -50,6 +54,7 @@ paramsSensor['lensCenty'] = lensCenty
 # Set correct array widths
 paramsSensor['lx'] = lx
 paramsSensor['ly'] = ly
+
 	
 def createTestPhase(paramsSensor):
 	# Unwrap paramsSensor
@@ -88,10 +93,11 @@ def createTestPhase(paramsSensor):
 	return Xo,Yo,phaseIn
 
 
-	
+# ======================================================================	
 # Run test
 # Create an incident phase
 Xo,Yo,phaseIn = createTestPhase(paramsSensor)
+
 # Plot the incident phase
 figPhaseIn = pl.figure()
 ax1 = figPhaseIn.gca(projection='3d')
@@ -99,13 +105,16 @@ surf = ax1.plot_surface(Xo,Yo,phaseIn, rstride=1, cstride=1, cmap='jet')
 ax1.set_xlabel('x')
 ax1.set_ylabel('y')
 ax1.set_zlabel('Phase')
+
 # Create the intensity distribution
 X,Y,Ii = wfs(phaseIn, paramsSensor)
+
 # Plot the intensity distribution
 Xmm = X*1000.0
 Ymm = Y*1000.0
 figIi = pl.figure()
 conNum = pl.pcolor(Xmm,Ymm,Ii)
+# Include white circle at center of ideal spot (lenslet center)
 conNum_rel = pl.plot((lensCentx*lx + lx/paramsSensor['numPupilx'])*1000, (lensCenty*ly + ly/paramsSensor['numPupily'])*1000, 'o', color='w')
 pl.title('Numerical Solution (mm)')
 pl.show()
