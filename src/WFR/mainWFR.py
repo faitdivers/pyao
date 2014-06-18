@@ -12,17 +12,24 @@ def wfr(centroids, params):
 	#Get dimensions
 	x_dim = params['noApertx']
 	y_dim = params['noAperty']
-
-	#Get the size of the subaperture
-	Dl = params['D']
+	
+	#Get lenslet centers
+	lensCentx = params['lensCentx']
+	lensCenty = params['lensCenty']
+	lx = params['lx']
+	ly = params['ly']
+	
+	#Get the size of the lenslet
+	D = params['D']
+	#Get the distance between two lenslets
+	dl = params['dl']
 	
 	#Create phase_id matrix
 	phase_id = create_phase_id(centroids,x_dim,y_dim)
 	#Create phase_num matrix
 	phase_num, teller = create_phase_num(phase_id,x_dim,y_dim)
-	#Create G matrix
-	G = create_G(centroids, phase_num, teller, x_dim, y_dim, Dl)
-	
+	#Create Fried matrix
+	G = create_Friedmap(centroids, phase_num, teller, x_dim, y_dim, D)
 	#Solve the least-squares problem
 	# phi = (G^T G)^-1 G^T centroids
 	F = dot(G.T,G) #G.T*G
@@ -30,11 +37,10 @@ def wfr(centroids, params):
 	H = dot(F_inv,G.T)
 	phi = dot(H,centroids)
 	
-	#print phi.shape
+	#Determine the physical points of the phi's 
+	phiCentersX, phiCentersY = determine_phi_positions(lensCentx, lx, x_dim, lensCenty, ly, y_dim, dl, D)
 	
-	# syntax: ones(shape, dtype=None, order='C')
-	#return ones((params['numPupilx'],params['numPupily']))
-	return phi
+	return phi, phiCentersX, phiCentersY
 
 def create_phase_id(centroids, x_dim, y_dim):
 	#Create a phase_id matrix
@@ -63,7 +69,7 @@ def create_phase_num(phase_id, x_dim, y_dim):
 				teller += 1
 	return phase_num, teller
 
-def create_G(centroids, phase_num, teller, x_dim, y_dim, Dl):
+def create_Friedmap(centroids, phase_num, teller, x_dim, y_dim, Dl):
 	#Create G matrix
 	#For clarity an actual matrix shape is used
 	number_slopes = x_dim*y_dim
@@ -88,4 +94,51 @@ def create_G(centroids, phase_num, teller, x_dim, y_dim, Dl):
 def pseudo_inverse(A):
 	A_inverse = linalg.pinv(A)
 	return A_inverse
+	
+def determine_phi_positions(lensCentx, lx, dim_x, lensCenty, ly, dim_y, dl, D):
+	#denormalize lens center arrays
+	lensCentersX = lensCentx*lx
+	lensCentersY = lensCenty*ly
+	
+	#shift positions of centers to positions of phi
+	#this is done by substracting 0.5 dl
+	lensCentersXShifted = lensCentersX-0.5*dl
+	lensCentersYShifted = lensCentersY-0.5*dl
+	
+	#phi consists of one more row and column
+	#create these extra rows and columns
+	
+	#For the x positions, reshape
+	lensCentersXShifted = lensCentersXShifted.reshape((dim_y, dim_x))
+	#get last column
+	last_column_x = lensCentersXShifted[:,-1]
+	#add dl + D to get correct center
+	last_column_phi_x = last_column_x + dl + D
+	#otherwise we can't append it
+	last_column_phi_x = last_column_phi_x.reshape((dim_y,1))
+	#add this column to the phi positions of x
+	phiCentersXAllColumns = append(lensCentersXShifted, last_column_phi_x,1)
+	#copy the last row and append
+	phiCentersX_last_row = phiCentersXAllColumns[-1:]
+	phiCentersX = vstack([phiCentersXAllColumns, phiCentersX_last_row])
+	
+	#For the y positions
+	#get the last row
+	last_row_y = lensCentersYShifted[-dim_x:]
+	#add dl + D to get correct centers for the new last row
+	last_row_phi_y = last_row_y + dl + D
+	#add the last row to the matrix
+	phiCentersYAllRows = hstack([lensCentersYShifted,last_row_phi_y])
+	#reshape to get last column
+	phiCentersYAllRows = phiCentersYAllRows.reshape((dim_y+1, dim_x))
+	#copy last column
+	phiCentersY_last_column = phiCentersYAllRows[:,-1].reshape((dim_x,1))
+	#complete centers for phi Y
+	phiCentersY = append(phiCentersYAllRows,phiCentersY_last_column,1)
+	
+	#put them in same format as phi
+	phiCentersX = hstack(phiCentersX)
+	phiCentersY = hstack(phiCentersY)
+	
+	return phiCentersX, phiCentersY
 	
