@@ -102,8 +102,9 @@ def determine_phi_positions(lensCentx, lx, dim_x, lensCenty, ly, dim_y, dl, D):
 	
 	#shift positions of centers to positions of phi
 	#this is done by substracting 0.5 dl
-	lensCentersXShifted = lensCentersX-0.5*dl
-	lensCentersYShifted = lensCentersY-0.5*dl
+	lensCentersXShifted = lensCentersX-0.5*(dl+D)
+	print lensCentersXShifted
+	lensCentersYShifted = lensCentersY-0.5*(dl+D)
 	
 	#phi consists of one more row and column
 	#create these extra rows and columns
@@ -139,6 +140,9 @@ def determine_phi_positions(lensCentx, lx, dim_x, lensCenty, ly, dim_y, dl, D):
 	#put them in same format as phi
 	phiCentersX = hstack(phiCentersX)
 	phiCentersY = hstack(phiCentersY)
+	
+	print lensCentersX
+	print phiCentersX
 	
 	return phiCentersX, phiCentersY
 	
