@@ -27,9 +27,9 @@ def wfr(centroids, params):
 	#Create phase_id matrix
 	phase_id = create_phase_id(centroids,x_dim,y_dim)
 	#Create phase_num matrix
-	phase_num, teller = create_phase_num(phase_id,x_dim,y_dim)
+	phase_num, counter = create_phase_num(phase_id,x_dim,y_dim)
 	#Create Fried matrix
-	G = create_Friedmap(centroids, phase_num, teller, x_dim, y_dim, D)
+	G = create_Friedmap(centroids, phase_num, counter, x_dim, y_dim, D)
 	#Solve the least-squares problem
 	# phi = (G^T G)^-1 G^T centroids
 	F = dot(G.T,G) #G.T*G
@@ -59,15 +59,15 @@ def create_phase_id(centroids, x_dim, y_dim):
 	
 def create_phase_num(phase_id, x_dim, y_dim):
 		#Create phase_num matrix
-	teller = 0
+	counter = 0
 	phase_num = zeros(((x_dim+1),(y_dim+1)),dtype=int)
 	for i in range(0,x_dim+1):
 		for j in range(0,y_dim+1):
 			#Check if the phase_id is non zero
 			if phase_id[i,j] != 0:
-				phase_num[i,j] = teller
-				teller += 1
-	return phase_num, teller
+				phase_num[i,j] = counter
+				counter += 1
+	return phase_num, counter
 
 def create_Friedmap(centroids, phase_num, teller, x_dim, y_dim, Dl):
 	#Create G matrix
