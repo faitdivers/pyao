@@ -141,8 +141,5 @@ def determine_phi_positions(lensCentx, lx, dim_x, lensCenty, ly, dim_y, dl, D):
 	phiCentersX = hstack(phiCentersX)
 	phiCentersY = hstack(phiCentersY)
 	
-	print lensCentersX
-	print phiCentersX
-	
 	return phiCentersX, phiCentersY
 	
