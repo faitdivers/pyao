@@ -36,6 +36,7 @@ def wfr(centroids, params):
 	F_inv = pseudo_inverse(F)
 	H = dot(F_inv,G.T)
 	phi = dot(H,centroids)
+	phi.reshape((x_dim+1,y_dim+1))
 	
 	#Determine the physical points of the phi's 
 	phiCentersX, phiCentersY = determine_phi_positions(lensCentx, lx, x_dim, lensCenty, ly, y_dim, dl, D)
@@ -103,7 +104,6 @@ def determine_phi_positions(lensCentx, lx, dim_x, lensCenty, ly, dim_y, dl, D):
 	#shift positions of centers to positions of phi
 	#this is done by substracting 0.5 dl
 	lensCentersXShifted = lensCentersX-0.5*(dl+D)
-	print lensCentersXShifted
 	lensCentersYShifted = lensCentersY-0.5*(dl+D)
 	
 	#phi consists of one more row and column
@@ -138,8 +138,8 @@ def determine_phi_positions(lensCentx, lx, dim_x, lensCenty, ly, dim_y, dl, D):
 	phiCentersY = append(phiCentersYAllRows,phiCentersY_last_column,1)
 	
 	#put them in same format as phi
-	phiCentersX = hstack(phiCentersX)
-	phiCentersY = hstack(phiCentersY)
+	#phiCentersX = hstack(phiCentersX)
+	#phiCentersY = hstack(phiCentersY)
 	
 	return phiCentersX, phiCentersY
 	
