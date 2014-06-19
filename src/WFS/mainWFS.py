@@ -40,7 +40,6 @@ def wfs(phaseIn, paramsSensor):
 	# Create spatial grid for the diffraction patterns for each lens
 	dfft = lam*f/supD # Sample length [m]
 	xfft = arange(-lam*f/2.0/dx, lam*f/2.0/dx + dfft, dfft) # Sample positions[m]
-	Xfft, Yfft = meshgrid(xfft, xfft) # Create spatial grid
 	
 	# Calculate pupil function
 	P = sqrt(XSup**2.0 + YSup**2.0) <= D/2.0 # Pupil function
@@ -59,14 +58,13 @@ def wfs(phaseIn, paramsSensor):
 		phasePlate = phaseInterp(xSup, xSup) # Insert phase grid into the support grid
 		Uin = exp(1j*phasePlate) # Caculate the complex amplitude from the phase 
 		Ulb = P*Uin # Complex amplitude just before the lens
-		Ula = dx*dy*numpy.fft.fftshift(numpy.fft.fft2(Ulb)) # Complex amplitude just behind the lens
+		Ui = dx*dy*numpy.fft.fftshift(numpy.fft.fft2(Ulb)) # Complex amplitude just behind the lens
 		
 		# Calculate the intensity distribution on the image plane
-		Ui = exp(1j*k*f)*exp(1j*k/(2.0*f)*((Xfft + xShift)**2.0 + (Yfft + yShift)**2.0))/(1j*lam*f)*Ula # Complex amplitude on the image plane
 		IiPlate = absolute(Ui)**2.0 # Intensity profile in the focal plane, numerically
-		XfftPlate = Xfft + xShift + lensCentx[ii] # Adjust the x-axis
-		YfftPlate = Yfft	+ yShift + lensCenty[ii] # Adjust the y-axis
-		IiInterp = interpolate.interp2d(XfftPlate[0], YfftPlate[:,0], IiPlate, kind='cubic') # Create interpolation function
+		xfftPlate = xfft + xShift + lensCentx[ii] # Adjust the x-axis
+		yfftPlate = xfft	+ yShift + lensCenty[ii] # Adjust the y-axis
+		IiInterp = interpolate.interp2d(xfftPlate, yfftPlate, IiPlate, kind='cubic') # Create interpolation function
 		IiPlate = IiInterp(x, y) # Insert support grid into the image plane grid
 		Ii = Ii + IiPlate # Collect single lens patterns
 	Ii = Ii/amax(absolute(Ii)) # Normalize intensity distribution
@@ -95,7 +93,7 @@ def tiltPhasePlate(phasePlate, k, f, xPhase, yPhase, dx, dy):
 	# Compesates tilt in the phase plate and gives the postion shifts for the diffraction pattern	
 	
 	# Calculate the average phase tilt and preproces the phase plate
-	Gx, Gy = gradient(phasePlate,dx,dy) # Determine the gradient of the phase plate
+	Gy, Gx = gradient(phasePlate,dx,dy) # Determine the gradient of the phase plate
 	Gx = mean(Gx) # Determine the tilt in the x-direction
 	Gy = mean(Gy) # Determine the tilt in the y-direction
 	theta = arctan(Gx/k) # Incident angle with respect to the x-axis [rad]
