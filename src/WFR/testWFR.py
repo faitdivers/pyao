@@ -1,4 +1,5 @@
 from mainWFR import *
+from plotWavefront import *
 import sys
 import os
 sys.path.append(os.path.dirname(os.path.realpath(__file__))+'/../')
@@ -60,7 +61,8 @@ def test_run():
 	sensorParameters = parameters['Sensor'];
 
 	centroids = ones((sensorParameters['noApertx']*sensorParameters['noAperty']*2,1))
-	wfRec = wfr(centroids, sensorParameters)
+	wfRec,phiCentersX, phiCentersY = wfr(centroids, sensorParameters)
+	plotWavefront(phiCentersX,phiCentersY,wfRec)
 	return
 
 test_run()
