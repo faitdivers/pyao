@@ -13,7 +13,7 @@ def kroneckerDelta(x):
 # to add 1 to the argument. The function does NOT solve int_{0}^{inf} = t^{n-1}*e^{-t} dt.
 # It only extends validity beyond n < 0. The result is only guaranteed for integer 
 # arguments.
-def gamma(n):
+def gamma2(n):
     f = 1
     if n >=0:
         while n > 1:
@@ -21,7 +21,11 @@ def gamma(n):
             n -= 1
         return f
     else:
-        return inf
+        return inf  
+    #if n > 0:
+    #    return math.gamma(n + 1)
+    #else:
+    #    return inf
   
 # Map Cartesian coordinates of polar coordinates : (r,t) = mapping(x,y)
 # Computes the radius R and angle THETA from the (arrays) X and Y, representing
