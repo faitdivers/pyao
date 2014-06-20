@@ -59,14 +59,14 @@ João P. Lopes e Silva
 In the previous part of this report, we already mentioned the first steps in the use of adaptive optics. First we described waverfront generating and wavefront sensing. In this chapter of the report, we direct our focus to the reconstruction of the wavefront. 
 
 \section{Zonal Reconstruction}
-In order to describe the gradient of the wavefront, we first take a look at a zonal reconstruction method. With zonal reconstruction, we split up the wavefront in zones. These zones can represent a regular grid of square or rectangular elements or some other local region such as a hexagonal or other shape. For Shack-Hartmann wavefront sensors, the type of sensor that is used, these zones are generally chosen to match the lenslet array.
+In order to describe the gradient of the wavefront, we first take a look at a zonal reconstruction method. With zonal reconstruction, we split up the wavefront in zones. These zones can represent a regular grid of square or rectangular elements or some other local region such as a hexagon or other shape. For Shack-Hartmann wavefront sensors, the type of sensor that is used, these zones are generally chosen to match the lenslet array.
 
 \subsection{reconstruction of wavefront slopes}
 As can be seen in the part of the centroid algorithm, the relation between the slope of the wavefront and the wavefront phase can be defined by the following partial derivative:
 $$ \sigma_x = \frac{\partial\phi(x,y)}{\partial x},$$ 
 $$ \sigma_y = \frac{\partial\phi(x,y)}{\partial y}.$$ 
 Where $\sigma_x$ and $\sigma_y$ approximate the gradient of the phase in the $x$ and $y$ direction, respectively.
-In order to estimate the derivatives, we need to use a finite difference (FD) method. There are a number of different FD methods which depend on the sampling geometry. Some of these geometries are the Fried\cite{fried1977least}, Hudgin\cite{hudgin1977wave} and Southwell\cite{southwell1980wave} geometries. We first start with a detailed explanation of the Fried geometry.
+In order to estimate the derivatives, we need to use a finite difference (FD) method. There are a number of different FD methods which depend on the sampling geometry. Some of these geometries are the Fried~\cite{fried1977least}, Hudgin~\cite{hudgin1977wave} and Southwell~\cite{southwell1980wave} geometries. We first start with a detailed explanation of the Fried geometry.
 
 \subsection{Fried Geometry}
 The Fried FD method calculates the average slope in one grid cell by using the four phase points. We first tkae a look at one part of the cell grid.
@@ -78,7 +78,7 @@ The Fried FD method calculates the average slope in one grid cell by using the f
 \newpage
 \noindent The goal is to calculate average of the both slopes. The first slope (in the x-direction) is given by the red line. We can easily see that this slope is given by:
 $$ \sigma_{x,\text{red}} = \frac{\phi(2,1) - \phi(1,1)}{h}, $$
-where $h$ is the step between the 2 phase measurments, ussualy the size of the subapperature.
+where $h$ is the step between the 2 phase measurements, usualy the size of the subaperature.
 Now we do the same for the other slope:
 $$ \sigma_{x,\text{blue}} = \frac{\phi(2,2) - \phi(1,2)}{h}. $$
 Now we take the average of these 2 slopes on then we know the slope of the wavefront in this zone (for x-direction).
@@ -94,7 +94,7 @@ This is the Fried geometry model. Later in this chapter the Southwell and Hudgin
 \subsection{Creating the geometry matrix}
 The next step is to take geometry model and structurize it in an orderly fashion. We structurize the model as followed:
 $$ s = G\phi + n.$$  
-Here s is the vector containing the slopes, made by appending $[\sigma_x \sigma_y]^\top$. The symbol $\phi$ is a vector filled with the phase points used define the slope and n is the noise. The equations used to link $\phi$ with $s$ can be found in the geometry matrix G. In our previous example we can derive the following G matrix:
+Here s is the vector containing the slopes, made by appending $[\sigma_x^top \sigma_y^top]^\top$. The symbol $\phi$ is a vector filled with the phase points used define the slope and n is the noise. The equations used to link $\phi$ with $s$ can be found in the geometry matrix G. In our previous example we can derive the following G matrix:
 $$ 
 \begin{bmatrix}
 \sigma_x \\
@@ -134,7 +134,7 @@ Lets take a look at the way the Hudgin geometry is defined. First we start with 
 From this we can easily derive the slope approximation in x and y direction. These are given by the following equations:
 $$ \sigma_x = \frac{\phi(2,1)-\phi(1,1)}{h}$$
 $$ \sigma_x = \frac{\phi(1,2)-\phi(1,1)}{h}$$
-From these equations we can derive the geometry matrix, just as we have done with the Fried geometry. But if we look closer to Figure 2, we see that slopes $\sigma_x$ and $\sigma_y$ are not defined in the same point, as with the Fried geometry. Due to our sensor, the Shack-Hartmann sensor, and it`s centroid algorithm, we only the 2 slopes in the same point. As this geometry requires the slopes at 2 different pionts, we have to conclude that we cannot use the Hudgin geometry. But fortunatly, we can alter the Hudgin geometry slightly, and use it on a Shack-Hartmann snesor. This is called the `Modified` Hudgin geometry\cite{rosensteiner2011cumulative}.
+From these equations we can derive the geometry matrix, just as we have done with the Fried geometry. But if we look closer to Figure 2, we see that slopes $\sigma_x$ and $\sigma_y$ are not defined in the same point, as with the Fried geometry. Due to our sensor, the Shack-Hartmann sensor, and its centroid algorithm, we only the 2 slopes in the same point. As this geometry requires the slopes at 2 different pionts, we have to conclude that we cannot use the Hudgin geometry. But fortunatly, we can alter the Hudgin geometry slightly, and use it on a Shack-Hartmann snesor. This is called the `Modified` Hudgin geometry\cite{rosensteiner2011cumulative}.
 \newline
 \newline
 The Modified Hudgin geometry uses the same theory as the Hudgin geometry, but it makes it capable for being used in a Shack-Hartmann sensor. Let`s see an overview of the slopes and phase points as they are used in the Modified Hudgin geometry.  
@@ -248,7 +248,14 @@ $$ y=Fx $$
 We would like to find the optimal solution $\hat{x}$, which we can write as:
 \newline
 \newline
-$ min_x \ \ \epsilon^T \epsilon $, subjected to $ y=Fx + \epsilon$
+\begin{equation*}
+\begin{aligned}
+& \underset{x}{\text{minimize}}
+& & \epsilon^T\epsilon \\
+& \text{subject to}
+& & y=Fx + \epsilon
+\end{aligned}
+\end{equation*}
 \newline
 \newline
 Where $\epsilon$ is the residual vector. We can rewrite the equation above in a more standard problem:
@@ -262,7 +269,7 @@ When using this estimator, the reconstruction problem can be solved by:
 $$ \hat{\phi} = (G^TG)^{-1}G^TS  $$
 \newline
 \newline
-Unfortunatly, our problem is defined slightly different. We need to think about the fact that we also have noise in our equations, which means that we cannot take $\phi$ as a determinstic vector. In that case, we need to formulate the stochastic least squares problem. We would like to minimize the following equation:
+Unfortunatly, our problem is defined slightly different. We need to think about the fact that we also have noise in our equations, which means that we cannot take $\phi$ as a determinstic vector. Note that we have noise info and `a priori` information about the phase available. In that case, we need to formulate the stochastic least squares problem. We would like to minimize the following equation:
 $$ y=Fx+L\epsilon$$
 From which we know that x has a mean of $\bar{x}$ and the covariance matrix P, which we consider to be positive-definite.
 $\epsilon$ is consider white and is not correlated to x. We know that the solution to this problem has to be unbiased and have a minimum-variance. We first specify our linear estimator as:
