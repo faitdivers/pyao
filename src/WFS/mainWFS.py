@@ -31,7 +31,7 @@ def wfs(phaseIn, paramsSensor):
 	dy = ly/(Ny - 1.0) # Sample length on y-axis [m]
 	x = arange(0.0, lx + dx, dx) # Sample positions on x-axis [m]
 	y = arange(0.0, ly + dy, dy) # Sample positions on y-axis [m]
-	Ii = zeros((size(x),size(y))) # Intensity distribution
+	Ii = zeros((size(y),size(x))) # Intensity distribution
 
 	# Create support grid in the pupil plane for each lens
 	xSup = arange(-supD/2,supD/2 + dx, dx) # Sample positions on x-axis [m]
@@ -93,7 +93,7 @@ def tiltPhasePlate(phasePlate, k, f, xPhase, yPhase, dx, dy):
 	# Compesates tilt in the phase plate and gives the postion shifts for the diffraction pattern	
 	
 	# Calculate the average phase tilt and preproces the phase plate
-	Gy, Gx = gradient(phasePlate,dx,dy) # Determine the gradient of the phase plate
+	Gy, Gx = gradient(phasePlate,dy,dx) # Determine the gradient of the phase plate
 	Gx = mean(Gx) # Determine the tilt in the x-direction
 	Gy = mean(Gy) # Determine the tilt in the y-direction
 	theta = arctan(Gx/k) # Incident angle with respect to the x-axis [rad]
