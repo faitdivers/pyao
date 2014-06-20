@@ -1,0 +1,115 @@
+\documentclass{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{mathrsfs,amsmath}
+\usepackage{float}
+\usepackage{subfig}
+\usepackage{units}
+\usepackage{cite}
+\usepackage{slashbox}
+\usepackage{listings}
+\usepackage{color}
+
+\definecolor{mygreen}{rgb}{0,0.6,0}
+\definecolor{mygray}{rgb}{0.5,0.5,0.5}
+\definecolor{mymauve}{rgb}{0.58,0,0.82}
+
+
+\usepackage[a4paper]{geometry}	% enlarges the page margins to standard A4 paper
+\usepackage{fancyhdr}		          % header usepackage
+\usepackage{graphicx}		         % figures usepackage
+\usepackage{mathtools}                       % Used in some equations for displaying text
+\usepackage{amsmath}                        % No idea what it is, but seems usefull
+\usepackage{amssymb} 		        % symbol for set
+\usepackage{mathrsfs}                        %lagrange symbol
+\usepackage{float}
+\usepackage{epstopdf}
+
+% Puts captions of tables on top
+\floatstyle{plaintop}
+\restylefloat{table}
+
+% Puts captions in bold
+\captionsetup{labelfont=bf}
+
+\begin{document}
+\section{Introduction}
+This manual is intended as reference guide to show you around the wavefront generation code of Adaptive Optics in Python. This manual will comprise of a description of the classes as well as their methods and functions. As far as is reasonably necessary, an example is included.
+
+As current, the WFG part includes two classes. One class on the Zernike aberrations. The second class is on the stochastic behaviour of the the wavefront, as for example Kolmogorov behaviour.
+
+\newpage
+\lstset{language=Python} 
+% Zernike static methods
+\section{Zernike Functions}
+\subsection{zernike}
+Z = zernike(rho, theta,u,v = None):
+
+Returns
+
+
+\subsection{zernikeIndex}
+u,v = def zernikeIndex(i):
+
+
+% Zernike dynamic class
+\section{ZernikeWave Class}
+\subsection{Constructor}
+
+\subsection{addMode}
+
+\subsection{changeModeWeight}
+
+\subsection{removeMode}
+
+\subsection{modeExists}
+
+\subsection{getModes}
+
+\subsection{getWeights}
+
+\subsection{createWavefront}
+
+\subsection{decomposeWavefront}
+
+\subsection{plotMode}
+
+\subsection{plotWavefront}
+
+% Phasescreen dynamic class
+\section{PhaseScreen Class}
+\subsection{Constructor}
+
+\subsection{setType}
+
+\subsection{getType}
+
+\subsection{setParams}
+
+\subsection{getParameters}
+
+\subsection{createWavefront}
+
+\subsection{kolmogorov}
+
+\subsection{vonkarman}
+
+\subsection{plotWavefront}
+
+% Static support function on wfg
+\section{Support functions}
+\subsection{kroneckerDelta}
+
+\subsection{gamma2}
+
+\subsection{cart2pol}
+
+\subsection{pol2cart}
+
+\subsection{createGrid}
+
+\subsection{circ}
+
+
+\end{document}
