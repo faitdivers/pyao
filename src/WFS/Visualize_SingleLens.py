@@ -1,10 +1,11 @@
 #Visualization for Single Lens System 
-#Updated: June 18, 2014
+#Updated: June 20, 2014
 #Project: PyAO
-#Description: Allows for testing/visualization of a SingleLens solution. 
-#             Calls wfs from mainWFS.py for the numerical solution, 
-#			  then calculates the analytical solution and plots both 
-#             solutions. This file stands alone from the PyAO project main. 
+#Description: Allows for testing/visualization of a SingleLens intensity 
+#			  distribution. Calls wfs from mainWFS.py for the numerical 
+#			  intensities, then calculates the analytical intensities.
+# 			  Plots both solutions and the error between them. This file 
+#			  stands alone from the PyAO project main. 
 
 from mainWFS import *
 from lensArrayConfig import *
@@ -53,45 +54,6 @@ def setup_params():
 	paramsSensor['ly'] = ly
 	
 	return paramsSensor
-
-	
-	
-# This function generates a test phase (wavefront) for the test run. 
-# Directly copied from testWFS.py
-def createTestPhase(paramsSensor):
-	# Unwrap paramsSensor
-	Nx = paramsSensor['numPupilx'] # Samples on the x-axis per lenslet
-	Ny = paramsSensor['numPupily'] # Samples on the y_axis per lenslet
-	lx = paramsSensor['lx'] # Width of the lenslet array in the x-direction [m]
-	ly = paramsSensor['ly'] # Width of the lenslet array in the y-direction [m]
-	lam = paramsSensor['lam'] # Wavelength [m]
-	k = 2*pi/lam # Wavenumber
-	
-	dxo = lx/(Nx - 1.0) # Sample length on x-axis [m]
-	dyo = ly/(Ny - 1.0) # Sample length on y-axis [m]
-	xo = arange(0.0,lx + dxo,dxo) # Sample positions on x-axis [m]
-	yo = arange(0.0,ly + dyo,dyo) # Sample positions on y-axis [m]
-	Xo, Yo = meshgrid(xo,yo) # Create spatial grid
-	
-	# Create random wavefront
-#	ax = random.uniform(-1.0,1.0)*2.0
-#	ay = random.uniform(-1.0,1.0)*2.0
-#	bx = random.uniform(-1.0,1.0)*1.0
-#	by = random.uniform(-1.0,1.0)*1.0
-#	cx = random.uniform(-1.0,1.0)*0.0001 # Tilt x
-#	cy = random.uniform(-1.0,1.0)*0.0001 # Tilt y
-#	ex = random.uniform(-1.0,1.0)*2.0
-#	ey = random.uniform(-1.0,1.0)*2.0
-#	d =  random.uniform(-1.0,1.0)
-#
-#	phaseIn = k*((ax*Xo)**3.0 + (ay*Yo)**3.0 + (bx*Xo)**2.0 + 
-#		(by*Yo)**2.0 + cx*Xo + cy*Yo + d + (ex*Xo)**4.0 + (ey*Yo)**4.0)
-	
-	# Create a planar wavefront
-	phaseIn = zeros((size(yo),size(xo)))
-
-	return Xo,Yo,phaseIn
-
 	
 	
 # This function calculates the analytical solution for the intensity distribution 
@@ -124,24 +86,18 @@ def analyticalLens (xi, yi, wf, paramsSensor):
 	
 # Define Parameters
 paramsSensor = setup_params()
-# Generate Wavefront
-xo, yo, wf = createTestPhase(paramsSensor)
+# Define Planar Wavefront
+wf = zeros((paramsSensor['numPupilx'],paramsSensor['numPupily']))
 # Get Numerical Solution - use WFSmain.py
 xi, yi, Ii = wfs(wf, paramsSensor)
 # Get Analytical Solution
 Ia = analyticalLens(xi, yi, wf, paramsSensor)
+# Calculate error between numerical and analytical solutions
+I_err = Ii - Ia
 
-# Plotting
-# Plot Wavefront
-figPhaseIn = pl.figure()
-ax = figPhaseIn.gca(projection='3d')
-surf = ax.plot_surface(xo*1000,yo*1000,wf)
-ax.set_xlabel('x [mm]')
-ax.set_ylabel('y [mm]')
-ax.set_zlabel('Phase')
-ax.set_title('Incident Wavefront Phase')
 
-# Plot Numerical Intensity Distribution
+# Prepare Plots
+# Numerical Intensity Distribution
 figIi = pl.figure()
 conNum = pl.pcolor(xi*1000,yi*1000,Ii)
 pl.xlabel('x (mm)')
@@ -149,7 +105,7 @@ pl.ylabel('y (mm)')
 pl.title('Normalized Numerical Intensity Distribution')
 pl.colorbar()
 
-# Plot Analytical Solution
+# Analytical Intensity Distribution
 figIa = pl.figure()
 conAna = pl.pcolor(xi*1000,yi*1000,Ia)
 pl.xlabel('x (mm)')
@@ -157,4 +113,13 @@ pl.ylabel('y (mm)')
 pl.title('Normalized Analytical Intensity Distribution')
 pl.colorbar()
 
+# Error between Intensity Distributions
+figIa = pl.figure()
+conAna = pl.pcolor(xi*1000,yi*1000,I_err)
+pl.xlabel('x (mm)')
+pl.ylabel('y (mm)')
+pl.title('Error Between Normalized Numerical and Analytical Intensities')
+pl.colorbar()
+
+# Show all three plots
 pl.show()
