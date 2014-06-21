@@ -1,4 +1,6 @@
-# Updated: June 17, 2014
+# PyAO Project Presentation: Demo Function
+# Updated: June 18, 2014.
+
 import math
 from numpy import *
 from scipy import *
@@ -32,16 +34,17 @@ paramsSensor = {
 	'dl' : 10.0e-6,	
 	# Support factor used for support size [m] = support factor x diameter lenslet
 	'supportFactor' : 4,
-	
+		
 	# Noise Parameters
     # Include Measurement Noise
-    'Noisy': False, # True = include Readout, Photon noise, False = don't estimate measurement noise
+    'Noisy': True, # True = include Readout, Photon noise, False = don't estimate measurement noise
 	# Readout Noise Parameters (Modelled as Gaussian): based on CCD characteristics
     'sigma_readout': 0.005, # ratio of # readout noise electrons (nominally 0:5) to 
 							# mean signal brightness (nominally 1000 electrons)
 	'mean_readout': 0.0,   # should be 0 for white noise
 	# Photon Noise Parameters (Modelled as Poisson): based only on expected value of Ii 
 	}
+	
 	
 # Compute lenslet centres and check minimal array widths 
 lx, ly, lensCentx, lensCenty = lensletCentres(paramsSensor)
@@ -51,6 +54,7 @@ paramsSensor['lensCenty'] = lensCenty
 # Set correct array widths
 paramsSensor['lx'] = lx
 paramsSensor['ly'] = ly
+
 	
 def createTestPhase(paramsSensor):
 	# Unwrap paramsSensor
@@ -67,42 +71,50 @@ def createTestPhase(paramsSensor):
 	yo = arange(0.0,ly + dyo,dyo) # Sample positions on y-axis [m]
 	Xo, Yo = meshgrid(xo,yo) # Create spatial grid
 	
-	# Create random wavefront
-#	ax = random.uniform(-1.0,1.0)*2.0
-#	ay = random.uniform(-1.0,1.0)*2.0
-#	bx = random.uniform(-1.0,1.0)*1.0
-#	by = random.uniform(-1.0,1.0)*1.0
-#	cx = random.uniform(-1.0,1.0)*0.0001 # Tilt x
-#	cy = random.uniform(-1.0,1.0)*0.0001 # Tilt y
-#	ex = random.uniform(-1.0,1.0)*2.0
-#	ey = random.uniform(-1.0,1.0)*2.0
-#	d =  random.uniform(-1.0,1.0)
-#
-#	phaseIn = k*((ax*Xo)**3.0 + (ay*Yo)**3.0 + (bx*Xo)**2.0 + 
-#		(by*Yo)**2.0 + cx*Xo + cy*Yo + d + (ex*Xo)**4.0 + (ey*Yo)**4.0)
-	
+	# Create random wavefront variables
+	ax = 0 # random.uniform(-1.0,1.0)*2.0
+	ay = 0 # random.uniform(-1.0,1.0)*2.0
+	bx = 0 # random.uniform(-1.0,1.0)*1.0
+	by = 0 # random.uniform(-1.0,1.0)*1.0
+	cx = random.uniform(-1.0,1.0)*0.005 # Tilt x
+	cy = random.uniform(-1.0,1.0)*0.005 # Tilt y
+	ex = 0 # random.uniform(-1.0,1.0)*2.0
+	ey = 0 # random.uniform(-1.0,1.0)*2.0
+	d =  0 # random.uniform(-1.0,1.0)
+
 	# Create a planar wavefront
 	phaseIn = zeros((size(yo),size(xo)))
 
+	# Create a random wavefront
+	#phaseIn = k*((ax*Xo)**3.0 + (ay*Yo)**3.0 + (bx*Xo)**2.0 + 
+	#	(by*Yo)**2.0 + cx*Xo + cy*Yo + d + (ex*Xo)**4.0 + (ey*Yo)**4.0)
+	
+	
 	return Xo,Yo,phaseIn
 
+
+# ======================================================================	
 # Run test
-# Create a icident phase
+# Create an incident phase
 Xo,Yo,phaseIn = createTestPhase(paramsSensor)
-# Plot the incident pahse
+
+# Plot the incident phase
 figPhaseIn = pl.figure()
-ax = figPhaseIn.gca(projection='3d')
-surf = ax.plot_surface(Xo,Yo,phaseIn, rstride=1, cstride=1, cmap='jet')
-ax.set_xlabel('x')
-ax.set_ylabel('y')
-ax.set_zlabel('Phase')
-pl.show()
+ax1 = figPhaseIn.gca(projection='3d')
+surf = ax1.plot_surface(Xo,Yo,phaseIn, rstride=1, cstride=1, cmap='jet')
+ax1.set_xlabel('x')
+ax1.set_ylabel('y')
+ax1.set_zlabel('Phase')
+
 # Create the intensity distribution
 X,Y,Ii = wfs(phaseIn, paramsSensor)
+
 # Plot the intensity distribution
 Xmm = X*1000.0
 Ymm = Y*1000.0
 figIi = pl.figure()
 conNum = pl.pcolor(Xmm,Ymm,Ii)
+# Include white circle at center of ideal spot (lenslet center)
+conNum_rel = pl.plot((lensCentx*lx + lx/paramsSensor['numPupilx'])*1000, (lensCenty*ly + ly/paramsSensor['numPupily'])*1000, 'o', color='w')
 pl.title('Numerical Solution (mm)')
 pl.show()
