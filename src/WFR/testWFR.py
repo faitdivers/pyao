@@ -20,7 +20,7 @@ def setup_params():
 	'numImagx' : 200,
 	'numImagy' : 200,
 	# number of apertures in the wfs
-	'noApertx': 5,
+	'noApertx': 4,
 	'noAperty': 4,
 	# Focal Length [m]
 	'f' : 18.0e-3,
@@ -61,7 +61,7 @@ def test_run():
 	sensorParameters = parameters['Sensor'];
 
 	centroids = ones((sensorParameters['noApertx']*sensorParameters['noAperty']*2,1))
-	wfRec,phiCentersX, phiCentersY = wfr(centroids, sensorParameters)
+	wfRec,phiCentersX, phiCentersY = wfr(centroids, sensorParameters, 'fried')
 	plotWavefront(phiCentersX,phiCentersY,wfRec)
 	return
 
