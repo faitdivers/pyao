@@ -54,7 +54,17 @@ def setup_params():
     'supportFactor' : 4,
     # Illumination threshold (fractional flux threshold)
     'illumThreshold' : 0.3,
-    }
+	
+	# Noise Parameters
+    # Include Measurement Noise
+    'Noisy': False, # True = include Readout, Photon noise, False = don't estimate measurement noise
+	# Readout Noise Parameters (Modelled as Gaussian): based on CCD characteristics
+    'sigma_readout': 0.005, # ratio of # readout noise electrons (nominally 0:5) to 
+							# mean signal brightness (nominally 1000 electrons)
+	'mean_readout': 0.0,   # should be 0 for white noise
+	# Photon Noise Parameters (Modelled as Poisson): based only on expected value of Ii 
+	}
+	
     # Compute lenslet centres and check minimal array widths 
     lx, ly, lensCentx, lensCenty = lensletCentres(paramsSensor)
     # Normalized lenslet centers
