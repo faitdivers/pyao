@@ -11,6 +11,8 @@ from Control.mainControl import *
 from DM.mainDM import *
 from Simulation.LatencyBuffer import LatencyBuffer
 from WFR.determinePhiPositions import determine_phi_positions
+import matplotlib.pyplot as pl
+import time
 
 
 def setup_params():
@@ -27,7 +29,7 @@ def setup_params():
     # Scalar or array containing the zernike modes
     'zernikeModes': [2, 4, 21],
     # Scalar or array containing the zernike weights, with respect to the modes
-    'zernikeWeights': [0.5, 0.25, -0.6]
+    'zernikeWeights': [0.0005, 0.00025, -0.0006]
     }
 
     paramsSensor = {
@@ -94,7 +96,7 @@ def setup_params():
     
     simulationParameters = {
     'frequency': 10,       # Frequency of the simulation in Hertz
-    'time': 10,            # Simulated time in seconds
+    'time': 1,            # Simulated time in seconds
     'delay': 0,  # Delay in number of samples
     'is_closed_loop': True
     }
@@ -165,23 +167,25 @@ def runClosedLoop(parameters, iterations, buffer_size):
         print("Running simulation step %d" % (i))
         wf = wfg(sensor_parameters, wavefrontParameters['zernikeModes'],
                  wavefrontParameters['zernikeWeights'])
+        wf_buffer.append(wf)
+        wf_dm_buffer.append(wfDM)
+        
         wfRes = wf - wfDM
-        intensities = wfs(wfRes, sensor_parameters)[2]
+        
+        xInt, yInt, intensities = wfs(wfRes, sensor_parameters)
         centroids = centroid(intensities, sensor_parameters)
+        
+        intensities_buffer.append(intensities)
+        centroids_buffer.append(centroids)
+        
         wfRec = wfr(centroids, sensor_parameters,reconstruction_parameters['geometry'])
         wfRec = delay_buffer.update(wfRec)
+        reconstructed_buffer.append(wfRec)
+        
         actuator_commands = calculate_actuator_positions(wfRec, H)
         wfDM = calculate_actuated_mirror(actuator_commands, H)
         wfInterp = interpolate.interp2d(phi_cent_x, phi_cent_y, wfDM, kind='cubic')
         wfDM = wfInterp(x, y)
-         
-        wf_buffer.append(wf)
-        intensities_buffer.append(intensities)
-        centroids_buffer.append(centroids)
-        reconstructed_buffer.append(wfRec)
-        wf_dm_buffer.append(wfDM)
-        
-        wfDM = zeros((sensor_parameters['numPupilx'],sensor_parameters['numPupilx']))
 
     results = pack_simulation_results(wf_buffer, intensities_buffer,
                                     centroids_buffer, reconstructed_buffer,
@@ -211,7 +215,7 @@ def runOpenLoop(parameters, iterations, buffer_size):
     delay_buffer = LatencyBuffer(buffer_size, (sensor_parameters['numPupilx'],
                                      sensor_parameters['numPupilx']))
 
-
+    
     wf_buffer = []
     intensities_buffer = []
     centroids_buffer = []
@@ -306,10 +310,41 @@ def run_simulation(parameters):
     delay_buffer_size = simulation_parameters['delay'] + 1
 
     if simulation_parameters['is_closed_loop']:
-        runClosedLoop(parameters, iterations, delay_buffer_size)
+        results = runClosedLoop(parameters, iterations, delay_buffer_size)
     else:
-        runOpenLoop(parameters, iterations, delay_buffer_size)
+        results = runOpenLoop(parameters, iterations, delay_buffer_size)
+    plot_simulation(results, iterations, parameters)
 
 
+def plot_simulation(results, iterations, parameters):
+    sensor_parameters = parameters['Sensor']
+
+    Nx = sensor_parameters['numPupilx'] # Samples on the x-axis
+    Ny = sensor_parameters['numPupily'] # Samples on the y_axis
+    lx = sensor_parameters['lx'] # Width of the lenslet array in the x-direction [m]
+    ly = sensor_parameters['ly'] # Width of the lenslet array in the y-direction [m]
+    
+            # Create grid for in the focal plane
+    dx = lx/(Nx - 1.0) # Sample length on x-axis [m]
+    dy = ly/(Ny - 1.0) # Sample length on y-axis [m]
+    x = arange(0.0, lx + dx, dx) # Sample positions on x-axis [m]
+    y = arange(0.0, ly + dy, dy) # Sample positions on y-axis [m]
+    
+    wf = results['wf']
+    wfDm = results['wf_dm']
+
+    pl.figure()   
+    for i in range(0, iterations):
+        pl.pcolor(x,y,wf[i] - wfDm[i], vmin=-0.0035, vmax=0.0035)
+        pl.xlabel('x (mm)')
+        pl.ylabel('y (mm)')
+        pl.title('Deformed wave-front')
+        pl.colorbar()
+        pl.draw()
+        pl.savefig('wfRes' + str(i).zfill(3) + '.png')
+        pl.clf()
+        
+    
+    
 parameters = setup_params()
 run_simulation(parameters)
