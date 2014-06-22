@@ -10,6 +10,7 @@ from WFR.mainWFR import *
 from Control.mainControl import *
 from DM.mainDM import *
 from Simulation.LatencyBuffer import LatencyBuffer
+from WFR.determinePhiPositions import determine_phi_positions
 
 
 def setup_params():
@@ -86,7 +87,7 @@ def setup_params():
     'frequency': 10,       # Frequency of the simulation in Hertz
     'time': 10,            # Simulated time in seconds
     'delay': 0,  # Delay in number of samples
-    'geometry': 'fried', #The geometry that is used for reconstruction (choose: fried, southwell, mhudgin)
+    'geometry': 'southwell', #The geometry that is used for reconstruction (choose: fried, southwell, mhudgin)
     'is_closed_loop': True
     }
 
@@ -136,6 +137,13 @@ def runClosedLoop(parameters, iterations, buffer_size):
 
     delay_buffer = LatencyBuffer(buffer_size, (sensorParameters['numPupilx'],
                                      sensorParameters['numPupilx']))
+    
+    ## Determine Phi positions                   
+    phiCentersX, phiCentersY = determine_phi_positions(sensorParameters['lensCentx'], sensorParameters['lx'], sensorParameters['noApertx'], sensorParameters['lensCenty'], sensorParameters['ly'], sensorParameters['noAperty'], sensorParameters['dl'], sensorParameters['D'], simulation_parameters['geometry'])
+    
+    print phiCentersX
+    print phiCentersY
+    
     for i in range(0, iterations):
         print("Running simulation step %d" % (i))
         wf = wfg(sensorParameters, wavefrontParameters['zernikeModes'],
@@ -143,7 +151,7 @@ def runClosedLoop(parameters, iterations, buffer_size):
         wfRes = wf - wfDM
         xInt, yInt, intensities = wfs(wfRes, sensorParameters)
         centroids = centroid(intensities, sensorParameters)
-        wfRec, phiCentersX, phiCentersY = wfr(centroids, sensorParameters,simulation_parameters['geometry'])
+        wfRec = wfr(centroids, sensorParameters,simulation_parameters['geometry'])
         wfRec = delay_buffer.update(wfRec)
         actCommands = control(wfRec, actuatorParameters)
         wfDM = dm(actCommands, sensorParameters)
@@ -181,6 +189,9 @@ def runOpenLoop(parameters, iterations, buffer_size):
 
     delay_buffer = LatencyBuffer(buffer_size, (sensorParameters['numPupilx'],
                                      sensorParameters['numPupilx']))
+
+	## Determine Phi positions                   
+    phiCentersX, phiCentersY = determine_phi_positions(sensorParameters['lensCentx'], sensorParameters['lx'], sensorParameters['noApertx'], sensorParameters['lensCenty'], sensorParameters['ly'], sensorParameters['noAperty'], sensorParameters['dl'], sensorParameters['D'], simulation_parameters['geometry'])
 
     wf_buffer = []
     intensities_buffer = []

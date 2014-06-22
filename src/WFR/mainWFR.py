@@ -1,5 +1,4 @@
 from numpy import *
-from determinePhiPositions import determine_phi_positions
 from createGeometryMatrix import create_geometry_matrix
 
 def wfr(centroids, params, geometry):
@@ -15,12 +14,6 @@ def wfr(centroids, params, geometry):
 	x_dim = params['noApertx']
 	y_dim = params['noAperty']
 	
-	#Get lenslet centers
-	lensCentx = params['lensCentx']
-	lensCenty = params['lensCenty']
-	lx = params['lx']
-	ly = params['ly']
-	
 	#Get the size of the lenslet
 	D = params['D']
 	#Get the distance between two lenslets
@@ -35,10 +28,7 @@ def wfr(centroids, params, geometry):
 	H = dot(F_inv,G.T)
 	phi = dot(H,centroids)
 	
-	#Determine the physical points of the phi's 
-	phiCentersX, phiCentersY = determine_phi_positions(lensCentx, lx, x_dim, lensCenty, ly, y_dim, dl, D, geometry)
-	
-	return phi, phiCentersX, phiCentersY
+	return phi
 
 def pseudo_inverse(A):
 	A_inverse = linalg.pinv(A)
