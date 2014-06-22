@@ -23,17 +23,18 @@ def calculateH(nwfRec, numAct, posWfr, posAct, sig1, sig2, w1, w2):
     
 def plotWFR(wfr, noApertx, noAperty):
     # plot a wavefront
-    W = wfr.reshape(noAperty+1, noApertx+1)
-    xgridw = linspace(0,1,noApertx+1)
-    ygridw = linspace(0,1,noAperty+1)        
+    W = wfr.reshape(noAperty + 1, noApertx + 1)
+    xgridw = linspace(0, 1, noApertx + 1)
+    ygridw = linspace(0, 1, noAperty + 1)
     Xw, Yw = numpy.meshgrid(xgridw, ygridw)
     figu = pl.figure()
-    axi = figu.gca(projection='3d')        
-    surfa = axi.plot_surface(Xw, Yw, W, rstride=1, cstride=1, cmap=cm.coolwarm,linewidth=0, antialiased=True)        
+    axi = figu.gca(projection='3d')
+    surfa = axi.plot_surface(Xw, Yw, W, rstride=1, cstride=1, cmap=cm.coolwarm,
+                              linewidth=0, antialiased=True)
     figu.colorbar(surfa, shrink=0.5, aspect=5)
     axi.set_xlim3d(0, xgridw.max())
     axi.set_ylim3d(0, ygridw.max())
-    axi.set_zlim3d(W.min(), 1.03*W.max())
+    axi.set_zlim3d(W.min(), 1.03 * W.max())
     pl.show()
     
 def calculatePosWFr(numActx, numActy, noApertx, noAperty, lensCentx, lensCenty, dl):
