@@ -56,7 +56,7 @@ João P. Lopes e Silva
 
 \section*{Introduction}
 
-In the previous part of this report, we already mentioned the first steps in the use of adaptive optics. First we described waverfront generating and wavefront sensing. In this chapter of the report, we direct our focus to the reconstruction of the wavefront. 
+In the previous part of this report, we already mentioned the first steps in the use of adaptive optics. First we described wavefront generating and wavefront sensing. In this chapter of the report, we direct our focus to the reconstruction of the wavefront. 
 
 \section{Zonal Reconstruction}
 In order to describe the gradient of the wavefront, we first take a look at a zonal reconstruction method. With zonal reconstruction, we split up the wavefront in zones. These zones can represent a regular grid of square or rectangular elements or some other local region such as a hexagon or other shape. For Shack-Hartmann wavefront sensors, the type of sensor that is used, these zones are generally chosen to match the lenslet array.
@@ -69,7 +69,7 @@ Where $\sigma_x$ and $\sigma_y$ approximate the gradient of the phase in the $x$
 In order to estimate the derivatives, we need to use a finite difference (FD) method. There are a number of different FD methods which depend on the sampling geometry. Some of these geometries are the Fried~\cite{fried1977least}, Hudgin~\cite{hudgin1977wave} and Southwell~\cite{southwell1980wave} geometries. We first start with a detailed explanation of the Fried geometry.
 
 \subsection{Fried Geometry}
-The Fried FD method calculates the average slope in one grid cell by using the four phase points. We first tkae a look at one part of the cell grid.
+The Fried FD method calculates the average slope in one grid cell by using the four phase points. We first take a look at one part of the cell grid.
 \begin{figure}[h!]
   \centering
   \includegraphics[scale=0.6]{figures/fried}
@@ -78,7 +78,8 @@ The Fried FD method calculates the average slope in one grid cell by using the f
 \newpage
 \noindent The goal is to calculate average of the both slopes. The first slope (in the x-direction) is given by the red line. We can easily see that this slope is given by:
 $$ \sigma_{x,\text{red}} = \frac{\phi(2,1) - \phi(1,1)}{h}, $$
-where $h$ is the step between the 2 phase measurements, usualy the size of the subaperature.
+where $h$ is the step between the 2 phase measurements, usually the size of the subaperture.
+
 Now we do the same for the other slope:
 $$ \sigma_{x,\text{blue}} = \frac{\phi(2,2) - \phi(1,2)}{h}. $$
 Now we take the average of these 2 slopes on then we know the slope of the wavefront in this zone (for x-direction).
@@ -128,13 +129,13 @@ As mentioned before, there are many other geometries that can be used to generat
 Lets take a look at the way the Hudgin geometry is defined. First we start with an overview of the slopes and phase points.
 \begin{figure}[h!]
   \centering
-  \includegraphics[scale=0.6]{figures/Hudgin}
+  \includegraphics[scale=0.6]{figures/hudgin}
   \caption{slope approximation, Hudgin}
 \end{figure}
 From this we can easily derive the slope approximation in x and y direction. These are given by the following equations:
 $$ \sigma_x = \frac{\phi(2,1)-\phi(1,1)}{h}$$
 $$ \sigma_x = \frac{\phi(1,2)-\phi(1,1)}{h}$$
-From these equations we can derive the geometry matrix, just as we have done with the Fried geometry. But if we look closer to Figure 2, we see that slopes $\sigma_x$ and $\sigma_y$ are not defined in the same point, as with the Fried geometry. Due to our sensor, the Shack-Hartmann sensor, and its centroid algorithm, we only the 2 slopes in the same point. As this geometry requires the slopes at 2 different pionts, we have to conclude that we cannot use the Hudgin geometry. But fortunatly, we can alter the Hudgin geometry slightly, and use it on a Shack-Hartmann snesor. This is called the `Modified` Hudgin geometry\cite{rosensteiner2011cumulative}.
+From these equations we can derive the geometry matrix, just as we have done with the Fried geometry. But if we look closer to Figure 2, we see that slopes $\sigma_x$ and $\sigma_y$ are not defined in the same point, as with the Fried geometry. Due to our sensor, the Shack-Hartmann sensor, and it`s centroid algorithm, we only the 2 slopes in the same point. As this geometry requires the slopes at 2 different pionts, we have to conclude that we cannot use the Hudgin geometry. But fortunately, we can alter the Hudgin geometry slightly, and use it on a Shack-Hartmann sensor. This is called the `Modified` Hudgin geometry\cite{rosensteiner2011cumulative}.
 \newline
 \newline
 The Modified Hudgin geometry uses the same theory as the Hudgin geometry, but it makes it capable for being used in a Shack-Hartmann sensor. Let`s see an overview of the slopes and phase points as they are used in the Modified Hudgin geometry.  
@@ -179,7 +180,6 @@ $$
 The last geometry which will be examined is the Southwell geometry. In the case of Southwell geometry, the phase points lie in the same place as the points where the slopes are defined. If we take a look at an overview where these points are defined, we can then define a relationship between the phase points and the slopes.
 
 
-
 \begin{figure}[h!]
   \centering
   \includegraphics[scale=0.6]{figures/southwell}
@@ -195,7 +195,7 @@ We can see that this geometry takes the average of the two slopes, in x and y-di
 $$ \frac{\sigma_x(2,2)-\sigma_x(1,2)}{2} = \frac{\phi(2,2)-\phi(1,2)}{h}$$
 $$ \frac{\sigma_y(2,2)-\sigma_y(2,1)}{2} = \frac{\phi(2,2)-\phi(2,1)}{h}$$
 Again, we can rewrite this set of equations in a matrix, where we can define a geometry matrix. 
-Unforntunatly, due to the nature of the equations posted above, it is not that straightforward to define the geometry matrix. For this geometry we need to take another step. We first start to add a dummy variable $\varSigma$ to the equations above. We means we get:
+Unfortunately, due to the nature of the equations posted above, it is not that straightforward to define the geometry matrix. For this geometry we need to take another step. We first start to add a dummy variable $\varSigma$ to the equations above. We means we get:
 $$ \frac{\sigma_x(2,1)-\sigma_x(1,1)}{2} = \frac{\phi(2,1)-\phi(1,1)}{h} = \varSigma_{x1}$$
 $$ \frac{\sigma_x(2,2)-\sigma_x(1,2)}{2} = \frac{\phi(2,2)-\phi(1,2)}{h} = \varSigma_{x2}$$
 $$ \frac{\sigma_y(1,2)-\sigma_y(1,1)}{2} = \frac{\phi(1,2)-\phi(1,1)}{h} = \varSigma_{y1}$$
@@ -264,11 +264,12 @@ After expanding the above expression, computing the gradient and setting the gra
 $$ F^TF\hat{x}=F^Ty $$
 which gives us the least squares estimator $\hat{x}$
 $$ \hat{x} = (F^TF)^{-1}F^Ty $$
-In this case, the matrix $(F^TF)^{-1}F^T$ is called a pseudoinverse, namely the Moore-Penrose inverse.
+In this case, the matrix $(F^TF)^{-1}F^T$ is called a pseudo inverse, namely the Moore-Penrose inverse.
 When using this estimator, the reconstruction problem can be solved by:
 $$ \hat{\phi} = (G^TG)^{-1}G^TS  $$
 \newline
 \newline
+
 Unfortunatly, our problem is defined slightly different. We need to think about the fact that we also have noise in our equations, which means that we cannot take $\phi$ as a determinstic vector. Note that we have noise info and `a priori` information about the phase available. In that case, we need to formulate the stochastic least squares problem. We would like to minimize the following equation:
 $$ y=Fx+L\epsilon$$
 From which we know that x has a mean of $\bar{x}$ and the covariance matrix P, which we consider to be positive-definite.
@@ -319,14 +320,14 @@ $$\hat{\phi} = C_\phi G^T(GC_\phi G^T + C_n)^{-1}S $$
 
 \newpage
 \section{Modal reconstruction}
-In the previous chapter we have tried to reconstruct the wavefront using the zonal approach. Now we view another techinque, the modal wavefront reconstruction. In modal reconstruction, we use a linear combination of basis polynomials over the entire apertue. These basis polynomials can be Zernike polynomials, Karhunen-Loeve functions, Legendre polynomials and Fourier series. In this report we will stick to the use of Zernike polynomials, as they are also used in the wavefront generation part. 
+In the previous chapter we have tried to reconstruct the wavefront using the zonal approach. Now we view another technique, the modal wavefront reconstruction. In modal reconstruction, we use a linear combination of basis polynomials over the entire aperture. These basis polynomials can be Zernike polynomials, Karhunen-Loeve functions, Legendre polynomials and Fourier series. In this report we will stick to the use of Zernike polynomials, as they are also used in the wavefront generation part. 
 
 \subsection{Zernike polynomials}
 In the case of modal reconstruction, we can express the wavefront as followed:
 $$
 \phi (x,y) = \sum_{k=0}^{M}a_kZ_k(x,y), 
 $$
-Where $a_k$ is the coeffecient that needs to be calculated and $Z_k$ is the basis polynomial, in our case the Zernike polynomial. THe Zernike polynomial is defined as followed:
+Where $a_k$ is the coefficient that needs to be calculated and $Z_k$ is the basis polynomial, in our case the Zernike polynomial. The Zernike polynomial is defined as followed:
 $$
 Z_u^v(\rho,\theta) = \sqrt{\frac{2(u+1)}{1+\delta(v,0)}}\sum_{s=0}^{\frac{u-v}{2}}\frac{(-1)^s(u-s)!}{s!(\frac{u+v}{2}-s)!(\frac{u-v}{2}-s)!}
 \rho^{u-2s}cos(v\theta),
@@ -336,14 +337,14 @@ $$
 \phi (x,y,\xi) = \sum_{u=0}^{u_{max}}\sum_{v=0}^{v_{max}}z_{uv}Z_u^v(x,y),
 $$
 with $\xi$ the vector containing all the coefficients $z_{uv}$.
-Now we can represent the wavefront in terms of a polynomial, but the only information that is given by the wavefront sensor is the slope. Therefor we need to take a look at the spatial derivates of the Zernike polynomials:
+Now we can represent the wavefront in terms of a polynomial, but the only information that is given by the wavefront sensor is the slope. Therefore we need to take a look at the spatial derivatives of the Zernike polynomials:
 $$
 \frac{\partial \phi(x,y)}{\partial x} = \sum_{u,v}z_{u,v}\frac{\partial Z_u^v(x,y)}{\partial x},
 $$
 $$
 \frac{\partial \phi(x,y)}{\partial y} = \sum_{u,v}z_{u,v}\frac{\partial Z_u^v(x,y)}{\partial y}.
 $$
-Again, we can write this set of equations more effectivly into the following matrix notation:
+Again, we can write this set of equations more effectively into the following matrix notation:
 $$
 \begin{bmatrix}
 \sigma_x(i,j) \\
@@ -365,7 +366,7 @@ $$
 S = B\xi + \eta
 $$
 \subsection{Least squares estimations}
-The set of equations which are obtained, are quiet similat to those derived from the zonal reconstruction. In that view, we can use the same technique to approximate the wavefront. This gives us the following solution to the least squares problem:
+The set of equations which are obtained, are quiet similar to those derived from the zonal reconstruction. In that view, we can use the same technique to approximate the wavefront. This gives us the following solution to the least squares problem:
 $$
 \hat{\xi} = (B^TB)^{-1}B^TS 
 $$
@@ -378,16 +379,16 @@ $$
 In the previous chapters we discussed two ways of reconstructing the wavefront, the Zonal and Modal reconstruction. We have seen the difference in these two methods, and now we are going to investigate the advantages and disadvantages of both these methods.
 
 \subsection{Zonal}
-We first start with the zonal reconstruction. This method of reconstrcution is the oldest method, dating from the early seventies. The advantage is that this makes the theoreticall work less complicated and makes it relative easy and straightfoward to implemend (especcialy in a time where computers are not what the are now). Another advantage is that reconstructed wavefront still contains a broad range of spatial frequencies, inlcuding high spatial frequencies. 
+We first start with the zonal reconstruction. This method of reconstruction is the oldest method, dating from the early seventies. The advantage is that this makes the theoretical work less complicated and makes it relative easy and straightforward to implement (especially in a time where computers are not what the are now). Another advantage is that reconstructed wavefront still contains a broad range of spatial frequencies, including high spatial frequencies. 
 \newline
 \newline
-The major drawback of the Zonal reconstruction is the fact we only consider linear approximations. In practice, a (abbrated) wavefront is mostly non-linear. There are new types of reconstruction, for example using splines, to grasp the non-linear character. But the methods discussed in this report are al linear. Another disadvantage is that the phase points are all approximated individualy, which makes computation time, especially for large number of phase points, very large.
+The major drawback of the Zonal reconstruction is the fact we only consider linear approximations. In practice, a (abberated) wavefront is mostly non-linear. There are new types of reconstruction, for example using splines, to grasp the non-linear character. But the methods discussed in this report are al linear. Another disadvantage is that the phase points are all approximated individualy, which makes computation time, especially for large number of phase points, very large.
 
 \subsection{Modal}
 The modal reconstruction uses a linear combination of basis polynomials. The advantage of using these basis polynomials, like Zernike, is that from the reconstructed wavefront it is easy to see any optical errors, like defocus or astigmatism. This is due to the fact that these errors are defined using for example Zernike polynomials. Another advantage of modal reconstruction is that it is computed faster the zonal reconstruction, especially using the Fast Fourier Transform (FFT).
 \newline
 \newline
-The drawback of the modal reconstruction is that the reconstruction of non-smooth wavefronts requires high order approxiamtion. This makes this method much more slower in the case of spikes or peaks in the wavefront. Another drawback is the socalled Runge`s phenomenom. This means that when a function is approximated, the higher order terms will spike at the boundries of the function. As can be seen below.
+The drawback of the modal reconstruction is that the reconstruction of non-smooth wavefronts requires high order approximation. This makes this method much more slower in the case of spikes or peaks in the wavefront. Another drawback is the so-called Runge`s phenomenon. This means that when a function is approximated, the higher order terms will spike at the boundaries of the function. As can be seen below.
 \begin{figure}[h!]
   \centering
   % \includegraphics[scale=1]{figures/runge}
@@ -397,5 +398,6 @@ The drawback of the modal reconstruction is that the reconstruction of non-smoot
 % \newpage
 % \bibliographystyle{plain}
 % \bibliography{mybib}
+
 
 \end{document}
