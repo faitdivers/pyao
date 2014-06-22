@@ -13,7 +13,7 @@ from Simulation.LatencyBuffer import LatencyBuffer
 from WFR.determinePhiPositions import determine_phi_positions
 import matplotlib.pyplot as pl
 import time
-
+from Control.PIDController import PIDcontroller
 
 def setup_params():
     """ Set-up the simulation parameters
@@ -157,7 +157,9 @@ def runClosedLoop(parameters, iterations, buffer_size):
     phi_cent_x, phi_cent_y, H = calculate_constants(sensor_parameters, 
                                                     actuator_parameters, 
                                                     reconstruction_parameters)
-        # Create grid for in the focal plane
+    
+    controller = PIDcontroller(2.0, 0.5, 0)
+    # Create grid for in the focal plane
     dx = lx/(Nx - 1.0) # Sample length on x-axis [m]
     dy = ly/(Ny - 1.0) # Sample length on y-axis [m]
     x = arange(0.0, lx + dx, dx) # Sample positions on x-axis [m]
@@ -183,6 +185,7 @@ def runClosedLoop(parameters, iterations, buffer_size):
         reconstructed_buffer.append(wfRec)
         
         actuator_commands = calculate_actuator_positions(wfRec, H)
+        actuator_commands = controller.update(actuator_commands)
         wfDM = calculate_actuated_mirror(actuator_commands, H)
         wfInterp = interpolate.interp2d(phi_cent_x, phi_cent_y, wfDM, kind='cubic')
         wfDM = wfInterp(x, y)
@@ -333,16 +336,20 @@ def plot_simulation(results, iterations, parameters):
     wf = results['wf']
     wfDm = results['wf_dm']
 
-    pl.figure()   
-    for i in range(0, iterations):
-        pl.pcolor(x,y,wf[i] - wfDm[i], vmin=-0.0035, vmax=0.0035)
-        pl.xlabel('x (mm)')
-        pl.ylabel('y (mm)')
-        pl.title('Deformed wave-front')
-        pl.colorbar()
+    pl.figure()
+    pl.ion()
+    pl.show()
+    wf_plot = pl.pcolormesh(x,y,wf[0] - wfDm[0], vmin=-0.0035, vmax=0.0035)
+    pl.xlabel('x (mm)')
+    pl.ylabel('y (mm)')
+    pl.title('Deformed wave-front')
+    pl.savefig('wfRes000.png')
+    for i in range(1, iterations):
+        wf_res = wf[i] - wfDm[i]
+        wf_plot.set_array(wf_res.ravel())
         pl.draw()
         pl.savefig('wfRes' + str(i).zfill(3) + '.png')
-        pl.clf()
+        time.sleep(1)
         
     
     
