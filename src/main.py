@@ -340,6 +340,7 @@ def plot_simulation(results, iterations, parameters):
     pl.ion()
     pl.show()
     wf_plot = pl.pcolormesh(x,y,wf[0] - wfDm[0], vmin=-0.0035, vmax=0.0035)
+    pl.colorbar()
     pl.xlabel('x (mm)')
     pl.ylabel('y (mm)')
     pl.title('Deformed wave-front')
