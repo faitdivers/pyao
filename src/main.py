@@ -212,7 +212,7 @@ def runOpenLoop(parameters, iterations, buffer_size):
         wfRes = wf - wfDM
         xInt, yInt, intensities = wfs(wfRes, sensorParameters)
         centroids = centroid(intensities, sensorParameters)
-        phiCentersY = wfr(centroids, sensorParameters,simulation_parameters['geometry'])
+        wfRec = wfr(centroids, sensorParameters,simulation_parameters['geometry'])
         wfRec = delay_buffer.update(wfRec)
         wfDM = dm(0, sensorParameters, actuatorParameters)
 
