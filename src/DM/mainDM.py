@@ -38,8 +38,7 @@ def plotWFR(wfr, noApertx, noAperty):
     pl.show()
 
 
-def calculate_actuator_positions(reconstructed_wavefront, actuator_parameters,
-                                 h_matrix):
+def calculate_actuator_positions(reconstructed_wavefront, h_matrix):
     """
 
     """
