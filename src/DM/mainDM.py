@@ -4,11 +4,20 @@ import matplotlib.pyplot as pl
 from mpl_toolkits.mplot3d import Axes3D
 from matplotlib import cm
 
-def calculateH(nwfRec, numAct, posWfr, posAct, sig1, sig2, w1, w2):    
-    H = zeros([nwfRec,numAct]);
-    for i in range (0, nwfRec):
-        for j in range ( 0, numAct):
-            H[i][j] = w1/(2*pi*sig1**2)*exp(-((posWfr[i][0]-posAct[j][0])**2+(posWfr[i][1]- posAct[j][1])**2)/(2*sig1**2))+ w2/(2*pi*sig2**2)*exp(-((posWfr[i][0]-posAct[j][0])**2+(posWfr[i][1]-posAct[j][1])**2)/(2*sig2**2))
+
+def calculateH(nwfRec, numAct, posWfr, posAct, sig1, sig2, w1, w2):
+    H = zeros([nwfRec, numAct])
+    k1 = w1 / (2 * pi * sig1 ** 2)
+    k2 = w2 / (2 * pi * sig2 ** 2)
+
+    for i in range(0, nwfRec):
+        for j in range(0, numAct):
+            y_sqrd = (posWfr[i][0] - posAct[j][0]) ** 2
+            x_srqd = (posWfr[i][1] - posAct[j][1]) ** 2
+            y_sqrd_x_sqrd = y_sqrd + x_srqd
+            part1 = k1 * exp(- y_sqrd_x_sqrd / (2 * sig1 ** 2))
+            part2 = k2 * exp(- y_sqrd_x_sqrd / (2 * sig2 ** 2))
+            H[i][j] = part1 + part2
     return H
 
     
