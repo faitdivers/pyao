@@ -347,7 +347,7 @@ def plot_simulation(results, iterations, parameters):
     pl.savefig('wfRes000.png')
     for i in range(1, iterations):
         wf_res = wf[i] - wfDm[i]
-        wf_plot.set_array(wf_res.ravel())
+        pl.pcolormesh(x,y,wf[i] - wfDm[i], vmin=-0.0035, vmax=0.0035)
         pl.draw()
         pl.savefig('wfRes' + str(i).zfill(3) + '.png')
         time.sleep(1)
