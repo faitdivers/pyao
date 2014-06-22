@@ -20,7 +20,7 @@ def calculateH(nwfRec, numAct, posWfr, posAct, sig1, sig2, w1, w2):
             H[i][j] = part1 + part2
     return H
 
-    
+
 def plotWFR(wfr, noApertx, noAperty):
     # plot a wavefront
     W = wfr.reshape(noAperty + 1, noApertx + 1)
@@ -79,8 +79,8 @@ def dm(actCommand, paramsSens, paramsAct):
     w2= -1
     sig1= 0.54*dl
     sig2= 0.85*dl
-    
-        
+
+
     posWfr = calculatePosWFr(numActx, numActy, noApertx, noAperty, lensCentx, lensCenty, dl)
     
     #calculate the position of the actuators
