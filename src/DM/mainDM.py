@@ -48,6 +48,13 @@ def calculate_actuator_positions(reconstructed_wavefront, actuator_parameters,
     p2 = dot(p1_inv, h_matrix.T)
     u = dot(p2, reconstructed_wavefront)
     return u
+
+
+def calculate_actuated_mirror(control_command, h_matrix):
+    dm_wavefront = dot(h_matrix, control_command)
+    return dm_wavefront
+
+
 def dm(actCommand, paramsSens, paramsAct):
 
     noApertx= paramsSens['noApertx']
