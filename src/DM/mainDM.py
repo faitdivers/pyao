@@ -36,41 +36,7 @@ def plotWFR(wfr, noApertx, noAperty):
     axi.set_ylim3d(0, ygridw.max())
     axi.set_zlim3d(W.min(), 1.03 * W.max())
     pl.show()
-    
-def calculatePosWFr(numActx, numActy, noApertx, noAperty, lensCentx, lensCenty, dl):
-    # calculate the position of the wavefronts according to hudgin geometry
-    nWrx = noApertx+1
-    print("number of wavefront x:",nWrx)
-    nWry = noAperty+1    
-    posWfr = numpy.zeros([nWrx*nWry,2])
-    
-    dwf = dl # wavefront spacing is equal to the lenslet diameter
-    
-    lensCentPos = 0;
-    upperflag = 0;
-    for i in range(0, nWry):
-        for j in range (0, nWrx):        
-            if (i*nWrx+j<(i+1)*nWrx-1):
-                posWfr[i*nWrx+j][0] = lensCentx[lensCentPos] - dwf/2
-                posWfr[i*nWrx+j][1] = lensCenty[lensCentPos] - dwf/2                                
-            else:
-                posWfr[i*nWrx+j][0] = lensCentx[lensCentPos] + dwf/2
-                posWfr[i*nWrx+j][1] = lensCenty[lensCentPos] - dwf/2                                                
-                    
-            if (j<noApertx-1)&(i<nWry-1)&((i*nWrx+j)<(nWrx*(nWry-1)-1)):             
-                lensCentPos = lensCentPos + 1
-            if upperflag == 1:                
-                posWfr[i*nWrx+j][0] = posWfr[(i-1)*nWrx+j][0]
-                posWfr[i*nWrx+j][1] = posWfr[(i-1)*nWrx+j][1] + dwf
-#        print ("limit:",(i+1)*nWrx-1)
-        if ((i*nWrx+j)==((i+1)*nWrx-1))&((i*nWrx+j)<(nWrx*(nWry-1)-1)):
-            lensCentPos = lensCentPos + 1 
-        if ((i*nWrx+j)>=(nWrx*(nWry-1)-1)):
-            upperflag = 1;            
 
-    return posWfr
-    
-            
 def dm(actCommand, paramsSens, paramsAct):
 
     noApertx= paramsSens['noApertx']
