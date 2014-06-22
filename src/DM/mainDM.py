@@ -37,6 +37,17 @@ def plotWFR(wfr, noApertx, noAperty):
     axi.set_zlim3d(W.min(), 1.03 * W.max())
     pl.show()
 
+
+def calculate_actuator_positions(reconstructed_wavefront, actuator_parameters,
+                                 h_matrix):
+    """
+
+    """
+    p1 = dot(h_matrix.T, h_matrix)
+    p1_inv = numpy.linalg.inv(p1)
+    p2 = dot(p1_inv, h_matrix.T)
+    u = dot(p2, reconstructed_wavefront)
+    return u
 def dm(actCommand, paramsSens, paramsAct):
 
     noApertx= paramsSens['noApertx']
