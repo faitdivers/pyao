@@ -65,7 +65,7 @@ def setup_params():
 	'mean_readout': 0.0,   # should be 0 for white noise
 	# Photon Noise Parameters (Modelled as Poisson): based only on expected value of Ii 
 	}
-	
+
     # Compute lenslet centres and check minimal array widths 
     lx, ly, lensCentx, lensCenty = lensletCentres(paramsSensor)
     # Normalized lenslet centers
@@ -81,13 +81,21 @@ def setup_params():
     'numActx': 8,
     'numActy': 8,
     # parameters to characterize influence function
+    'sig1_multiplier': 0.54,
+    'sig2_multiplier': 0.85,
+    'w1': 2,
+    'w2': -1
     }
 
+    reconstructionParameters = {
+    #The geometry that is used for reconstruction (choose: fried, southwell, mhudgin)
+    'geometry': 'southwell'
+    }
+    
     simulationParameters = {
     'frequency': 10,       # Frequency of the simulation in Hertz
     'time': 10,            # Simulated time in seconds
     'delay': 0,  # Delay in number of samples
-    'geometry': 'southwell', #The geometry that is used for reconstruction (choose: fried, southwell, mhudgin)
     'is_closed_loop': True
     }
 
@@ -98,7 +106,8 @@ def setup_params():
     'Wavefront': paramsWavefront,
     'Sensor': paramsSensor,
     'Actuator': paramsActuator,
-    'Simulation': simulationParameters
+    'Simulation': simulationParameters,
+    'Reconstruction': reconstructionParameters
     }
 
     return parameters
@@ -121,10 +130,15 @@ def runClosedLoop(parameters, iterations, buffer_size):
     """
     # Get parameters.
     wavefrontParameters = parameters['Wavefront']
-    sensorParameters = parameters['Sensor']
-    actuatorParameters = parameters['Actuator']
-    simulation_parameters = parameters['Simulation']
+    sensor_parameters = parameters['Sensor']
+    actuator_parameters = parameters['Actuator']
+    reconstruction_parameters = parameters['Reconstruction']
 
+    Nx = sensor_parameters['numPupilx'] # Samples on the x-axis
+    Ny = sensor_parameters['numPupily'] # Samples on the y_axis
+    lx = sensor_parameters['lx'] # Width of the lenslet array in the x-direction [m]
+    ly = sensor_parameters['ly'] # Width of the lenslet array in the y-direction [m]
+    
     wf_buffer = []
     intensities_buffer = []
     centroids_buffer = []
@@ -132,42 +146,47 @@ def runClosedLoop(parameters, iterations, buffer_size):
     wf_dm_buffer = []
     
     print("Running closed-loop simulation")
-    # The first deformable mirror effect: (No effect)
-    wfDM = dm(0, sensorParameters, actuatorParameters)
 
-    delay_buffer = LatencyBuffer(buffer_size, (sensorParameters['numPupilx'],
-                                     sensorParameters['numPupilx']))
+    wfDM = zeros((sensor_parameters['numPupilx'],sensor_parameters['numPupilx']))
+    
+    delay_buffer = LatencyBuffer(buffer_size, (len(sensor_parameters['lensCentx']), 1))
     
     ## Determine Phi positions                   
-    phiCentersX, phiCentersY = determine_phi_positions(sensorParameters['lensCentx'], sensorParameters['lx'], sensorParameters['noApertx'], sensorParameters['lensCenty'], sensorParameters['ly'], sensorParameters['noAperty'], sensorParameters['dl'], sensorParameters['D'], simulation_parameters['geometry'])
-    
-    print phiCentersX
-    print phiCentersY
+    phi_cent_x, phi_cent_y, H = calculate_constants(sensor_parameters, 
+                                                    actuator_parameters, 
+                                                    reconstruction_parameters)
+        # Create grid for in the focal plane
+    dx = lx/(Nx - 1.0) # Sample length on x-axis [m]
+    dy = ly/(Ny - 1.0) # Sample length on y-axis [m]
+    x = arange(0.0, lx + dx, dx) # Sample positions on x-axis [m]
+    y = arange(0.0, ly + dy, dy) # Sample positions on y-axis [m]
     
     for i in range(0, iterations):
         print("Running simulation step %d" % (i))
-        wf = wfg(sensorParameters, wavefrontParameters['zernikeModes'],
+        wf = wfg(sensor_parameters, wavefrontParameters['zernikeModes'],
                  wavefrontParameters['zernikeWeights'])
         wfRes = wf - wfDM
-        xInt, yInt, intensities = wfs(wfRes, sensorParameters)
-        centroids = centroid(intensities, sensorParameters)
-        wfRec = wfr(centroids, sensorParameters,simulation_parameters['geometry'])
+        intensities = wfs(wfRes, sensor_parameters)[2]
+        centroids = centroid(intensities, sensor_parameters)
+        wfRec = wfr(centroids, sensor_parameters,reconstruction_parameters['geometry'])
         wfRec = delay_buffer.update(wfRec)
-        actCommands = control(wfRec, actuatorParameters)
-
-        wfDM = dm(actCommands, sensorParameters, actuatorParameters)
-
+        actuator_commands = calculate_actuator_positions(wfRec, H)
+        wfDM = calculate_actuated_mirror(actuator_commands, H)
+        wfInterp = interpolate.interp2d(phi_cent_x, phi_cent_y, wfDM, kind='cubic')
+        wfDM = wfInterp(x, y)
+         
         wf_buffer.append(wf)
         intensities_buffer.append(intensities)
         centroids_buffer.append(centroids)
         reconstructed_buffer.append(wfRec)
         wf_dm_buffer.append(wfDM)
+        
+        wfDM = zeros((sensor_parameters['numPupilx'],sensor_parameters['numPupilx']))
 
     results = pack_simulation_results(wf_buffer, intensities_buffer,
                                     centroids_buffer, reconstructed_buffer,
                                     wf_dm_buffer)
     return results
-
 
 
 def runOpenLoop(parameters, iterations, buffer_size):
@@ -185,15 +204,13 @@ def runOpenLoop(parameters, iterations, buffer_size):
     The stop condition is the simulation time.
     """
     wavefrontParameters = parameters['Wavefront']
-    sensorParameters = parameters['Sensor']
+    sensor_parameters = parameters['Sensor']
     actuatorParameters = parameters['Actuator']
     simulation_parameters = parameters['Simulation']
 
-    delay_buffer = LatencyBuffer(buffer_size, (sensorParameters['numPupilx'],
-                                     sensorParameters['numPupilx']))
+    delay_buffer = LatencyBuffer(buffer_size, (sensor_parameters['numPupilx'],
+                                     sensor_parameters['numPupilx']))
 
-	## Determine Phi positions                   
-    phiCentersX, phiCentersY = determine_phi_positions(sensorParameters['lensCentx'], sensorParameters['lx'], sensorParameters['noApertx'], sensorParameters['lensCenty'], sensorParameters['ly'], sensorParameters['noAperty'], sensorParameters['dl'], sensorParameters['D'], simulation_parameters['geometry'])
 
     wf_buffer = []
     intensities_buffer = []
@@ -240,7 +257,44 @@ def pack_simulation_results(wf, intensities, centroids, reconstructed, wf_dm):
     return simulation_results
 
 
+def calculate_constants(sensor_parameters, actuator_parameters,
+                        reconstruction_parameters):
+    lens_centers_x = sensor_parameters['lensCentx']
+    lens_centers_y = sensor_parameters['lensCenty']
+    length_x = sensor_parameters['lx']
+    length_y = sensor_parameters['ly']
+    n_apertures_x = sensor_parameters['noApertx']
+    n_apertures_y = sensor_parameters['noAperty']
+    dl = sensor_parameters['dl']
+    D = sensor_parameters['D']
+    geometry = reconstruction_parameters['geometry']
+    sig1_mult = actuator_parameters['sig1_multiplier']
+    sig2_mult = actuator_parameters['sig2_multiplier']
+    w1 = actuator_parameters['w1']
+    w2 = actuator_parameters['w2']
+    
+    
+    phi_cent_x, phi_cent_y =  determine_phi_positions(lens_centers_x, length_x, n_apertures_x,
+                                                      lens_centers_y, length_y, n_apertures_y,
+                                                      dl, D, geometry)
+    
+    phi_centers = array([phi_cent_x, phi_cent_y])
+    phi_centers = phi_centers.T
+    
+    actuator_positions_x = lens_centers_x * length_x
+    actuator_positions_y = lens_centers_y * length_y
+    actuator_positions = array([actuator_positions_x, 
+                               actuator_positions_y])
+    actuator_positions = actuator_positions.T
+    
+    nwfRec = len(phi_cent_x)
+    numAct = len(lens_centers_x)
+    sig1 = sig1_mult * dl
+    sig2 = sig2_mult * dl
+    H = calculateH(nwfRec, numAct, phi_centers, actuator_positions, sig1, sig2, w1, w2)
+    return phi_cent_x, phi_cent_y, H
 
+    
 def run_simulation(parameters):
     """ Runs the configured simulation. Either an open or closed loop.
 
