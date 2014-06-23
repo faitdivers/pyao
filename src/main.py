@@ -11,6 +11,7 @@ from Control.mainControl import *
 from DM.mainDM import *
 from Simulation.LatencyBuffer import LatencyBuffer
 from WFR.determinePhiPositions import determine_phi_positions
+from WFR.plotWavefront import plotWavefront
 
 
 def setup_params():
@@ -25,9 +26,9 @@ def setup_params():
     """
     paramsWavefront = {
     # Scalar or array containing the zernike modes
-    'zernikeModes': [2, 4, 21],
+    'zernikeModes': [1],
     # Scalar or array containing the zernike weights, with respect to the modes
-    'zernikeWeights': [0.5, 0.25, -0.6]
+    'zernikeWeights': [1]
     }
 
     paramsSensor = {
@@ -38,8 +39,8 @@ def setup_params():
     'numImagx' : 200,
     'numImagy' : 200,
     # number of apertures in the wfs
-    'noApertx': 4,
-    'noAperty': 4,
+    'noApertx': 15,
+    'noAperty': 15,
     # Focal Length [m]
     'f' : 18.0e-3,
     # Diameter of aperture of single lenslet [m]	
@@ -84,8 +85,8 @@ def setup_params():
     }
 
     simulationParameters = {
-    'frequency': 10,       # Frequency of the simulation in Hertz
-    'time': 10,            # Simulated time in seconds
+    'frequency': 1,       # Frequency of the simulation in Hertz
+    'time': 1,            # Simulated time in seconds
     'delay': 0,  # Delay in number of samples
     'geometry': 'southwell', #The geometry that is used for reconstruction (choose: fried, southwell, mhudgin)
     'is_closed_loop': True
@@ -141,17 +142,15 @@ def runClosedLoop(parameters, iterations, buffer_size):
     ## Determine Phi positions                   
     phiCentersX, phiCentersY = determine_phi_positions(sensorParameters['lensCentx'], sensorParameters['lx'], sensorParameters['noApertx'], sensorParameters['lensCenty'], sensorParameters['ly'], sensorParameters['noAperty'], sensorParameters['dl'], sensorParameters['D'], simulation_parameters['geometry'])
     
-    print phiCentersX
-    print phiCentersY
-    
     for i in range(0, iterations):
         print("Running simulation step %d" % (i))
         wf = wfg(sensorParameters, wavefrontParameters['zernikeModes'],
-                 wavefrontParameters['zernikeWeights'])
+                 wavefrontParameters['zernikeWeights'], False)
         wfRes = wf - wfDM
         xInt, yInt, intensities = wfs(wfRes, sensorParameters)
         centroids = centroid(intensities, sensorParameters)
         wfRec = wfr(centroids, sensorParameters,simulation_parameters['geometry'])
+        #plotWavefront(phiCentersX,phiCentersY,wfRec,sensorParameters['noApertx'],sensorParameters['noAperty'],simulation_parameters['geometry'])
         wfRec = delay_buffer.update(wfRec)
         actCommands = control(wfRec, actuatorParameters)
         wfDM = dm(actCommands, sensorParameters)
