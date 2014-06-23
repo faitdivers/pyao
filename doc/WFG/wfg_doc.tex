@@ -9,6 +9,8 @@
 \usepackage{cite}
 \usepackage{slashbox}
 \usepackage{subfiles}
+\usepackage{listings}
+\usepackage{color}
 
 \usepackage[a4paper]{geometry}	% enlarges the page margins to standard A4 paper
 \usepackage{fancyhdr}		          % header usepackage
@@ -26,6 +28,9 @@
 
 % Puts captions in bold
 \captionsetup{labelfont=bf}
+
+\usepackage[ampersand]{easylist}
+
 
 \begin{document}
 
@@ -54,10 +59,10 @@ The goal of the wavefront generation part of the project Adaptive Optics in Pyth
 
 The distinction between these two sections is somewhat ambiguous, as both of these components will be added up to combine to the final wavefront. The choice to separate them is more based on implementation considerations rather then mathematical reasons. 
 
-The current implementation of the wavefront generation is static. There is no temporal dependency implemented. This can be a short coming in phase screen generation, as it current can currently not model a passing cloud for example. The choice for this is simply because project was bounded. This is a topic for improvement in the future. Where possible, effort has been done to make the wavefront generation code ready to be extended in the future. Simply by adding functions and methods to the classes and making existing functions and methods easy to be extended - the object oriented programming approach. 
+The current implementation of the wavefront generation is static. There is no temporal dependency implemented. This can be a shortcoming in phase screen generation, as it currently cannot model a passing cloud for example. The choice for this is simply because project was bounded. This is a topic for improvement in the future. Where possible, effort has been done to make the wavefront generation code ready to be extended in the future. Simply by adding functions and methods to the classes and making existing functions and methods easy to be extended - the object oriented programming approach. 
 
 \subsection{Wave Equation}
-The behaviour of light is, as is well known, explained by Maxwell's equations. Clever substitution of Amp\`{e}re's law into Faraday's law - or vice versa - and using Gauss' law to ensure dependency on only the magnetic field or the electric field. This will yield a neat equation where the wave behaviour is naturally apparent, the wave equation. This reader is probably not the best location to bore you with the entire derivation of the wave equation. It is however important to remember the plane wave behaviour of light later on, as it will make understanding much easier.
+The behaviour of light is, as is well known, explained by Maxwell's equations. Clever substitution of Amp\`{e}re's law into Faraday's law - or vice versa - and using Gauss' law to ensure dependency on only the magnetic field or the electric field. This will yield a neat equation where the wave behaviour is naturally apparent, the wave equation. This reader is probably not the best location to bore you with the entire derivation of the wave equation. It is however important to remember the plane wave behaviour of light later on, as it will make understanding much easier \footnote{For a more extensive derivation of the wave equation, please refer to the appendix.}.
 
 In equation \ref{eq_wfg01}, the wave equation is given. In this equation, polarization is ignored. In the equation, $n^2 = \nicefrac{\epsilon}{\epsilon_0}$ is the ratio of the dielectric constants, or the refractive index and $c$ is the propagation speed of the wave, or the speed of light. The vector $U = (E, B)^T$ is the combined vector, containing the electric field and the magnetic field.
 
@@ -249,7 +254,16 @@ Thus, given some $i$ of the Noll index, it is possible to find the corresponding
 
 The remainder can then be used to compute $m$.  By simply checking if $i$ is odd or even the, $m$ can be set positive or negative. For the actual value of $m$ take into account the alternating series of $m_n$ and the fact that they are defined on  range of $m$: $m = -n, -n+2,...,n-2,n$ as pointed out earlier.
 
-This will give a single scalar that can be used to map to two scaler, making it much easier to compute wavefronts as will be pointed out in the next section. 
+This will give a single scalar that can be used to map to two scaler, making it much easier to compute wavefronts as will be pointed out in the next section. Figure \ref{fig_wfg06} plots the modes with corresponding Noll's index.
+
+\newpage
+\begin{figure}[H]
+	\center
+	\includegraphics[width=1.0\textwidth, height=1\textwidth]{Figures/Nollsmap.png}
+	\label{fig_wfg06}
+	\caption{Noll's mapping, for the first then modes with corresponding plots of the Zernike modes in Python.}
+\end{figure}
+
 
 %%
 %EXAMPLE IN PSEUDOCODE HERE? how to find (m,n) with i
@@ -620,12 +634,12 @@ The transformation back to the real spatial domain can be done efficiently by a 
 
 Many solutions have been proposed to make up for the error arising in the low frequency domain. Some have tried to introduce random draws from Zernike modes as a compensation. This will obviously run into trouble when decomposing in the wavefront in Zernike modes, as one will find the "random" mode directly back during decompression. An alternative method is the "subharmonics" method \cite{zernikeCircle}. %pages 168-169
 
-\newpage
 The subharmonics method used in the implementation was introduced by Lane \textit{et al.}  \cite{lane1992simulation}. It divides a grid point in the spatial frequency domain in consecutively smaller and smaller 3-by-3 grids, like the example of \ref{fig_wfg04}
 
+\newpage
 \begin{figure}[H]
 	\center
-	\includegraphics[height=1.0\textwidth, height=.3\textwidth]{Figures/subharmonics.png}
+	\includegraphics[height=.5\textwidth, height=.3\textwidth]{Figures/subharmonics.png}
 	\caption{The subharmonics division grid, here only 2 divisions are shown.}
 	\label{fig_wfg04}
 \end{figure}
@@ -637,16 +651,560 @@ For every subdivision, the same method is repeated as was outlined in equation \
 \label{eq_wfg54}
 \end{equation}
 
-For practical reasons, $p$, $f_x$ and $f_y$ are finite. In the code $p$ is limited to three and the sample grid is picked by the user. Note that there is no reason to take lower frequencies into account then the sample length of the data set. On the other side, there is no reason to take into account frequencies above the Nyquist criterion. Furthermore, the choice of $r_0$, for von Karman also $l_0$ and $L_0$, must be outside of the sample length and Nyquist constraints. In figure \ref{fig_wfg05} a realization of a Kolmogorov phase aberration.
+For practical reasons, $p$, $f_x$ and $f_y$ are finite. In the code $p$ is limited to three and the sample grid is picked by the user. Note that there is no reason to take lower frequencies into account then the sample length of the data set. On the other side, there is no reason to take into account frequencies above the Nyquist criterion. Furthermore, the choice of $r_0$, for von K{\'a}rm{\'a}n also $l_0$ and $L_0$, must be outside of the sample length and Nyquist constraints. In figure \ref{fig_wfg05} a realization of a Kolmogorov phase aberration.
 
 \begin{figure}[H]
 	\center
-	\includegraphics[height=1.0\textwidth, height=.3\textwidth]{Figures/kolmogorov.png}
+	\includegraphics[height=0.5\textwidth, height=.3\textwidth]{Figures/kolmogorov.png}
 	\caption{A realization of a Kolmogorov phase aberration, here with $r_0 = 0.1$, $p=3$ and $N_x,N_y = 30$.}
 	\label{fig_wfg05}
 \end{figure}
+
+To conclude, Kolmogorov, von K{\'a}rm{\'a}n and Zernike are created in a similar manner. The final wavefront is simply a addition of both aberrations. This will not be discussed further.
+
+\newpage
+\section{WFG in Python}
+This is a manual is intended as reference guide to show around the wavefront generation code of Adaptive Optics in Python. This manual will comprise of a description of the classes together with their methods and functions. A new page is made for every function, for readability, due to the many indentations, consider this when printing!
+
+As of current, the WFG part includes two classes. One class on the Zernike aberrations. The second class is on the phase screens of the the wavefront, as for example Kolmogorov behaviour.
+
+\lstset{language=Python} 
+% Zernike static methods
+\subsection{Zernike: Coding Example}
+Coding Example: This code creates a wavefront consisting of three Zernike modes 2,4 and 21, with the corresponding weights 0.5, 0.25 and -0.6. The wavefornt is plotted and then decomposed. The array (vector) \texttt{a}, should return 0.5, 0.25 and -0.6! The computation \texttt{numpy.dot(numpy.transpose(z),z)} should return near identity as was described in the text earlier.
+
+\texttt{zw = ZernikeWave()}
+
+\texttt{zw.addMode([2,4,21], [.5,.25,-.6]) }
+
+\texttt{W = zw.createWavefront(40,40)}
+
+\texttt{zw.plotWavefront(40,40)}
+
+\texttt{z,a = zw.decomposeWavefront(W)}
+
+\newpage
+\subsection{Zernike functions}
+\subsubsection*{\texttt{Z = zernike(rho, theta,u,v = None)}}
+\textbf{Arguments}
+\begin{description}
+\item[\texttt{rho}]\hfill \\
+	Meshgrid array or scalar containing the distance from the optical origin $r$.
+\item[\texttt{theta}]\hfill \\
+ 	Meshgrid array or scalar containing the cylindrical radial 	angle $\theta$. 
+\item[\texttt{u}] \hfill \\
+	$u$ mode index of the Zernike mapping, if $v$ is omitted, this is $i$ in Noll's mapping.
+\item[\texttt{v}] \hfill \\
+	 $v$ mode index of the Zernike mapping, this can be omitted if Noll's mapping is desired. 
+\end{description}
+\textbf{Returns}
+\begin{description}
+\item[\texttt{Z}] \hfill \\
+ The $(u,v)$ or $i$ Zernike mode, on the grid points defined in \texttt{rho} and \texttt{theta}.
+\end{description}
+
+\newpage
+\subsubsection*{\texttt{u,v = zernikeIndex(i)}}
+\textbf{Arguments}
+\begin{description}
+\item[\texttt{i}] \hfill \\
+Noll's mapping index
+\end{description}
+\textbf{Returns}
+\begin{description}
+\item[\texttt{u}] \hfill \\
+$u$ of the Zernike mapping
+\item[\texttt{v}] \hfill \\
+$v$ of the Zernike mapping
+\end{description}
+
+\newpage
+\subsection{ZernikeWave Class: Methods and Functions}
+\subsubsection*{\texttt{zw = ZernikeWave()}}
+\textbf{Arguments}
+\begin{description}
+	\item[\texttt{None}]
+\end{description}
+\textbf{Returns}
+\begin{description}
+	\item[\texttt{zw}]
+	An instance of the ZernikeWave class
+\end{description}
+
+\newpage
+\subsubsection*{\texttt{addMode(i, alpha\_i = 1)}}
+\textbf{Arguments}
+\begin{description}
+  \item[\texttt{i}] \hfill \\
+  Array or scalar containing the Zernike modes in Noll's mapping to add
+  \item[\texttt{alpha\_i}] \hfill \\
+  Array or scalar containing the weight of the modes specified, if omitted, a weight of one will be assumed. Ideal for decomposition, when the weighting is not important.
+\end{description}
+\textbf{Returns}
+\begin{description}
+	\item[\texttt{None}]
+\end{description}
+
+\newpage
+\subsubsection*{\texttt{changeModeWeight(iModeToChange,alpha\_i = 1)}}
+\textbf{Arguments}
+\begin{description}
+  \item[\texttt{i}] \hfill \\
+  Array or scalar containing the Zernike modes in Noll's mapping to add
+  \item[\texttt{alpha\_i}] \hfill \\
+  Array or scalar containing the weight of the modes specified, if omitted, a weight of one will be assumed. Ideal for decomposition, when the weighting is not important.
+\end{description}
+\textbf{Returns}
+\begin{description}
+	\item[\texttt{None}]
+\end{description}
+
+\newpage
+\subsubsection*{\texttt{removeMode(iToRemove)}}
+\textbf{Arguments}
+\begin{description}
+  \item[\texttt{iToRemove}] \hfill \\
+  Array or scalar containing the modes to remove.
+\end{description}
+\textbf{Returns}
+\begin{description}
+	\item[\texttt{None}]
+\end{description}
+
+\newpage
+\subsubsection*{\texttt{exists = modeExists(i)}}
+\textbf{Arguments}
+\begin{description}
+	\item[\texttt{i}]
+	Scalar of Noll's index, to check.
+\end{description}
+\textbf{Returns}
+\begin{description}
+	\item[\texttt{exists}]
+	Returns 1 (True) if mode is existent, else 0 (False).
+\end{description}
+
+\newpage
+\subsubsection*{\texttt{i = getModes()}}
+\textbf{Arguments}
+\begin{description}
+	\item[\texttt{None}]
+\end{description}
+\textbf{Returns}
+\begin{description}
+	\item[\texttt{i}]
+	List or scalar, with the modes specified in this instance.
+\end{description}
+
+\newpage
+\subsubsection*{\texttt{alpha\_i = getWeights()}}
+\textbf{Arguments}
+\begin{description}
+	\item[\texttt{None}]
+\end{description}
+\textbf{Returns}
+\begin{description}
+	\item[\texttt{alpha\_i}]
+	List or scalar, with the weights of the modes specified in this instance.
+\end{description}
+
+\newpage
+\subsubsection*{\texttt{W = createWavefront(nX,nY)}}
+\textbf{Arguments}
+\begin{description}
+  \item[\texttt{nX}] \hfill \\
+  Number of elements in $x$-direction of the grid
+  \item[\texttt{nY}] \hfill \\
+ 	Number of elements in $y$-direction of the grid
+\end{description}
+\textbf{Returns}
+\begin{description}
+	\item[\texttt{W}]
+	The created wavefront, containing the zernike weights specified in the instance, on the grid elements specified, the spatial domain is in the unity circle.
+\end{description}
+
+\newpage
+\subsubsection*{\texttt{Z,A = decomposeWavefront(W)}}
+\textbf{Arguments}
+\begin{description}
+  \item[\texttt{W}] \hfill \\
+  The wavefront to decompose
+\end{description}
+\textbf{Returns}
+\begin{description}
+	\item[\texttt{Z}]
+	The constructed basis matrix $\mathcal{Z}$, can be used to check identity of $\mathcal{Z}^T \mathcal{Z}$ to determine the validity of the decomposition.
+	\item[\texttt{A}]
+	The computed weights, according to the weights sepified in the instance of the ZernikeWave class.
+\end{description}
+
+\newpage
+\subsubsection*{\texttt{plotMode(iToPlot,nX,nY)}}
+\textbf{Arguments}
+\begin{description}
+  \item[\texttt{iToPlot}]
+  The mode in Noll's index to plot, can be used for checking intermediate results of the construction.
+  \item[\texttt{nX}] \hfill \\
+  Number of elements in $x$-direction of the grid
+  \item[\texttt{nY}] \hfill \\
+ 	Number of elements in $y$-direction of the grid
+\end{description}
+\textbf{Returns}
+\begin{description}
+	\item[\texttt{None}]
+\end{description}
+
+\newpage
+\subsubsection*{\texttt{plotWavefront(nX,nY)}}
+\textbf{Arguments}
+\begin{description}
+  \item[\texttt{nX}] \hfill \\
+  Number of elements in $x$-direction of the grid
+  \item[\texttt{nY}] \hfill \\
+ 	Number of elements in $y$-direction of the grid
+\end{description}
+\textbf{Returns}
+\begin{description}
+	\item[\texttt{None}]
+\end{description}
+
+% Phasescreen dynamic class
+\newpage
+\subsection{PhaseScreen Class: Example}
+Coding Example: Create a Kolmogorov phase screen with $r_0 = 0.1$. The other parameters $l_0$ and $L_0$ are specified but not used. They can be deleted. Also consider trying to replace 'Kolmogorov' by 'vonKarman' for a von K{\'a}rm{\'a}n pahse screen. The phase screen is then created and plotted.
+\texttt{ps = PhaseScreen()}
+\texttt{ps.setType('Kolmogorov') }
+\texttt{ps.setParams(\{'r0' : .1, 'l0' : .01, 'L0' : 100\})}
+\texttt{W = ps.createWavefront(40,40)}
+\texttt{ps.plotWavefront(40,40)}
+
+\newpage
+\subsection{PhaseScreen Class: Methods and Functions}
+\subsubsection*{\texttt{ps = PhaseScreen()}}
+\textbf{Arguments}
+\begin{description}
+	\item[\texttt{None}]
+\end{description}
+\textbf{Returns}
+\begin{description}
+	\item[\texttt{ps}]
+	An instance of the PhaseScreen class
+\end{description}
+
+\newpage
+\subsubsection*{\texttt{setType(phaseScreenType = 'Kolmogorov'}}
+\textbf{Arguments}
+\begin{description}
+	\item[\texttt{phaseScreenType}]
+	A string containing the name of the phase screen to use, as of current, 'Kolmogorov' or 'vonKarman' can be used. If omitted, a Kolmogorov phase screen is assumed.
+\end{description}
+\textbf{Returns}
+\begin{description}
+	\item[\texttt{None}]
+\end{description}
+
+\newpage
+\subsubsection*{\texttt{screenType = getType()}}
+\textbf{Arguments}
+\begin{description}
+	\item[\texttt{None}]
+\end{description}
+\textbf{Returns}
+\begin{description}
+	\item[\texttt{screenType}]
+	A string containing the name of the used phase screen.
+\end{description}
+
+\newpage
+\subsubsection*{\texttt{setParams(parameters)}}
+\textbf{Arguments}
+\begin{description}
+	\item[\texttt{screenType}]
+	A 'dict' data type containing the the parameters of the phase screen. For Kolmogorov, 'r0' is used, for 'von Karman', 'r0', 'l0' and 'L0' is used. Use this format, as an example: \texttt{{'r0': 0.1, 'l0':0.1, 'L0' : 100}}. If more parameters are specified then necessary, the unused are omitted. If to few are specified the code throws an error.
+\end{description}
+\textbf{Returns}
+\begin{description}
+	\item[\texttt{None}]
+\end{description}
+
+\newpage
+\subsubsection*{\texttt{params = getParameters()}}
+\textbf{Arguments}
+\begin{description}
+	\item[\texttt{None}]
+\end{description}
+\textbf{Returns}
+\begin{description}
+	\item[\texttt{params}]
+	A 'dict' datatype containing the parameters used by the specific type set-up. The returned format is similar to \texttt{setParameters(\dots)} and dependant on the set type: 'Kolmogorov' or 'von Karman'.
+\end{description}
+
+\newpage
+\subsubsection*{\texttt{W = createWavefront(nX,nY)}}
+\textbf{Arguments}
+\begin{description}
+  \item[\texttt{nX}] \hfill \\
+  Number of elements in $x$-direction of the grid
+  \item[\texttt{nY}] \hfill \\
+ 	Number of elements in $y$-direction of the grid
+\end{description}
+\textbf{Returns}
+\begin{description}
+	\item[\texttt{W}]
+	The created wavefront, containing the set type screen specified in the instance, on the grid elements specified, the spatial domain is in the unity rectangle.
+\end{description}
+
+\newpage
+\subsubsection*{\texttt{phi = kolmogorov(N, r0, D = 2.)}}
+\textbf{Arguments}
+\begin{description}
+  \item[\texttt{N}] \hfill \\
+  Number of elements in $x,y$-direction of the grid.
+  \item[\texttt{r0}] \hfill \\
+  The Fried parameter $r_0$, the caracteristic eddy or turbulent bubble size.
+  \item[\texttt{D}] \hfill \\
+ 	The range on which to create the wavefront. By default, it is plotted on teh unity rechtangle, so the rectangle edge length D is 2, if anything else is desired, consider replacement.  
+\end{description}
+\textbf{Returns}
+\begin{description}
+	\item[\texttt{W}]
+	The created wavefront, constructed via the subharmonics method, containing the set type screen specified in the instance, on the grid elements specified, the spatial domain is in the unity rectangle.
+\end{description}
+
+\newpage
+\subsubsection*{\texttt{phi = vonkarman(N, r0, l0, L0, D = 2)}}
+\textbf{Arguments}
+\begin{description}
+  \item[\texttt{N}] \hfill \\
+  Number of elements in $x,y$-direction of the grid.
+  \item[\texttt{r0}] \hfill \\
+  The Fried parameter $r_0$, the caracteristic eddy or turbulent bubble size.
+  \item[\texttt{l0}] \hfill \\
+  The von Karman small length scale.
+  \item[\texttt{L0}] \hfill \\
+  The von Karman large length scale.
+  \item[\texttt{D}] \hfill \\
+ 	The range on which to create the wavefront. By default, it is plotted on teh unity rechtangle, so the rectangle edge length D is 2, if anything else is desired, consider replacement. 
+\end{description}
+\textbf{Returns}
+\begin{description}
+	\item[\texttt{W}]
+	The created wavefront, constructed via the subharmonics method, containing the set type screen specified in the instance, on the grid elements specified, the spatial domain is in the unity rectangle.
+\end{description}
+
+\newpage
+\subsubsection*{\texttt{phi = hfkolmogorov(N, r0, D = 2.)}}
+\textbf{Arguments}
+\begin{description}
+  \item[\texttt{N}] \hfill \\
+  Number of elements in $x,y$-direction of the grid.
+  \item[\texttt{r0}] \hfill \\
+  The Fried parameter $r_0$, the caracteristic eddy or turbulent bubble size.
+  \item[\texttt{D}] \hfill \\
+ 	The range on which to create the wavefront. By default, it is plotted on teh unity rechtangle, so the rectangle edge length D is 2, if anything else is desired, consider replacement.  
+\end{description}
+\textbf{Returns}
+\begin{description}
+	\item[\texttt{W}]
+	The created wavefront, containing the set type screen specified in the instance, on the grid elements specified, the spatial domain is in the unity rectangle.
+\end{description}
+
+\newpage
+\subsubsection*{\texttt{phi = hfvonkarman(N, r0, l0, L0, D = 2)}}
+\textbf{Arguments}
+\begin{description}
+  \item[\texttt{N}] \hfill \\
+  Number of elements in $x,y$-direction of the grid.
+  \item[\texttt{r0}] \hfill \\
+  The Fried parameter $r_0$, the caracteristic eddy or turbulent bubble size.
+  \item[\texttt{l0}] \hfill \\
+  The von Karman small length scale.
+  \item[\texttt{L0}] \hfill \\
+  The von Karman large length scale.
+  \item[\texttt{D}] \hfill \\
+ 	The range on which to create the wavefront. By default, it is plotted on teh unity rechtangle, so the rectangle edge length D is 2, if anything else is desired, consider replacement. 
+\end{description}
+\textbf{Returns}
+\begin{description}
+	\item[\texttt{W}]
+	The created wavefront, containing the set type screen specified in the instance, on the grid elements specified, the spatial domain is in the unity rectangle.
+\end{description}
+
+\newpage
+\subsubsection*{\texttt{W = plotWavefront(nX,nY)}}
+\textbf{Arguments}
+\begin{description}
+  \item[\texttt{nX}] \hfill \\
+  Number of elements in $x$-direction of the grid
+  \item[\texttt{nY}] \hfill \\
+ 	Number of elements in $y$-direction of the grid
+\end{description}
+\textbf{Returns}
+\begin{description}
+	\item[\texttt{None}]
+\end{description}
+
+\newpage
+\subsection{Support Functions}
+The following functions are used inside the phase screen and zernike classes to provide some services that show up more often.
+
+\subsubsection*{\texttt{f = kroneckerDelta(x)}}
+\textbf{Arguments}
+\begin{description}
+	\item[\texttt{x}]
+	The input argument.
+\end{description}
+\textbf{Returns}
+\begin{description}
+	\item[\texttt{f}]
+	Dirac delta function, $\infty$ on $x=0$, zero otherwise.
+\end{description}
+
+\newpage
+\subsubsection*{\texttt{f = gamma2(n)}}
+\textbf{Arguments}
+\begin{description}
+	\item[\texttt{x}]
+	The input argument.
+\end{description}
+\textbf{Returns}
+\begin{description}
+	\item[\texttt{f}]
+	Factorial or gamma function, $\infty$ for $x<0$, else it returns the factorial. Recall: Gamma$(n+1) = n!$, currently a lazy implementation, without the need to add 1 to the argument. The function does NOT solve $int_{0}^{inf} = t^{n-1}*e^{-t} dt$. It only extends validity beyond $n < 0$. The result is only guaranteed for integer arguments.
+\end{description}
+
+\newpage
+\subsubsection*{\texttt{R,Theta = cart2pol(X,Y)}}
+\textbf{Arguments}
+\begin{description}
+	\item[\texttt{X}]
+	The position on the x axis in meshgrid format.
+	\item[\texttt{X}]
+	The position on the y axis in meshgrid format.
+\end{description}
+\textbf{Returns}
+\begin{description}
+	\item[\texttt{R}]
+	The position on the $r$ axis in meshgrid format.
+	\item[\texttt{Theta}]
+	The position on the $\theta$ axis in meshgrid format.
+\end{description}
+
+\newpage
+\subsubsection*{\texttt{X,Y = pol2cart(R,Theta}}
+\textbf{Arguments}
+\begin{description}
+	\item[\texttt{R}]
+	The position on the $r$ axis in meshgrid format.
+	\item[\texttt{Theta}]
+	The position on the $\theta$ axis in meshgrid format.
+\end{description}
+\textbf{Returns}
+\begin{description}
+	\item[\texttt{X}]
+	The position on the x axis in meshgrid format.
+	\item[\texttt{X}]
+	The position on the y axis in meshgrid format.
+\end{description}
+
+\newpage
+\subsubsection*{\texttt{X,Y = createGrid(nX, nY,rangeX=[-1,1],rangeY=[-1,1])}}
+\textbf{Arguments}
+\begin{description}
+	\item[\texttt{nX}]
+	Distance between grid point on the x-axis.
+	\item[\texttt{nY}]
+	Distance between grid point on the y-axis.
+	\item[\texttt{rangeX}]
+	The x range where the grid is defined, assumes a unity rectangle by default.
+	\item[\texttt{rangeY}]
+	The y range where the grid is defined, assumes a unity rectangle by default.
+\end{description}
+\textbf{Returns}
+\begin{description}
+	\item[\texttt{f}]
+	Returns a meshgrid, with a specified number of elements in both x an y direction. Additionally, the range can be specified, if the ranges are not specified, it is assumed to be in [-1,1] 
+\end{description}
+
+\newpage
+\subsubsection*{\texttt{inCircle = circ(X,Y,radius = 1.,datatype = 'bool')}}
+\textbf{Arguments}
+\begin{description}
+	\item[\texttt{X}]
+	The position on the x axis in meshgrid format.
+	\item[\texttt{X}]
+	The position on the y axis in meshgrid format.
+	\item[\texttt{radius}]
+	The radius to define the aperture radius with. Set to one by default.
+	\item[\texttt{datatype}]
+	The datatype to return. Set to boolean by default.
+\end{description}
+\textbf{Returns}
+\begin{description}
+	\item[\texttt{f}]
+	Returns a circular aperture based on the grid X and Y in the specified datatype. The radius is assumed at one, if it is not specified. Whether to include the boundary of the circle can be a topic of discussion.
+\end{description}
+
+\newpage
+\section{Appendix: Maxwell Equations}
+\subsection{Obtaining the Wave-Equation}
+Maxwell equations provide insight of the behaviour of light a continues wave, that propagates through a medium. In the case of a homogeneous, non-dispersive medium in absence of charges, Maxwell's equations reduce to a neat wave equation.
+
+To get to the wave description of the Maxwell equations, start with the orthogonality between the electric field and the magnetic field, as decribed by  Faraday's law. First take the curl of Faraday's law, by multiplying it with the gradient operator in \ref{eq_wfga1} on both sides. The electric field is described by the vector $E$, the magnetic field is represented by $B$. Both $\mu$ and $\epsilon$ are material dependant constants.
+\begin{equation}
+\label{eq_wfga1}
+\nabla \times (\nabla \times E) = -\frac{\partial}{\partial t}(\nabla \times B)
+\end{equation}
+
+Now consider Amp\`{e}re's law below in equation \ref{eq_wfga2}.
+\begin{equation}
+\label{eq_wfga2}
+\nabla \times B = \mu \left( J + \epsilon \frac{\partial E}{\partial t} \right)
+\end{equation}
+
+Then substitute Amp\`{e}re's law in Faraday's law. Further, since no charge was assumed, the charge density $J$ can be set to zero, as below in \ref{eq_wfga3}.
+\begin{equation}
+\label{eq_wfga3}
+\nabla \times (\nabla \times E) = -\mu \epsilon \frac{\partial^2}{\partial t^2} E
+\end{equation}
+
+Now consider the vector identity from equation \ref{eq_wfga4}.
+\begin{equation}
+\label{eq_wfga4}
+\nabla \times (\nabla \times E) = \nabla(\nabla \cdot E) - \nabla^2 E
+\end{equation}
+
+The reason for introducing the identity in equation \ref{eq_wfga4} becomes obvious when considering Gauss' law below in equation \ref{eq_wfga5}. Now note that the gradient of the scalar $\nabla \cdot E$ is zero.
+\begin{equation}
+\label{eq_wfga5}
+\nabla \cdot E = \frac{\rho}{\epsilon}
+\end{equation}
+
+Thus reducing to equation \ref{eq_wfga6} below. It is now apparent that the equation is second order time dependant differential equation.
+\begin{equation}
+\label{eq_wfga6}
+\nabla^2 E - \mu \epsilon \frac{\partial^2}{\partial t^2} E = 0 
+\end{equation}
+
+Similar manipulations can also be done for the magnetic field, start here with taking the curl of Amp\`{e}re's law and substituting Faraday's law into it. The wave equation for the magnetic field is described in equation \ref{eq_wfga7}.
+\begin{equation}
+\label{eq_wfga7}
+\nabla^2 B - \mu \epsilon \frac{\partial^2}{\partial t^2} B = 0 
+\end{equation}
+
+For Cartesian coordinates, the Laplacians $\nabla^2 E$ and $\nabla^2 B$ are i independent with respect to the coordinates. Giving rise to equation with the intensity vector $U(r,t)$ in equation \ref{eq_wfga8}
+\begin{equation}
+\label{eq_wfga8}
+\left( \nabla^2 - \mu \epsilon \frac{\partial^2}{\partial t^2} \right) U(r,t)= 0 
+\end{equation}
+
+The common way to solve these second order time dependant wave equations, is by separating the it into a spatial part and a time dependant part. Giving the result as is in equation \ref{eq_wfga9}. Note now the constant $\mu \epsilon$ can the repalced by the wave number $k = 2\pi/\lambda $ an the wave propagation speed $c = 1/\sqrt{\mu_0 \epsilon_0}$.
+\begin{equation}
+\label{eq_wfga9}
+\end{equation}
 
 \newpage
 \bibliography{refs}
 \bibliographystyle{ieeetran}
 \end{document}
+
