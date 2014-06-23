@@ -159,6 +159,10 @@ class ZernikeWave:
         ax.set_zlabel(title)
         p.show()
         
+        p.figure()
+        p.scatter(X, Y, c=WF)
+        p.colorbar()
+        p.show()
         
     
        
