@@ -163,6 +163,10 @@ class ZernikeWave:
         ax.set_zlabel(title)
         p.show()
         
+        p.figure()
+        p.scatter(X, Y, c=WF)
+        p.colorbar()
+        p.show()
 
 # Create Zernike Grid : Z_{u}^{v} = zernike(rho,theta,n)
 # Compute the zernike mode based on Noll's index n, at the specified location

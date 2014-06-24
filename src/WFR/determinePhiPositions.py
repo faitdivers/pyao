@@ -57,6 +57,8 @@ def phi_positions_fried(lensCentx, lx, dim_x, lensCenty, ly, dim_y, dl, D):
 	#put them in same format as phi
 	phiCentersX = hstack(phiCentersX)
 	phiCentersY = hstack(phiCentersY)
+	phiCentersX = phiCentersX.reshape((len(phiCentersX),1))
+	phiCentersY = phiCentersY.reshape((len(phiCentersY),1))
 	
 	return phiCentersX, phiCentersY
 		
@@ -65,5 +67,8 @@ def phi_positions_southwell(lensCentx, lx, lensCenty, ly):
 	#denormalize lens center arrays
 	phiCentersX = lensCentx*lx
 	phiCentersY = lensCenty*ly
+	
+	phiCentersX = phiCentersX.reshape((len(phiCentersX),1))
+	phiCentersY = phiCentersY.reshape((len(phiCentersY),1))
 	
 	return phiCentersX, phiCentersY

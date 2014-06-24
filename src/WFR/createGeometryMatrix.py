@@ -24,11 +24,11 @@ def create_phase_id(centroids, x_dim, y_dim):
 		for j in range(0,y_dim):
 			#Check if the slope at s(i,j) is non zero
 			#Put a 1 at each place of phi we need
-			if centroids[i*x_dim+j,0] != 0 or centroids[i*x_dim+j+number_slopes,0] != 0:
-				phase_id[i,j] = 1
-				phase_id[i,j+1] = 1
-				phase_id[i+1,j] = 1
-				phase_id[i+1,j+1] = 1
+			#if centroids[i*x_dim+j,0] != 0 or centroids[i*x_dim+j+number_slopes,0] != 0:
+			phase_id[i,j] = 1
+			phase_id[i,j+1] = 1
+			phase_id[i+1,j] = 1
+			phase_id[i+1,j+1] = 1
 	return phase_id
 	
 def create_phase_num(phase_id,x_dim,y_dim,geometry):
