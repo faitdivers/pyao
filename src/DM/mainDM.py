@@ -9,9 +9,12 @@ def calculate_hmatrix(actuator_parameters, reconstruction_parameters):
 	sig2 = actuator_parameters['sig2']
 	w1 = actuator_parameters['w1']
 	w2 = actuator_parameters['w2']
-	actuator_positions_x = actuator_parameters['actuator_positions_x']
-	actuator_positions_y = actuator_parameters['actuator_positions_y']
-	number_of_actuators = len(actuator_positions_x)
+	num_act_x = actuator_parameters['numActx']
+	num_act_y = actuator_parameters['numActy']
+	act_distance = actuator_parameters['act_distance']
+	
+	act_pos_x, act_pos_y = calculate_dm_square_configuration(num_act_x, num_act_y, act_distance)
+	number_of_actuators = len(act_pos_x)
 	
 	phi_positions_x = reconstruction_parameters['phi_positions_x']
 	phi_positions_y = reconstruction_parameters['phi_positions_y']
@@ -24,8 +27,8 @@ def calculate_hmatrix(actuator_parameters, reconstruction_parameters):
 
 	for i in range(0, number_of_phi_locations):
 		for j in range(0, number_of_actuators):
-			y_squared = (phi_positions_y[i] - actuator_positions_y[j]) ** 2
-			x_squared = (phi_positions_x[i] - actuator_positions_x[j]) ** 2
+			y_squared = (phi_positions_y[i] - act_pos_y[j]) ** 2
+			x_squared = (phi_positions_x[i] - act_pos_x[j]) ** 2
 			y_sqrd_x_sqrd = y_squared + x_squared
 			
 			part1 = k1 * np.exp(- y_sqrd_x_sqrd / (2 * sig1 ** 2))
@@ -55,6 +58,9 @@ def calculate_dm_wavefront(control_command, h_matrix):
 
 
 def calculate_dm_square_configuration(num_act_x, num_act_y, distance_actuators):
+	"""
+
+	"""
 	act_cent_x = np.arange(num_act_x) * distance_actuators + (distance_actuators / 2)
 	act_cent_y = np.arange(num_act_y) * distance_actuators + (distance_actuators / 2)
 	act_cent_x, act_cent_y = np.meshgrid(act_cent_x, act_cent_y) # Create rectangular grids for centres [m]
