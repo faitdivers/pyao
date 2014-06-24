@@ -17,10 +17,10 @@ def calculate_hmatrix(actuator_parameters, reconstructed_wavefront):
 	phi_locations_y = reconstructed_wavefront[1]
 	number_of_phi_locations = len(phi_locations_x)
 	
-	H = zeros([number_of_phi_locations, number_of_actuators])
+	H = np.zeros([number_of_phi_locations, number_of_actuators])
 	
-	k1 = w1 / (2 * pi * sig1 ** 2)
-	k2 = w2 / (2 * pi * sig2 ** 2)
+	k1 = w1 / (2 * np.pi * sig1 ** 2)
+	k2 = w2 / (2 * np.pi * sig2 ** 2)
 
 	for i in range(0, number_of_phi_locations):
 		for j in range(0, number_of_actuators):
@@ -28,8 +28,8 @@ def calculate_hmatrix(actuator_parameters, reconstructed_wavefront):
 			x_srqd = (phi_locations_x[i] - actuator_positions_x[j]) ** 2
 			y_sqrd_x_sqrd = y_sqrd + x_srqd
 			
-			part1 = k1 * exp(- y_sqrd_x_sqrd / (2 * sig1 ** 2))
-			part2 = k2 * exp(- y_sqrd_x_sqrd / (2 * sig2 ** 2))
+			part1 = k1 * np.exp(- y_sqrd_x_sqrd / (2 * sig1 ** 2))
+			part2 = k2 * np.exp(- y_sqrd_x_sqrd / (2 * sig2 ** 2))
 			
 			H[i][j] = part1 + part2
 	return H
