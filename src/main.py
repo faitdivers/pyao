@@ -23,21 +23,21 @@ def setup_params():
         Multiple dictionaries, containing the parameters and their values.
     """
     paramsWavefront = {
-        # Do zernike wfg
-        'zernike' :
-        # Scalar or array containing the zernike modes 
-        {'zernikeModes' : [2,4,21],
-        # Scalar or array containing the zernike weights, with respect to the modes 
-        'zernikeWeights' : [0.5,0.25,-0.6]},        
-        # Do Kolmogorov wfg
-        'kolmogorov' :
-        # Set Kolmogorov parameters
-        {'r0' : 1},
-        # Do von Karman wfg
-        'vonkarman' :
-        # Set Von Karman parameters
-        {'r0' : 1, 'l0' : 1, 'L0' : 1}
-        }  
+    # Do zernike wfg
+    'zernike' :
+    # Scalar or array containing the zernike modes 
+    {'zernikeModes' : [2,4,21],
+    # Scalar or array containing the zernike weights, with respect to the modes 
+    'zernikeWeights' : [0.5,0.25,-0.6]},        
+    # Do Kolmogorov wfg
+    'kolmogorov' :
+    # Set Kolmogorov parameters
+    {'r0' : 1},
+    # Do von Karman wfg
+    'vonkarman' :
+    # Set Von Karman parameters
+    {'r0' : 1, 'l0' : 1, 'L0' : 1}
+    }  
 
     paramsSensor = {
     # number of samples in the pupil plane
@@ -74,7 +74,7 @@ def setup_params():
 	'mean_readout': 0.0,   # should be 0 for white noise
 	# Photon Noise Parameters (Modelled as Poisson): based only on expected value of Ii 
 	}
-	
+
     # Compute lenslet centres and check minimal array widths 
     lx, ly, lensCentx, lensCenty = lensletCentres(paramsSensor)
     # Normalized lenslet centers
@@ -89,6 +89,11 @@ def setup_params():
     # number of actuators
     'numActx': 8,
     'numActy': 8,
+    'distance_actuators': 10.0e-6,
+    'sig1': 0.54,
+    'sig2': 0.85,
+    'w1': 2,
+    'w2': -1
     # parameters to characterize influence function
     }
 
@@ -110,6 +115,49 @@ def setup_params():
     }
 
     return parameters
+
+
+def compute_hmatrix(actuator_parameters, sensor_parameters):
+    """ This function computes the H matrix for this simulation.
+    
+    To do this, first the phi locations are computed, and after that the H
+    matrix itself will be computed.
+    
+    TODO: Instead of using the lensCentx/y use the phi locations provided by
+    the WFR group when their code is merged into the master.
+    """
+    phi_positions_x = sensor_parameters['lensCentx']
+    phi_positions_y = sensor_parameters['lensCenty']
+    reconstruction_parameters = {
+    'phi_positions_x': phi_positions_x,
+    'phi_positions_y': phi_positions_y
+    }
+    H = calculate_hmatrix(actuator_parameters, reconstruction_parameters) 
+    return H
+
+
+def interpolate_wavefront(wave_front, phi_positions, sensor_parameters):
+    """ This function interpolates a wavefront that contains
+    less points to the default wavefront sizes being used in the
+    rest of the simulation.
+    
+    """
+    Nx = sensor_parameters['numPupilx'] # Samples on the x-axis
+    Ny = sensor_parameters['numPupily'] # Samples on the y_axis
+    lx = sensor_parameters['lx'] # Width of the lenslet array in the x-direction [m]
+    ly = sensor_parameters['ly'] # Width of the lenslet array in the y-direction [m]
+    
+    
+    dx = lx/(Nx - 1.0) # Sample length on x-axis [m]
+    dy = ly/(Ny - 1.0) # Sample length on y-axis [m]
+    x = arange(0.0, lx + dx, dx) # Sample positions on x-axis [m]
+    y = arange(0.0, ly + dy, dy) # Sample positions on y-axis [m]
+    
+    interp_function = interpolate.interp2d(phi_positions['x'], 
+                                           phi_positions['y'], 
+                                           wave_front, kind='linear')
+    interpolated_wavefront = interp_function(x, y)
+    return interpolated_wavefront
 
 
 def runClosedLoop(parameters, iterations, buffer_size):
@@ -140,6 +188,9 @@ def runClosedLoop(parameters, iterations, buffer_size):
     
     print("Running closed-loop simulation")
     # The first deformable mirror effect: (No effect)
+    
+    H = compute_hmatrix(actuatorParameters, sensorParameters)
+    
     wfDM = dm(0, sensorParameters)
 
     delay_buffer = LatencyBuffer(buffer_size, (sensorParameters['numPupilx'],
