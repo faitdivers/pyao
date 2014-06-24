@@ -23,21 +23,21 @@ def setup_params():
         Multiple dictionaries, containing the parameters and their values.
     """
     paramsWavefront = {
-        # Do zernike wfg
-        'zernike' :
-        # Scalar or array containing the zernike modes 
-        {'zernikeModes' : [2,4,21],
-        # Scalar or array containing the zernike weights, with respect to the modes 
-        'zernikeWeights' : [0.5,0.25,-0.6]},        
-        # Do Kolmogorov wfg
-        'kolmogorov' :
-        # Set Kolmogorov parameters
-        {'r0' : 1},
-        # Do von Karman wfg
-        'vonkarman' :
-        # Set Von Karman parameters
-        {'r0' : 1, 'l0' : 1, 'L0' : 1}
-        }  
+    # Do zernike wfg
+    'zernike' :
+    # Scalar or array containing the zernike modes 
+    {'zernikeModes' : [2,4,21],
+    # Scalar or array containing the zernike weights, with respect to the modes 
+    'zernikeWeights' : [0.5,0.25,-0.6]},        
+    # Do Kolmogorov wfg
+    'kolmogorov' :
+    # Set Kolmogorov parameters
+    {'r0' : 1},
+    # Do von Karman wfg
+    'vonkarman' :
+    # Set Von Karman parameters
+    {'r0' : 1, 'l0' : 1, 'L0' : 1}
+    }  
 
     paramsSensor = {
     # number of samples in the pupil plane
@@ -74,7 +74,7 @@ def setup_params():
 	'mean_readout': 0.0,   # should be 0 for white noise
 	# Photon Noise Parameters (Modelled as Poisson): based only on expected value of Ii 
 	}
-	
+
     # Compute lenslet centres and check minimal array widths 
     lx, ly, lensCentx, lensCenty = lensletCentres(paramsSensor)
     # Normalized lenslet centers
