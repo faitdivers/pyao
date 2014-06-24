@@ -14,11 +14,13 @@ class ZernikeWave:
         self.indices = [] #empty(0,numpy.uint32)
         self.weights = [] #empty(0)
     
-    def addMode(self,i, alpha_i = 1):
+    def addMode(self,i, alpha_i = None):
         if not(isinstance(i,list)):
             i = [i]
         if not(isinstance(alpha_i,list)):
             alpha_i = [alpha_i]
+        if alpha_i == None:
+            alpha_i = ones((len(i),1))
         if len(i) != len(alpha_i):
             print("ERROR: Indices list and weighting list must have equal lengths.")
             return   
@@ -73,22 +75,25 @@ class ZernikeWave:
     def getWeights(self):
         return self.weights
     
-    def createWavefront(self,nX,nY):
+    def createWavefront(self,nX,nY,circAperture = False):
         numberOfModes = len(self.indices)
         pos = 0
 
         WF = zeros([nX,nY])
         X,Y = createGrid(nX,nY)
         R,T = cart2pol(X,Y)
-        aperture = circ(X,Y)
         
         while pos < numberOfModes:
             mode = self.indices[pos]
             weight = self.weights[pos]
-            zi = zernike(R,T,mode)*aperture
+            zi = zernike(R,T,mode)
             WF += weight * zi
             pos += 1
-
+        
+        if circAperture:
+            aperture = circ(X,Y)
+            WF = WF*aperture
+        
         return WF
     
     def decomposeWavefront(self,W):
@@ -145,10 +150,9 @@ class ZernikeWave:
         ax.set_zlabel(title)
         p.show()
     
-    def plotWavefront(self,nX,nY):
+    def plotWavefront(self,nX,nY,circAperture = True):
         X,Y = createGrid(nX,nY)
-        WF = self.createWavefront(nX,nY)  
-        print WF
+        WF = self.createWavefront(nX,nY,circAperture)  
         title = "Combined Phase, \phi(x), of the  Wavefront"
         # Plot results in a surface plot
         fig = p.figure();
@@ -159,9 +163,6 @@ class ZernikeWave:
         ax.set_zlabel(title)
         p.show()
         
-        
-    
-       
 
 # Create Zernike Grid : Z_{u}^{v} = zernike(rho,theta,n)
 # Compute the zernike mode based on Noll's index n, at the specified location

@@ -1,5 +1,6 @@
 from scipy import *
 import numpy
+import numpy as np
 from math import *
 
 def kroneckerDelta(x):
@@ -57,4 +58,14 @@ def createGrid(nX, nY,rangeX=[-1,1],rangeY=[-1,1]):
 # can be a topic of discussion. If desired, the returned datatype can be altered.
 def circ(X,Y,radius = 1.,datatype = 'bool'):
     return array((X*X + Y*Y) <= (radius*radius),datatype)
+
+# Preform a 2D inverse fourier transform based on existing fft classes in numpy.fft,
+# Using this method is more cleaner and easier to implement in line: It preforms
+# the shift in the fft (circular \pi-phase rotation) automatically.
+def invsfft2(U,deltaF = 1):
+    N = np.size(U,0)
+    return np.fft.ifftshift(np.fft.ifft2(np.fft.ifftshift(U))) * (N*deltaF)**2
     
+def sfft2(u,deltaX = 1):
+    N = np.size(U,0)
+    return np.fft.fftshift(np.fft.fft2(np.fft.fftshift(u))) * (deltaX/N)**2

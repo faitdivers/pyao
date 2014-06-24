@@ -1,6 +1,7 @@
 from numpy import *
 from scipy import *
 from zernike import *
+from phaseScreen import *
 
 # Create a wavefront, comprising of a sum of zernike modes, with their respective weithings.
 # Syntax:
@@ -16,13 +17,39 @@ from zernike import *
 # in order to make a discretization of the wavefront. Further the parameter debug can be specified
 # if a plot of the constructed wavefront is desired. 
 
-def wfg(params, zernikeModes, zernikeWeights, debug=False):
-	zw = ZernikeWave()
+def wfg(params, wavefrontParams,debug = False):
+    waveFrontPhi = numpy.zeros((params['numPupilx'],params['numPupily']))
+    
+    #Zernike
+    if 'zernike' in wavefrontParams:
+        zernikeModes = wavefrontParams['zernike']['zernikeModes']
+        zernikeWeights = wavefrontParams['zernike']['zernikeWeights']
+        
+        zw = ZernikeWave()
 	zw.addMode(zernikeModes, zernikeWeights)
-	waveFrontPhi = zw.createWavefront(params['numImagx'],params['numImagy'])
-	
-	# When calling with debug = true, plot the created wavefront if desired, so you can see what is done.
-	if debug:
-		zw.plotWavefront(params['numImagx'],params['numImagy'])
+	waveFrontPhi = waveFrontPhi + zw.createWavefront(params['numPupilx'],params['numPupily'])
+        
+        if debug:
+	   zw.plotWavefront(params['numPupilx'],params['numPupily'])
+    
+    if 'kolmogorov' in wavefrontParams:
+        phaseScreenParams = wavefrontParams['kolmogorov']
+        ps = PhaseScreen()
+        ps.setType('Kolmogorov')
+        ps.setParams(phaseScreenParams)
+        waveFrontPhi = waveFrontPhi + ps.createWavefront(params['numPupilx'],params['numPupily'])
+        
+        if debug:
+	   ps.plotWavefront(params['numPupilx'],params['numPupily'])
 
-	return waveFrontPhi
+    if 'vonkarman' in wavefrontParams:
+        phaseScreenParams = wavefrontParams['vonkarman']
+        ps = PhaseScreen()
+        ps.setType('vonKarman')
+        ps.setParams(phaseScreenParams)
+        waveFrontPhi = waveFrontPhi + ps.createWavefront(params['numPupilx'],params['numPupily'])
+        
+        if debug:
+	   ps.plotWavefront(params['numPupilx'],params['numPupily'])
+        				
+    return waveFrontPhi
