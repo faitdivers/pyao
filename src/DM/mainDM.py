@@ -46,6 +46,14 @@ def calculate_actuation_command(reconstructed_wavefront, h_matrix):
 	return u
 
 
+def calculate_dm_wavefront(control_command, h_matrix):
+	"""
+
+	"""
+	dm_wavefront = np.dot(h_matrix, control_command)
+	return dm_wavefront
+
+
 def dm(actCom, paramsSens):
-	return zeros((paramsSens['numPupilx'],paramsSens['numPupily']))
+	return np.zeros((paramsSens['numPupilx'],paramsSens['numPupily']))
 
