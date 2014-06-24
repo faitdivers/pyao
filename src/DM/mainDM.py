@@ -1,4 +1,4 @@
-from numpy import *
+import numpy as np
 
 
 def calculate_hmatrix(actuator_parameters, reconstructed_wavefront):
@@ -33,6 +33,17 @@ def calculate_hmatrix(actuator_parameters, reconstructed_wavefront):
 			
 			H[i][j] = part1 + part2
 	return H
+
+
+def calculate_actuation_command(reconstructed_wavefront, h_matrix):
+	"""
+
+	"""
+	p1 = np.dot(h_matrix.T, h_matrix)
+	p1_inv = np.linalg.inv(p1)
+	p2 = np.dot(p1_inv, h_matrix.T)
+	u = np.dot(p2, reconstructed_wavefront)
+	return u
 
 
 def dm(actCom, paramsSens):
