@@ -1,7 +1,7 @@
 import numpy as np
 
 
-def calculate_hmatrix(actuator_parameters, reconstructed_wavefront):
+def calculate_hmatrix(actuator_parameters, reconstruction_parameters):
 	"""
 	
 	"""
@@ -13,9 +13,9 @@ def calculate_hmatrix(actuator_parameters, reconstructed_wavefront):
 	actuator_positions_y = actuator_parameters['actuator_positions_y']
 	number_of_actuators = len(actuator_positions_x)
 	
-	phi_locations_x = reconstructed_wavefront[0]
-	phi_locations_y = reconstructed_wavefront[1]
-	number_of_phi_locations = len(phi_locations_x)
+	phi_positions_x = reconstruction_parameters['phi_positions_x']
+	phi_positions_y = reconstruction_parameters['phi_positions_y']
+	number_of_phi_locations = len(phi_positions_x)
 	
 	H = np.zeros([number_of_phi_locations, number_of_actuators])
 	
@@ -24,9 +24,9 @@ def calculate_hmatrix(actuator_parameters, reconstructed_wavefront):
 
 	for i in range(0, number_of_phi_locations):
 		for j in range(0, number_of_actuators):
-			y_sqrd = (phi_locations_y[i] - actuator_positions_y[j]) ** 2
-			x_srqd = (phi_locations_x[i] - actuator_positions_x[j]) ** 2
-			y_sqrd_x_sqrd = y_sqrd + x_srqd
+			y_squared = (phi_positions_y[i] - actuator_positions_y[j]) ** 2
+			x_squared = (phi_positions_x[i] - actuator_positions_x[j]) ** 2
+			y_sqrd_x_sqrd = y_squared + x_squared
 			
 			part1 = k1 * np.exp(- y_sqrd_x_sqrd / (2 * sig1 ** 2))
 			part2 = k2 * np.exp(- y_sqrd_x_sqrd / (2 * sig2 ** 2))
