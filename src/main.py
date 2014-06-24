@@ -89,6 +89,11 @@ def setup_params():
     # number of actuators
     'numActx': 8,
     'numActy': 8,
+    'distance_actuators': 10.0e-6,
+    'sig1': 0.54,
+    'sig2': 0.85,
+    'w1': 2,
+    'w2': -1
     # parameters to characterize influence function
     }
 
@@ -140,6 +145,9 @@ def runClosedLoop(parameters, iterations, buffer_size):
     
     print("Running closed-loop simulation")
     # The first deformable mirror effect: (No effect)
+    
+    
+    
     wfDM = dm(0, sensorParameters)
 
     delay_buffer = LatencyBuffer(buffer_size, (sensorParameters['numPupilx'],
