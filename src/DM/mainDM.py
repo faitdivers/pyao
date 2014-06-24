@@ -54,6 +54,16 @@ def calculate_dm_wavefront(control_command, h_matrix):
 	return dm_wavefront
 
 
+def calculate_dm_square_configuration(num_act_x, num_act_y, distance_actuators):
+	act_cent_x = np.arange(num_act_x) * distance_actuators + (distance_actuators / 2)
+	act_cent_y = np.arange(num_act_y) * distance_actuators + (distance_actuators / 2)
+	act_cent_x, act_cent_y = np.meshgrid(act_cent_x, act_cent_y) # Create rectangular grids for centres [m]
+	act_cent_x = np.hstack(act_cent_x) # Stack the rectangular grids [m]
+	act_cent_x = np.hstack(act_cent_y) # Stack the rectangular grids [m]
+	
+	return act_cent_x, act_cent_y
+
+
 def dm(actCom, paramsSens):
 	return np.zeros((paramsSens['numPupilx'],paramsSens['numPupily']))
 
