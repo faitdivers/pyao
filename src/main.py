@@ -28,17 +28,17 @@ def setup_params():
         # Do zernike wfg
         'zernike' :
         # Scalar or array containing the zernike modes 
-        {'zernikeModes' : [2,4,21],
+        {'zernikeModes' : [4],
         # Scalar or array containing the zernike weights, with respect to the modes 
-        'zernikeWeights' : [0.5,0.25,-0.6]},        
-        # Do Kolmogorov wfg
-        'kolmogorov' :
-        # Set Kolmogorov parameters
-        {'r0' : 1},
-        # Do von Karman wfg
-        'vonkarman' :
-        # Set Von Karman parameters
-        {'r0' : 1, 'l0' : 1, 'L0' : 1}
+        'zernikeWeights' : [1]}       
+#        # Do Kolmogorov wfg
+#        'kolmogorov' :
+#        # Set Kolmogorov parameters
+#        {'r0' : 1},
+#        # Do von Karman wfg
+#        'vonkarman' :
+#        # Set Von Karman parameters
+#        {'r0' : 1, 'l0' : 1, 'L0' : 1}
         }  
 
     paramsSensor = {
@@ -98,7 +98,7 @@ def setup_params():
     'frequency': 1,       # Frequency of the simulation in Hertz
     'time': 1,            # Simulated time in seconds
     'delay': 0,  # Delay in number of samples
-    'geometry': 'southwell', #The geometry that is used for reconstruction (choose: fried, southwell, mhudgin)
+    'geometry': 'fried', #The geometry that is used for reconstruction (choose: fried, southwell, mhudgin)
     'is_closed_loop': True
     }
 
@@ -154,12 +154,12 @@ def runClosedLoop(parameters, iterations, buffer_size):
     
     for i in range(0, iterations):
         print("Running simulation step %d" % (i))
-        wf = wfg(sensorParameters, wavefrontParameters)
+        wf = wfg(sensorParameters, wavefrontParameters, True)
         wfRes = wf - wfDM
         xInt, yInt, intensities = wfs(wfRes, sensorParameters)
         centroids = centroid(intensities, sensorParameters)
         wfRec = wfr(centroids, sensorParameters,simulation_parameters['geometry'])
-        #plotWavefront(phiCentersX,phiCentersY,wfRec,sensorParameters['noApertx'],sensorParameters['noAperty'],simulation_parameters['geometry'])
+        plotWavefront(phiCentersX,phiCentersY,wfRec,sensorParameters['noApertx'],sensorParameters['noAperty'],simulation_parameters['geometry'])
         wfRec = delay_buffer.update(wfRec)
         actCommands = control(wfRec, actuatorParameters)
         wfDM = dm(actCommands, sensorParameters)
