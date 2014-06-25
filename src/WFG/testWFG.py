@@ -1,3 +1,5 @@
+import numpy
+numpy.set_printoptions(threshold=numpy.nan)
 from numpy import allclose, load
 from zernike import *
 
@@ -5,7 +7,7 @@ import unittest
 import os
 
 #unittest.TestCase
-class TestZernikeWavefront():
+class TestZernikeWavefront(unittest.TestCase):
     def testConstructor(self):
         zernikeModes = [2,4,21]
         zernikeWeights = [0.5,0.25,-0.6]        
@@ -16,9 +18,15 @@ class TestZernikeWavefront():
 	self.assertTrue(zernikeModes,zw.getModes())
 	self.assertTrue(zernikeWeights, zw.getWeights())
 
-    def testWavefront(self):
-        data = load(os.getcwd()+'\Documents\GitHub\pyao\src\WFG\defocusTestData.npy')
-
+    def loadTestData(self, fileName):
+        script_dir = os.path.dirname(__file__)
+        rel_path = fileName
+        abs_file_path = os.path.join(script_dir, rel_path)
+        data = load(abs_file_path)
+        return data
+    
+    def testWavefront(self):        
+        data = self.loadTestData('defocusTestData.npy')
         paramt = {
         'numPupilx' : 11,
         'numPupily' : 11,
@@ -33,8 +41,8 @@ class TestZernikeWavefront():
         zw = ZernikeWave()
         zw.addMode(zernikeModes, zernikeWeights)
         wf = zw.createWavefront(paramt['numImagx'],paramt['numImagy'])
-        
-        self.assertEqual(data,wf)
+        test_result = allclose(wf, data)
+        self.assertTrue(test_result, 'Generated wave-front is different than expected.')
 
     def testWavefrontDecomposition(self):
         paramt = {
@@ -57,7 +65,7 @@ class TestZernikeWavefront():
         self.assertTrue(testResult)
         
     def testNollMapping(self):
-        data = load(os.getcwd()+'\Documents\GitHub\pyao\src\WFG\indexTestData.npy')
+        data = self.loadTestData('indexTestData.npy')
         datastr = ""
         for n in range(1,81):
             u,v = zernikeIndex(n)
