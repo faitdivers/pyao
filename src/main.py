@@ -28,17 +28,17 @@ def setup_params():
         # Do zernike wfg
         'zernike' :
         # Scalar or array containing the zernike modes 
-        {'zernikeModes' : [4],
+        {'zernikeModes' : [2],
         # Scalar or array containing the zernike weights, with respect to the modes 
-        'zernikeWeights' : [1]}       
-#        # Do Kolmogorov wfg
-#        'kolmogorov' :
-#        # Set Kolmogorov parameters
-#        {'r0' : 1},
-#        # Do von Karman wfg
-#        'vonkarman' :
-#        # Set Von Karman parameters
-#        {'r0' : 1, 'l0' : 1, 'L0' : 1}
+        'zernikeWeights' : [1]},        
+        # Do Kolmogorov wfg
+        'kolmogorov' :
+        # Set Kolmogorov parameters
+        {'r0' : 1},
+        # Do von Karman wfg
+        'vonkarman' :
+        # Set Von Karman parameters
+        {'r0' : 1, 'l0' : 1, 'L0' : 1}
         }  
 
     paramsSensor = {
@@ -159,7 +159,7 @@ def runClosedLoop(parameters, iterations, buffer_size):
         xInt, yInt, intensities = wfs(wfRes, sensorParameters)
         centroids = centroid(intensities, sensorParameters)
         wfRec = wfr(centroids, sensorParameters,simulation_parameters['geometry'])
-        plotWavefront(phiCentersX,phiCentersY,wfRec,sensorParameters['noApertx'],sensorParameters['noAperty'],simulation_parameters['geometry'])
+        #plotWavefront(phiCentersX,phiCentersY,wfRec,sensorParameters['noApertx'],sensorParameters['noAperty'],simulation_parameters['geometry'])
         wfRec = delay_buffer.update(wfRec)
         actCommands = control(wfRec, actuatorParameters)
         wfDM = dm(actCommands, sensorParameters)
