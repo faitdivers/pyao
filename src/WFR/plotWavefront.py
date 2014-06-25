@@ -27,6 +27,11 @@ def plotWavefront(Xpositions, Ypositions, phi, x_dim, y_dim, geometry):
 		phi = phi.reshape((y_dim,x_dim))
 	
 	plt.figure()
-	plt.pcolormesh(Xpositions, Ypositions, phi, vmin=z_min, vmax=z_max)
+	plt.scatter(Xpositions, Ypositions, c=phi)
 	plt.colorbar()
 	plt.show()
+	
+	#plt.figure()
+	#plt.pcolormesh(Xpositions, Ypositions, phi, vmin=z_min, vmax=z_max)
+	#plt.colorbar()
+	#plt.show()

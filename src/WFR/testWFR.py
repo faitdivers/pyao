@@ -1,5 +1,6 @@
 from mainWFR import *
 from plotWavefront import *
+from determinePhiPositions import determine_phi_positions
 import sys
 import os
 sys.path.append(os.path.dirname(os.path.realpath(__file__))+'/../')
@@ -20,8 +21,8 @@ def setup_params():
 	'numImagx' : 200,
 	'numImagy' : 200,
 	# number of apertures in the wfs
-	'noApertx': 4,
-	'noAperty': 4,
+	'noApertx': 5,
+	'noAperty': 5,
 	# Focal Length [m]
 	'f' : 18.0e-3,
 	# Diameter of aperture of single lenslet [m]	
@@ -59,10 +60,16 @@ def test_run():
 	# Get parameters.
 	parameters = setup_params()
 	sensorParameters = parameters['Sensor'];
+	
+	geometry = 'fried'
+	
+	phiCentersX, phiCentersY = determine_phi_positions(sensorParameters['lensCentx'], sensorParameters['lx'], sensorParameters['noApertx'], sensorParameters['lensCenty'], sensorParameters['ly'], sensorParameters['noAperty'], sensorParameters['dl'], sensorParameters['D'], geometry)
 
-	centroids = ones((sensorParameters['noApertx']*sensorParameters['noAperty']*2,1))
-	wfRec,phiCentersX, phiCentersY = wfr(centroids, sensorParameters, 'fried')
-	plotWavefront(phiCentersX,phiCentersY,wfRec)
+	y_slopes = ones((sensorParameters['noApertx']*sensorParameters['noAperty'],1))
+	x_slopes = zeros((sensorParameters['noApertx']*sensorParameters['noAperty'],1))
+	centroids = vstack([x_slopes, y_slopes])
+	wfRec = wfr(centroids, sensorParameters, geometry)
+	plotWavefront(phiCentersX,phiCentersY,wfRec,sensorParameters['noApertx'],sensorParameters['noAperty'],geometry)
 	return
 
 test_run()
