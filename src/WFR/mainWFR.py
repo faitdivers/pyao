@@ -23,10 +23,8 @@ def wfr(centroids, params, geometry):
 	G = create_geometry_matrix(centroids,x_dim,y_dim, geometry, D, dl)
 	#Solve the least-squares problem
 	# phi = (G^T G)^-1 G^T centroids
-	F = dot(G.T,G) #G.T*G
-	F_inv = pseudo_inverse(F)
-	H = dot(F_inv,G.T)
-	phi = dot(H,centroids)
+	F = pseudo_inverse(G)
+	phi = dot(F,centroids)
 	
 	return phi
 

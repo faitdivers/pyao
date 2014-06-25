@@ -70,6 +70,7 @@ def create_Friedmap(centroids, phase_num, counter, x_dim, y_dim, Dl):
 				G[counter+number_slopes, phase_num[i+1,j+1]] = 1/(2*Dl)
 				counter += 1
 	return G
+
 def create_mHudginmap(centroids, phase_num, counter, x_dim, y_dim, D):
 	print 'hudgin map'
 
