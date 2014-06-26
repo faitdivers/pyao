@@ -14,8 +14,9 @@ def lensletCentres(paramsSensor):
     # Calculated missing parameters in paramsSensor	
     lensCentx = arange(noApertx)*(dl + D) + D/2 # Centers on x-axis [m]
     lensCenty = arange(noAperty)*(dl + D) + D/2 # Centers on y-axis [m]
-    lensCentX, lensCentY = meshgrid(lensCentx, lensCenty) # Create rectangular grids for centres [m]
+    lensCentX, lensCentY = meshgrid(lensCentx, lensCenty) # Create rectangular grids for centres [m]   
     lensCentx = hstack(lensCentX) # Stack the rectangular grids [m]
+
     lensCenty = hstack(lensCentY) # Stack the rectangular grids [m]
     lCalx = (noApertx - 1.0)*(dl + D) + D # Calculated length of array in x-direction [m]
     lCaly = (noAperty - 1.0)*(dl + D) + D # Calculated length of array in y-direction [m]
@@ -32,5 +33,5 @@ def lensletCentres(paramsSensor):
     # Normalize lenslet centres
     lensCentx = lensCentx/lx
     lensCenty = lensCenty/ly    
-    
+    print("lensCentX:",lx)    
     return lx, ly, lensCentx, lensCenty
