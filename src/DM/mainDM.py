@@ -24,6 +24,7 @@ def calculateH(posWfr, posAct, paramsAct):
 
     
 def plotWFR(wfr, noApertx, noAperty):
+    # to be removed when integrated with WFR
     # plot a wavefront
     W = wfr.reshape(noAperty+1, noApertx+1)
     xgridw = linspace(0,1,noApertx+1)
@@ -73,41 +74,8 @@ def calculatePosWFr(paramsAct, paramsSens, dact):
 
     return posWfr
     
-def dmOptimizer(paramsSens, paramsAct):
-    noApertx= paramsSens['noApertx']
-    noAperty= paramsSens['noAperty']
-    lensCentx = paramsSens['lensCentx']
-    lensCenty = paramsSens['lensCenty']    
-    numActx=paramsAct['numActx']
-    numActy=paramsAct['numActy']
-    dl = lensCentx[1] - lensCentx[0] # distance of two lenslet
-     
-    numAct = numActx*numActy # number of actuators  
-    
-    # length of wavefront reconstruction vector
-    nwfRec = (noApertx+1)*(noAperty+1)
-        
-    wfRec = 0.5+0.001*random.randn(nwfRec,1) # generate wavefront reconstruction vector
-        
-    # parameters to characterize influence function
-    w1= 2
-    w2= -1
-    sig1= 0.54*dl
-    sig2= 0.85*dl
-    
-        
-    posWfr = calculatePosWFr(numActx, numActy, noApertx, noAperty, lensCentx, lensCenty, dl)
-    
-    #calculate the position of the actuators
-    posAct = numpy.zeros([numActx*numActy,2])
-    posAct = array([lensCentx, lensCenty])
-    posAct = posAct.T 
-    
-    u = ones([numAct, 1])
-    
-    # calculate influence matrix H
-    H = calculateH(nwfRec, numAct, posWfr, posAct, sig1, sig2, w1, w2) 
-    
+def calculate_u(wfRec, paramsAct):
+    H = paramsAct['H']
     # least square solution
     u = dot(numpy.linalg.pinv(H),wfRec) # alternatives for pseudo inverse
     return u
@@ -116,11 +84,7 @@ def dm(actCommand, paramsAct):
     H = paramsAct['H']
     # residual error
     wfDM = dot(H,actCommand)
-#    wfRes = wfRec - wfDM
-#    powerRes = sqrt((wfRes*wfRes).mean())
-
     
     return wfDM
     
-    #return zeros((paramsSens['numPupilx'],paramsSens['numPupily']))
 

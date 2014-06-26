@@ -164,7 +164,7 @@ def runClosedLoop(parameters, iterations, buffer_size):
         wfRec = delay_buffer.update(wfRec)        
 
         # calculate the reference input "u" based on wfrec
-        wfDM = dmOptimizer(sensorParameters, actuatorParameters)
+        wfDM = calculate_u(wfRec, actuatorParameters)
         
         # track the reference
         actCommands = control(u, actuatorParameters)
@@ -182,7 +182,6 @@ def runClosedLoop(parameters, iterations, buffer_size):
                                     centroids_buffer, reconstructed_buffer,
                                     wf_dm_buffer)
     return results
-    return wfDM
 
 
 
