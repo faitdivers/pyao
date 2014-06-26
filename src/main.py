@@ -47,8 +47,8 @@ def setup_params():
     'numImagx' : 200,
     'numImagy' : 200,
     # number of apertures in the wfs
-    'noApertx': 4,
-    'noAperty': 4,
+    'noApertx': 7,
+    'noAperty': 7,
     # Focal Length [m]
     'f' : 18.0e-3,
     # Diameter of aperture of single lenslet [m]	
@@ -84,13 +84,23 @@ def setup_params():
     paramsSensor['lx'] = lx
     paramsSensor['ly'] = ly
     
-
+    
+    dact = lensCentx[1] - lensCentx[0]
     paramsActuator = {
     # number of actuators
-    'numActx': 8,
-    'numActy': 8,
-    # parameters to characterize influence function
+    'numActx': 7,
+    'numActy': 7,
+    'w1': 2,
+    'w2': -1,
+    'sig1': 0.54*dact,
+    'sig2': 0.85*dact,
     }
+    
+    posAct = array([lensCentx, lensCenty])
+    posAct = posAct.T   
+    posWfr = calculatePosWFr(paramsActuator, paramsSensor, dact)
+    H = calculateH(posWfr, posAct, paramsActuator)
+    paramsActuator['H'] = H
 
     simulationParameters = {
     'frequency': 10,       # Frequency of the simulation in Hertz
@@ -131,7 +141,7 @@ def runClosedLoop(parameters, iterations, buffer_size):
     wavefrontParameters = parameters['Wavefront']
     sensorParameters = parameters['Sensor']
     actuatorParameters = parameters['Actuator']
-
+    
     wf_buffer = []
     intensities_buffer = []
     centroids_buffer = []
@@ -140,22 +150,28 @@ def runClosedLoop(parameters, iterations, buffer_size):
     
     print("Running closed-loop simulation")
     # The first deformable mirror effect: (No effect)
-    wfDM = dm(0, sensorParameters, actuatorParameters)
+    wfDM = dm(0, actuatorParameters)
 
     delay_buffer = LatencyBuffer(buffer_size, (sensorParameters['numPupilx'],
                                      sensorParameters['numPupilx']))
     for i in range(0, iterations):
         print("Running simulation step %d" % (i))
-        wf = wfg(sensorParameters, wavefrontParameters)
-        wfRes = wf - wfDM
+        wf = wfg(sensorParameters, wavefrontParameters)             
+        wfRes = wfRec - wfDM
         xInt, yInt, intensities = wfs(wfRes, sensorParameters)
         centroids = centroid(intensities, sensorParameters)
-        wfRec = wfr(centroids, sensorParameters)
-        wfRec = delay_buffer.update(wfRec)
-        actCommands = control(wfRec, actuatorParameters)
+        wfRec = wfr(centroids, sensorParameters)        
+        wfRec = delay_buffer.update(wfRec)        
 
-        wfDM = dm(actCommands, sensorParameters, actuatorParameters)
-
+        # calculate the reference input "u" based on wfrec
+        wfDM = dmOptimizer(sensorParameters, actuatorParameters)
+        
+        # track the reference
+        actCommands = control(u, actuatorParameters)
+        
+        # move mirror according to control input
+        wfDM = dm(actCommands, actuatorParameters)
+        
         wf_buffer.append(wf)
         intensities_buffer.append(intensities)
         centroids_buffer.append(centroids)
@@ -166,6 +182,7 @@ def runClosedLoop(parameters, iterations, buffer_size):
                                     centroids_buffer, reconstructed_buffer,
                                     wf_dm_buffer)
     return results
+    return wfDM
 
 
 
@@ -199,7 +216,7 @@ def runOpenLoop(parameters, iterations, buffer_size):
     print("Running open-loop simulation")
     # The first deformable mirror effect: (No effect)
     wfDM = dm(0, sensorParameters, actuatorParameters)
-
+    print (wfDM)
     for i in range(0, iterations):
         print("Running simulation step %d" % (i))
         wf = wfg(sensorParameters, wavefrontParameters)
@@ -251,6 +268,6 @@ def run_simulation(parameters):
     else:
         runOpenLoop(parameters, iterations, delay_buffer_size)
 
-
+plt.close("all") # close all existing figures
 parameters = setup_params()
 run_simulation(parameters)
