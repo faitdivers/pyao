@@ -10,7 +10,7 @@ from WFR.mainWFR import *
 from Control.mainControl import *
 from DM.mainDM import *
 from Simulation.LatencyBuffer import LatencyBuffer
-
+from Simulation.WavefrontAnimator import WavefronAnimator
 
 def setup_params():
     """ Set-up the simulation parameters
@@ -74,7 +74,7 @@ def setup_params():
 	'mean_readout': 0.0,   # should be 0 for white noise
 	# Photon Noise Parameters (Modelled as Poisson): based only on expected value of Ii 
 	}
-	
+
     # Compute lenslet centres and check minimal array widths 
     lx, ly, lensCentx, lensCenty = lensletCentres(paramsSensor)
     # Normalized lenslet centers
@@ -96,7 +96,7 @@ def setup_params():
     'frequency': 10,       # Frequency of the simulation in Hertz
     'time': 10,            # Simulated time in seconds
     'delay': 0,  # Delay in number of samples
-    'is_closed_loop': True
+    'is_closed_loop': False
     }
 
     # other sets of parameters may be defined if necessary
@@ -137,7 +137,7 @@ def runClosedLoop(parameters, iterations, buffer_size):
     centroids_buffer = []
     reconstructed_buffer = []
     wf_dm_buffer = []
-    
+
     print("Running closed-loop simulation")
     # The first deformable mirror effect: (No effect)
     wfDM = dm(0, sensorParameters)
@@ -243,13 +243,14 @@ def run_simulation(parameters):
     delay_buffer_size = simulation_parameters['delay'] + 1
 
     if simulation_parameters['is_closed_loop']:
-        runClosedLoop(parameters, iterations, delay_buffer_size)
+        results = runClosedLoop(parameters, iterations, delay_buffer_size)
     else:
-        runOpenLoop(parameters, iterations, delay_buffer_size)
+        results = runOpenLoop(parameters, iterations, delay_buffer_size)
 
+    wfAnimator = WavefronAnimator(simulation_parameters, parameters['Sensor'])
+    wfAnimator.set_wavefront_data(results['wf'])
+    wfAnimator.plot_animation()
 
-parameters = setup_params()
-run_simulation(parameters)
 # Only executes the simulation if this file is being called as main.
 if __name__ == '__main__':
     parameters = setup_params()
