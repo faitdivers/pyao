@@ -250,3 +250,7 @@ def run_simulation(parameters):
 
 parameters = setup_params()
 run_simulation(parameters)
+# Only executes the simulation if this file is being called as main.
+if __name__ == '__main__':
+    parameters = setup_params()
+    run_simulation(parameters)
