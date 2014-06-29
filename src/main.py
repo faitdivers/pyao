@@ -10,6 +10,8 @@ from WFR.mainWFR import *
 from Control.mainControl import *
 from DM.mainDM import *
 from Simulation.LatencyBuffer import LatencyBuffer
+from WFR.determinePhiPositions import determine_phi_positions
+from WFR.plotWavefront import plotWavefront
 
 
 def setup_params():
@@ -94,8 +96,9 @@ def setup_params():
 
     simulationParameters = {
     'frequency': 1,       # Frequency of the simulation in Hertz
-    'time': 2,            # Simulated time in seconds
+    'time': 1,            # Simulated time in seconds
     'delay': 0,  # Delay in number of samples
+    'geometry': 'fried', #The geometry that is used for reconstruction (choose: fried, southwell, mhudgin)
     'is_closed_loop': False
     }
 
@@ -131,6 +134,7 @@ def runClosedLoop(parameters, iterations, buffer_size):
     wavefrontParameters = parameters['Wavefront']
     sensorParameters = parameters['Sensor']
     actuatorParameters = parameters['Actuator']
+    simulation_parameters = parameters['Simulation']
 
     wf_buffer = []
     intensities_buffer = []
@@ -142,6 +146,11 @@ def runClosedLoop(parameters, iterations, buffer_size):
     # The first deformable mirror effect: (No effect)
     wfDM = dm(0, sensorParameters)
 
+
+    
+    ## Determine Phi positions                   
+    phiCentersX, phiCentersY = determine_phi_positions(sensorParameters['lensCentx'], sensorParameters['lx'], sensorParameters['noApertx'], sensorParameters['lensCenty'], sensorParameters['ly'], sensorParameters['noAperty'], sensorParameters['dl'], sensorParameters['D'], simulation_parameters['geometry'])
+    
     delay_buffer = LatencyBuffer(buffer_size, ((1+sensorParameters['noAperty'])*
                                      (1+sensorParameters['noApertx']),1))
     for i in range(0, iterations):
@@ -150,7 +159,9 @@ def runClosedLoop(parameters, iterations, buffer_size):
         wfRes = wf - wfDM
         xInt, yInt, intensities = wfs(wfRes, sensorParameters)
         centroids = centroid(intensities, sensorParameters)
-        wfRec, phiCentersX, phiCentersY = wfr(centroids, sensorParameters)
+        wfRec = wfr(centroids, sensorParameters,simulation_parameters['geometry'])
+        #plotWavefront(phiCentersX,phiCentersY,wfRec,sensorParameters['noApertx'],sensorParameters['noAperty'],simulation_parameters['geometry'])
+
         wfRec = delay_buffer.update(wfRec)
         actCommands = control(wfRec, actuatorParameters)
         wfDM = dm(actCommands, sensorParameters)
@@ -184,9 +195,13 @@ def runOpenLoop(parameters, iterations, buffer_size):
     wavefrontParameters = parameters['Wavefront']
     sensorParameters = parameters['Sensor']
     actuatorParameters = parameters['Actuator']
+    simulation_parameters = parameters['Simulation']
 
     delay_buffer = LatencyBuffer(buffer_size, ((1+sensorParameters['noAperty'])*
                                      (1+sensorParameters['noApertx']),1))
+
+	## Determine Phi positions                   
+    phiCentersX, phiCentersY = determine_phi_positions(sensorParameters['lensCentx'], sensorParameters['lx'], sensorParameters['noApertx'], sensorParameters['lensCenty'], sensorParameters['ly'], sensorParameters['noAperty'], sensorParameters['dl'], sensorParameters['D'], simulation_parameters['geometry'])
 
     wf_buffer = []
     intensities_buffer = []
@@ -204,8 +219,7 @@ def runOpenLoop(parameters, iterations, buffer_size):
         wfRes = wf - wfDM
         xInt, yInt, intensities = wfs(wfRes, sensorParameters)
         centroids = centroid(intensities, sensorParameters)
-        wfRec, phiCentersX, phiCentersY = wfr(centroids, sensorParameters)
-
+        wfRec = wfr(centroids, sensorParameters,simulation_parameters['geometry'])
         wfRec = delay_buffer.update(wfRec)
         wfDM = dm(0, sensorParameters)
 

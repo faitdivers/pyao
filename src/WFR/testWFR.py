@@ -1,5 +1,6 @@
 from mainWFR import *
 from plotWavefront import *
+from determinePhiPositions import determine_phi_positions
 import sys
 import os
 sys.path.append(os.path.dirname(os.path.realpath(__file__))+'/../')
@@ -81,23 +82,29 @@ def test_run():
 	# Get parameters.
 	parameters = setup_params()
 	sensorParameters = parameters['Sensor'];
-	wavefrontParameters = parameters['Wavefront'];
+	
+	geometries = ['fried', 'southwell'];
 
-	# Tilt in the x direction
-	centroids_ones = 0.*ones((sensorParameters['noApertx']*sensorParameters['noAperty'],1))
-	centroids_zeros = 1.0*ones((sensorParameters['noApertx']*sensorParameters['noAperty'],1))
-	centroids = concatenate([centroids_ones, centroids_zeros])
-	#centroids = ones((sensorParameters['noApertx']*sensorParameters['noAperty']*2,1))
-	wfRecTilt,phiCentersX, phiCentersY = wfr(centroids, sensorParameters)
-	plotWavefront(phiCentersX,phiCentersY,wfRecTilt)
+	for geometry in geometries:
+		print "Testing "+ geometry +" geometry..."
+		phiCentersX, phiCentersY = determine_phi_positions(sensorParameters['lensCentx'], sensorParameters['lx'], sensorParameters['noApertx'], sensorParameters['lensCenty'], sensorParameters['ly'], sensorParameters['noAperty'], sensorParameters['dl'], sensorParameters['D'], geometry)
 
-	# Zernike aberration
-	wf = wfg(sensorParameters, wavefrontParameters)
+		wavefrontParameters = parameters['Wavefront'];
 
-	xInt, yInt, intensities = wfs(wf, sensorParameters)
-	centroids = centroid(intensities, sensorParameters)
-	wfRecZer,phiCentersX, phiCentersY = wfr(centroids, sensorParameters)
-	plotWavefront(phiCentersX,phiCentersY,wfRecZer)
+		# Tilt in the x direction
+		centroids_ones = 0.*ones((sensorParameters['noApertx']*sensorParameters['noAperty'],1))
+		centroids_zeros = 1.0*ones((sensorParameters['noApertx']*sensorParameters['noAperty'],1))
+		centroids = concatenate([centroids_ones, centroids_zeros])
+		wfRecTilt = wfr(centroids, sensorParameters, geometry)
+		plotWavefront(phiCentersX,phiCentersY,wfRecTilt,sensorParameters['noApertx'],sensorParameters['noAperty'],geometry)
+
+		# Zernike aberration
+		wf = wfg(sensorParameters, wavefrontParameters)
+
+		xInt, yInt, intensities = wfs(wf, sensorParameters)
+		centroids = centroid(intensities, sensorParameters)
+		wfRecZer= wfr(centroids, sensorParameters, geometry)
+		plotWavefront(phiCentersX,phiCentersY,wfRecZer,sensorParameters['noApertx'],sensorParameters['noAperty'],geometry)
 
 	return
 
