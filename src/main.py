@@ -23,11 +23,21 @@ def setup_params():
         Multiple dictionaries, containing the parameters and their values.
     """
     paramsWavefront = {
-    # Scalar or array containing the zernike modes
-    'zernikeModes': [2, 4, 21],
-    # Scalar or array containing the zernike weights, with respect to the modes
-    'zernikeWeights': [0.5, 0.25, -0.6]
-    }
+        # Do zernike wfg
+        'zernike' :
+        # Scalar or array containing the zernike modes 
+        {'zernikeModes' : [2,4,21],
+        # Scalar or array containing the zernike weights, with respect to the modes 
+        'zernikeWeights' : [0.5,0.25,-0.6]},        
+        # Do Kolmogorov wfg
+        'kolmogorov' :
+        # Set Kolmogorov parameters
+        {'r0' : 1},
+        # Do von Karman wfg
+        'vonkarman' :
+        # Set Von Karman parameters
+        {'r0' : 1, 'l0' : 1, 'L0' : 1}
+        }  
 
     paramsSensor = {
     # number of samples in the pupil plane
@@ -136,8 +146,7 @@ def runClosedLoop(parameters, iterations, buffer_size):
                                      sensorParameters['numPupilx']))
     for i in range(0, iterations):
         print("Running simulation step %d" % (i))
-        wf = wfg(sensorParameters, wavefrontParameters['zernikeModes'],
-                 wavefrontParameters['zernikeWeights'])
+        wf = wfg(sensorParameters, wavefrontParameters)
         wfRes = wf - wfDM
         xInt, yInt, intensities = wfs(wfRes, sensorParameters)
         centroids = centroid(intensities, sensorParameters)
@@ -191,8 +200,7 @@ def runOpenLoop(parameters, iterations, buffer_size):
 
     for i in range(0, iterations):
         print("Running simulation step %d" % (i))
-        wf = wfg(sensorParameters, wavefrontParameters['zernikeModes'],
-                 wavefrontParameters['zernikeWeights'])
+        wf = wfg(sensorParameters, wavefrontParameters)
         wfRes = wf - wfDM
         xInt, yInt, intensities = wfs(wfRes, sensorParameters)
         centroids = centroid(intensities, sensorParameters)
