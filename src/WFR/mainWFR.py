@@ -132,7 +132,7 @@ def determine_phi_positions(lensCentx, lx, dim_x, lensCenty, ly, dim_y, dl, D):
 	#reshape to get last column
 	phiCentersYAllRows = phiCentersYAllRows.reshape((dim_y+1, dim_x))
 	#copy last column
-	phiCentersY_last_column = phiCentersYAllRows[:,-1].reshape((dim_x,1))
+	phiCentersY_last_column = phiCentersYAllRows[:,-1].reshape((dim_x+1,1))
 	#complete centers for phi Y
 	phiCentersY = append(phiCentersYAllRows,phiCentersY_last_column,1)
 	

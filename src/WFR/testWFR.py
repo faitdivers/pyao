@@ -33,7 +33,7 @@ def setup_params():
 	'numImagy' : 200,
 	# number of apertures in the wfs
 	'noApertx': 5,
-	'noAperty': 4,
+	'noAperty': 5,
 	# Focal Length [m]
 	'f' : 18.0e-3,
 	# Diameter of aperture of single lenslet [m]	
@@ -49,6 +49,15 @@ def setup_params():
 	'supportFactor' : 4,
 	# Illumination threshold (fractional flux threshold)
 	'illumThreshold' : 0.3,
+
+	# Noise Parameters
+    # Include Measurement Noise
+    'Noisy': False, # True = include Readout, Photon noise, False = don't estimate measurement noise
+	# Readout Noise Parameters (Modelled as Gaussian): based on CCD characteristics
+    'sigma_readout': 0.005, # ratio of # readout noise electrons (nominally 0:5) to 
+							# mean signal brightness (nominally 1000 electrons)
+	'mean_readout': 0.0,   # should be 0 for white noise
+	# Photon Noise Parameters (Modelled as Poisson): based only on expected value of Ii 
 	}
 	
 	# Compute lenslet centres and check minimal array widths 
@@ -83,11 +92,12 @@ def test_run():
 	# plotWavefront(phiCentersX,phiCentersY,wfRecTilt)
 
 	# Zernike aberration
-	wf = wfg(sensorParameters, wavefrontParameters['zernikeModes'], wavefrontParameters['zernikeWeights'])
+	wf = wfg(sensorParameters, wavefrontParameters, True)
+	plt.imshow(wf)
+	plt.show()
 	xInt, yInt, intensities = wfs(wf, sensorParameters)
-	plt.imshow(intensities)
-	print intensities
-	time.sleep(1000)
+	# plt.imshow(intensities)
+	# plt.colorbar();
 	centroids = centroid(intensities, sensorParameters)
 	wfRecZer,phiCentersX, phiCentersY = wfr(centroids, sensorParameters)
 	plotWavefront(phiCentersX,phiCentersY,wfRecZer)
