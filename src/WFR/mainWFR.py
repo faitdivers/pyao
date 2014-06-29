@@ -32,9 +32,6 @@ def wfr(centroids, params):
 	G = create_Friedmap(centroids, phase_num, counter, x_dim, y_dim, D)
 	#Solve the least-squares problem
 	# phi = (G^T G)^-1 G^T centroids
-	#F = dot(G.T,G) #G.T*G
-	#F_inv = pseudo_inverse(F)
-	#H = dot(F_inv,G.T)
 	G_pinv = pseudo_inverse(G)
 	phi = dot(G_pinv ,centroids)
 	

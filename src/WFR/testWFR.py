@@ -7,8 +7,6 @@ from WFS.lensArrayConfig import *
 from WFG.mainWFG import *
 from WFS.mainWFS import *
 from Centroid.mainCentroid import *
-import matplotlib.pyplot as plt
-import time
 
 def setup_params():
 	""" Set-up the simulation parameters
@@ -86,19 +84,17 @@ def test_run():
 	wavefrontParameters = parameters['Wavefront'];
 
 	# Tilt in the x direction
-	# centroids_ones = 0.*ones((sensorParameters['noApertx']*sensorParameters['noAperty'],1))
-	# centroids_zeros = 1.0*ones((sensorParameters['noApertx']*sensorParameters['noAperty'],1))
-	# centroids = concatenate([centroids_ones, centroids_zeros])
-	# #centroids = ones((sensorParameters['noApertx']*sensorParameters['noAperty']*2,1))
-	# wfRecTilt,phiCentersX, phiCentersY = wfr(centroids, sensorParameters)
-	# plotWavefront(phiCentersX,phiCentersY,wfRecTilt)
+	centroids_ones = 0.*ones((sensorParameters['noApertx']*sensorParameters['noAperty'],1))
+	centroids_zeros = 1.0*ones((sensorParameters['noApertx']*sensorParameters['noAperty'],1))
+	centroids = concatenate([centroids_ones, centroids_zeros])
+	#centroids = ones((sensorParameters['noApertx']*sensorParameters['noAperty']*2,1))
+	wfRecTilt,phiCentersX, phiCentersY = wfr(centroids, sensorParameters)
+	plotWavefront(phiCentersX,phiCentersY,wfRecTilt)
 
 	# Zernike aberration
 	wf = wfg(sensorParameters, wavefrontParameters)
 
 	xInt, yInt, intensities = wfs(wf, sensorParameters)
-	plt.imshow(intensities)
-	plt.colorbar();
 	centroids = centroid(intensities, sensorParameters)
 	wfRecZer,phiCentersX, phiCentersY = wfr(centroids, sensorParameters)
 	plotWavefront(phiCentersX,phiCentersY,wfRecZer)
