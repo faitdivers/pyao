@@ -96,11 +96,10 @@ def setup_params():
 
     simulationParameters = {
     'frequency': 1,       # Frequency of the simulation in Hertz
-<<<<<<< HEAD
     'time': 1,            # Simulated time in seconds
     'delay': 0,  # Delay in number of samples
     'geometry': 'fried', #The geometry that is used for reconstruction (choose: fried, southwell, mhudgin)
-    'is_closed_loop': True
+    'is_closed_loop': False
     }
 
     # other sets of parameters may be defined if necessary
@@ -156,7 +155,7 @@ def runClosedLoop(parameters, iterations, buffer_size):
                                      (1+sensorParameters['noApertx']),1))
     for i in range(0, iterations):
         print("Running simulation step %d" % (i))
-        wf = wfg(sensorParameters, wavefrontParameters, True)
+        wf = wfg(sensorParameters, wavefrontParameters)
         wfRes = wf - wfDM
         xInt, yInt, intensities = wfs(wfRes, sensorParameters)
         centroids = centroid(intensities, sensorParameters)
@@ -220,7 +219,7 @@ def runOpenLoop(parameters, iterations, buffer_size):
         wfRes = wf - wfDM
         xInt, yInt, intensities = wfs(wfRes, sensorParameters)
         centroids = centroid(intensities, sensorParameters)
-        wfRec, phiCentersX, phiCentersY = wfr(centroids, sensorParameters,simulation_parameters['geometry'])
+        wfRec = wfr(centroids, sensorParameters,simulation_parameters['geometry'])
         wfRec = delay_buffer.update(wfRec)
         wfDM = dm(0, sensorParameters)
 

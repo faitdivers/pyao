@@ -34,7 +34,7 @@ def setup_params():
 	'numImagy' : 200,
 	# number of apertures in the wfs
 	'noApertx': 10,
-	'noAperty': 9,
+	'noAperty': 10,
 	# Focal Length [m]
 	'f' : 18.0e-3,
 	# Diameter of aperture of single lenslet [m]	
