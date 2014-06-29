@@ -18,10 +18,12 @@ def setup_params():
 	"""
 
 	paramsWavefront = {
-    # Scalar or array containing the zernike modes
-    'zernikeModes': [4],
-    # Scalar or array containing the zernike weights, with respect to the modes
-    'zernikeWeights': [1.0]
+    # Do zernike wfg
+    'zernike' :
+    # Scalar or array containing the zernike modes 
+    {'zernikeModes' : [5],
+    # Scalar or array containing the zernike weights, with respect to the modes 
+    'zernikeWeights' : [10.]}
     }
 
 	paramsSensor = {
@@ -32,8 +34,8 @@ def setup_params():
 	'numImagx' : 200,
 	'numImagy' : 200,
 	# number of apertures in the wfs
-	'noApertx': 5,
-	'noAperty': 5,
+	'noApertx': 10,
+	'noAperty': 10,
 	# Focal Length [m]
 	'f' : 18.0e-3,
 	# Diameter of aperture of single lenslet [m]	
@@ -92,12 +94,11 @@ def test_run():
 	# plotWavefront(phiCentersX,phiCentersY,wfRecTilt)
 
 	# Zernike aberration
-	wf = wfg(sensorParameters, wavefrontParameters, True)
-	plt.imshow(wf)
-	plt.show()
+	wf = wfg(sensorParameters, wavefrontParameters)
+
 	xInt, yInt, intensities = wfs(wf, sensorParameters)
-	# plt.imshow(intensities)
-	# plt.colorbar();
+	plt.imshow(intensities)
+	plt.colorbar();
 	centroids = centroid(intensities, sensorParameters)
 	wfRecZer,phiCentersX, phiCentersY = wfr(centroids, sensorParameters)
 	plotWavefront(phiCentersX,phiCentersY,wfRecZer)
