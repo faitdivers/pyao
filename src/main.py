@@ -26,9 +26,9 @@ def setup_params():
         # Do zernike wfg
         'zernike' :
         # Scalar or array containing the zernike modes 
-        {'zernikeModes' : [2,4,21],
+        {'zernikeModes' : [5],
         # Scalar or array containing the zernike weights, with respect to the modes 
-        'zernikeWeights' : [0.5,0.25,-0.6]},        
+        'zernikeWeights' : [0.5]},        
         # Do Kolmogorov wfg
         'kolmogorov' :
         # Set Kolmogorov parameters
@@ -47,8 +47,8 @@ def setup_params():
     'numImagx' : 200,
     'numImagy' : 200,
     # number of apertures in the wfs
-    'noApertx': 4,
-    'noAperty': 4,
+    'noApertx': 10,
+    'noAperty': 10,
     # Focal Length [m]
     'f' : 18.0e-3,
     # Diameter of aperture of single lenslet [m]	
@@ -93,10 +93,10 @@ def setup_params():
     }
 
     simulationParameters = {
-    'frequency': 10,       # Frequency of the simulation in Hertz
-    'time': 10,            # Simulated time in seconds
+    'frequency': 1,       # Frequency of the simulation in Hertz
+    'time': 2,            # Simulated time in seconds
     'delay': 0,  # Delay in number of samples
-    'is_closed_loop': True
+    'is_closed_loop': False
     }
 
     # other sets of parameters may be defined if necessary
@@ -142,15 +142,15 @@ def runClosedLoop(parameters, iterations, buffer_size):
     # The first deformable mirror effect: (No effect)
     wfDM = dm(0, sensorParameters)
 
-    delay_buffer = LatencyBuffer(buffer_size, (sensorParameters['numPupilx'],
-                                     sensorParameters['numPupilx']))
+    delay_buffer = LatencyBuffer(buffer_size, ((1+sensorParameters['noAperty'])*
+                                     (1+sensorParameters['noApertx']),1))
     for i in range(0, iterations):
         print("Running simulation step %d" % (i))
         wf = wfg(sensorParameters, wavefrontParameters)
         wfRes = wf - wfDM
         xInt, yInt, intensities = wfs(wfRes, sensorParameters)
         centroids = centroid(intensities, sensorParameters)
-        wfRec = wfr(centroids, sensorParameters)
+        wfRec, phiCentersX, phiCentersY = wfr(centroids, sensorParameters)
         wfRec = delay_buffer.update(wfRec)
         actCommands = control(wfRec, actuatorParameters)
         wfDM = dm(actCommands, sensorParameters)
@@ -185,8 +185,8 @@ def runOpenLoop(parameters, iterations, buffer_size):
     sensorParameters = parameters['Sensor']
     actuatorParameters = parameters['Actuator']
 
-    delay_buffer = LatencyBuffer(buffer_size, (sensorParameters['numPupilx'],
-                                     sensorParameters['numPupilx']))
+    delay_buffer = LatencyBuffer(buffer_size, ((1+sensorParameters['noAperty'])*
+                                     (1+sensorParameters['noApertx']),1))
 
     wf_buffer = []
     intensities_buffer = []
@@ -204,7 +204,8 @@ def runOpenLoop(parameters, iterations, buffer_size):
         wfRes = wf - wfDM
         xInt, yInt, intensities = wfs(wfRes, sensorParameters)
         centroids = centroid(intensities, sensorParameters)
-        wfRec = wfr(centroids, sensorParameters)
+        wfRec, phiCentersX, phiCentersY = wfr(centroids, sensorParameters)
+
         wfRec = delay_buffer.update(wfRec)
         wfDM = dm(0, sensorParameters)
 
