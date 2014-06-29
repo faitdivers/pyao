@@ -4,6 +4,11 @@ import sys
 import os
 sys.path.append(os.path.dirname(os.path.realpath(__file__))+'/../')
 from WFS.lensArrayConfig import *
+from WFG.mainWFG import *
+from WFS.mainWFS import *
+from Centroid.mainCentroid import *
+import matplotlib.pyplot as plt
+import time
 
 def setup_params():
 	""" Set-up the simulation parameters
@@ -11,6 +16,13 @@ def setup_params():
 	Returns:
 		Multiple dicts, containing the parameters and their values.
 	"""
+
+	paramsWavefront = {
+    # Scalar or array containing the zernike modes
+    'zernikeModes': [4],
+    # Scalar or array containing the zernike weights, with respect to the modes
+    'zernikeWeights': [1.0]
+    }
 
 	paramsSensor = {
 	# number of samples in the pupil plane
@@ -51,6 +63,7 @@ def setup_params():
 	# Encapsulate all the parameter dicts
 	parameters = {
 	'Sensor' : paramsSensor,
+	'Wavefront' : paramsWavefront
 	}
 
 	return parameters
@@ -59,10 +72,26 @@ def test_run():
 	# Get parameters.
 	parameters = setup_params()
 	sensorParameters = parameters['Sensor'];
+	wavefrontParameters = parameters['Wavefront'];
 
-	centroids = ones((sensorParameters['noApertx']*sensorParameters['noAperty']*2,1))
-	wfRec,phiCentersX, phiCentersY = wfr(centroids, sensorParameters)
-	plotWavefront(phiCentersX,phiCentersY,wfRec)
+	# Tilt in the x direction
+	# centroids_ones = 0.*ones((sensorParameters['noApertx']*sensorParameters['noAperty'],1))
+	# centroids_zeros = 1.0*ones((sensorParameters['noApertx']*sensorParameters['noAperty'],1))
+	# centroids = concatenate([centroids_ones, centroids_zeros])
+	# #centroids = ones((sensorParameters['noApertx']*sensorParameters['noAperty']*2,1))
+	# wfRecTilt,phiCentersX, phiCentersY = wfr(centroids, sensorParameters)
+	# plotWavefront(phiCentersX,phiCentersY,wfRecTilt)
+
+	# Zernike aberration
+	wf = wfg(sensorParameters, wavefrontParameters['zernikeModes'], wavefrontParameters['zernikeWeights'])
+	xInt, yInt, intensities = wfs(wf, sensorParameters)
+	plt.imshow(intensities)
+	print intensities
+	time.sleep(1000)
+	centroids = centroid(intensities, sensorParameters)
+	wfRecZer,phiCentersX, phiCentersY = wfr(centroids, sensorParameters)
+	plotWavefront(phiCentersX,phiCentersY,wfRecZer)
+
 	return
 
 test_run()

@@ -32,10 +32,11 @@ def wfr(centroids, params):
 	G = create_Friedmap(centroids, phase_num, counter, x_dim, y_dim, D)
 	#Solve the least-squares problem
 	# phi = (G^T G)^-1 G^T centroids
-	F = dot(G.T,G) #G.T*G
-	F_inv = pseudo_inverse(F)
-	H = dot(F_inv,G.T)
-	phi = dot(H,centroids)
+	#F = dot(G.T,G) #G.T*G
+	#F_inv = pseudo_inverse(F)
+	#H = dot(F_inv,G.T)
+	G_pinv = pseudo_inverse(G)
+	phi = dot(G_pinv ,centroids)
 	
 	#Determine the physical points of the phi's 
 	phiCentersX, phiCentersY = determine_phi_positions(lensCentx, lx, x_dim, lensCenty, ly, y_dim, dl, D)
@@ -45,24 +46,23 @@ def wfr(centroids, params):
 def create_phase_id(centroids, x_dim, y_dim):
 	#Create a phase_id matrix
 	number_slopes = x_dim*y_dim
-	phase_id = zeros(((x_dim+1),(y_dim+1)),dtype=int)
-	for i in range(0,x_dim):
-		for j in range(0,y_dim):
+	phase_id = zeros(((y_dim+1),(x_dim+1)),dtype=int)
+	for i in range(0,y_dim):
+		for j in range(0,x_dim):
 			#Check if the slope at s(i,j) is non zero
 			#Put a 1 at each place of phi we need
-			if centroids[i*x_dim+j,0] != 0 or centroids[i*x_dim+j+number_slopes,0] != 0:
-				phase_id[i,j] = 1
-				phase_id[i,j+1] = 1
-				phase_id[i+1,j] = 1
-				phase_id[i+1,j+1] = 1
+			phase_id[i,j] = 1
+			phase_id[i,j+1] = 1
+			phase_id[i+1,j] = 1
+			phase_id[i+1,j+1] = 1
 	return phase_id
 	
 def create_phase_num(phase_id, x_dim, y_dim):
 		#Create phase_num matrix
 	counter = 0
-	phase_num = zeros(((x_dim+1),(y_dim+1)),dtype=int)
-	for i in range(0,x_dim+1):
-		for j in range(0,y_dim+1):
+	phase_num = zeros(((y_dim+1),(x_dim+1)),dtype=int)
+	for i in range(0,y_dim+1):
+		for j in range(0,x_dim+1):
 			#Check if the phase_id is non zero
 			if phase_id[i,j] != 0:
 				phase_num[i,j] = counter
@@ -75,20 +75,20 @@ def create_Friedmap(centroids, phase_num, teller, x_dim, y_dim, Dl):
 	number_slopes = x_dim*y_dim
 	G = zeros((2*number_slopes, teller),dtype=int)
 	counter = 0
-	for i in range(0,x_dim):
-		for j in range(0,y_dim):
-			if centroids[i*x_dim+j,0] != 0 or centroids[i*x_dim+j+number_slopes,0] != 0:
-				#For s_x
-				G[counter, phase_num[i,j]] = -1/(2*Dl)
-				G[counter, phase_num[i,j+1]] = -1/(2*Dl)
-				G[counter, phase_num[i+1,j]] = 1/(2*Dl)
-				G[counter, phase_num[i+1,j+1]] = 1/(2*Dl)
-				#For s_y
-				G[counter+number_slopes, phase_num[i,j]] = -1/(2*Dl)
-				G[counter+number_slopes, phase_num[i+1,j]] = -1/(2*Dl)
-				G[counter+number_slopes, phase_num[i,j+1]] = 1/(2*Dl)
-				G[counter+number_slopes, phase_num[i+1,j+1]] = 1/(2*Dl)
-				counter += 1
+	for i in range(0,y_dim):
+		for j in range(0,x_dim):
+			#For s_x
+			G[counter, phase_num[i,j]] = -1
+			G[counter, phase_num[i,j+1]] = 1
+			G[counter, phase_num[i+1,j]] = -1
+			G[counter, phase_num[i+1,j+1]] = 1
+			#For s_y
+			G[counter+number_slopes, phase_num[i,j]] = -1
+			G[counter+number_slopes, phase_num[i+1,j]] = 1
+			G[counter+number_slopes, phase_num[i,j+1]] = -1
+			G[counter+number_slopes, phase_num[i+1,j+1]] = 1
+			counter += 1
+	G = G/(2*Dl)
 	return G
 
 def pseudo_inverse(A):
