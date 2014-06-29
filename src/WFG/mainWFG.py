@@ -26,11 +26,11 @@ def wfg(params, wavefrontParams,debug = False):
         zernikeWeights = wavefrontParams['zernike']['zernikeWeights']
         
         zw = ZernikeWave()
-	zw.addMode(zernikeModes, zernikeWeights)
-	waveFrontPhi = waveFrontPhi + zw.createWavefront(params['numPupilx'],params['numPupily'])
+        zw.addMode(zernikeModes, zernikeWeights)
+        waveFrontPhi = waveFrontPhi + zw.createWavefront(params['numPupilx'],params['numPupily'])
         
         if debug:
-	   zw.plotWavefront(params['numPupilx'],params['numPupily'])
+        	zw.plotWavefront(params['numPupilx'],params['numPupily'])
     
     if 'kolmogorov' in wavefrontParams:
         phaseScreenParams = wavefrontParams['kolmogorov']
@@ -40,7 +40,7 @@ def wfg(params, wavefrontParams,debug = False):
         waveFrontPhi = waveFrontPhi + ps.createWavefront(params['numPupilx'],params['numPupily'])
         
         if debug:
-	   ps.plotWavefront(params['numPupilx'],params['numPupily'])
+	    	ps.plotWavefront(params['numPupilx'],params['numPupily'])
 
     if 'vonkarman' in wavefrontParams:
         phaseScreenParams = wavefrontParams['vonkarman']
@@ -50,6 +50,6 @@ def wfg(params, wavefrontParams,debug = False):
         waveFrontPhi = waveFrontPhi + ps.createWavefront(params['numPupilx'],params['numPupily'])
         
         if debug:
-	   ps.plotWavefront(params['numPupilx'],params['numPupily'])
+	    	ps.plotWavefront(params['numPupilx'],params['numPupily'])
         				
     return waveFrontPhi

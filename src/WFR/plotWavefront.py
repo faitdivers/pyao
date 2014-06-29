@@ -26,10 +26,22 @@ def plotWavefront(Xpositions, Ypositions, phi, x_dim, y_dim, geometry):
 		Ypositions = Ypositions.reshape((y_dim,x_dim))
 		phi = phi.reshape((y_dim,x_dim))
 	
-	plt.figure()
-	plt.scatter(Xpositions, Ypositions, c=phi)
-	plt.colorbar()
-	plt.show()
+
+	title = "Reconstructed Phase for " + geometry + " geometry"
+	fig = p.figure();
+	# Plot results in a surface plot
+	ax = p3.Axes3D(fig)
+	q = ax.scatter(Xpositions,Ypositions,phi, c=phi)
+	ax.set_xlabel('x')
+	ax.set_ylabel('y')
+	ax.set_zlabel(title)
+	fig.colorbar(q)
+	p.show() 
+
+	# plt.figure()
+	# plt.scatter(Xpositions, Ypositions, c=phi)
+	# plt.colorbar()
+	# plt.show()
 	
 	#plt.figure()
 	#plt.pcolormesh(Xpositions, Ypositions, phi, vmin=z_min, vmax=z_max)
