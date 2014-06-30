@@ -5,6 +5,7 @@
 \usepackage{mathrsfs,amsmath}
 \usepackage{float}
 \usepackage{subfig}
+\usepackage{graphicx}
 
 
 % Puts captions of tables on top
@@ -14,10 +15,56 @@
 % Puts captions in bold
 \captionsetup{labelfont=bf}
 
+\title{Wavefront Sensing}
+
 \begin{document}
+\maketitle
 
-This is a template.
+\input{Introduction}
+\input{FraunhoferApprox}
+\input{DFT}
+\input{ImgSys}
+\input{Pupil}
+\input{Noise}
+\input{LensletArray}
 
+\begin{thebibliography}{9}
+
+\bibitem{CFO}
+D. Voelz, \textit{Computational Fourier Optics}. SPIE Press, 2011.
+
+\bibitem{NSOWP}
+J.D. Schmidt, \textit{Numerical Simulation of Optical Wave Propagation with examples in Matlab (SPIE Press Monograph Vol. PM199)}. SPIE Press, Aug. 2010.
+
+\bibitem{AOLectureNotes}
+M. Verhaegen, "Lecture notes on control for High Resolution Imaging," May 2012.
+
+\bibitem{RayleighFigure}
+Pinhole Works. (2014, May 12). \textit{Goerge Airy vs. Lord Rayleigh} [Online]. Available: http://pinholeworks.com/wp/goerge-airy-vs-lord-rayleigh/
+
+\bibitem{NumSimCCD2011}
+M.V. Konnik and J.S. Welsh, "On numerical simulation of high-speed CCD/CMOS-based wavefront sensors for adaptive optics,"
+\textit{Proc. SPIE 8149},
+September 2011.
+
+\bibitem{WFCorr2013}
+C.S. Smith et al., "Iterative linear focal-plane wavefront correction,"
+\textit{J. Opt. Soc. Am. A}, vol. 30, no. 10, pp. 2002-2011, 
+October 2013.
+
+\bibitem{SHWFS2006}
+L. Gilles and B. Ellerbroek, "Shack-Hartmann wavefront sensing with elongated sodium laser beacons: centroiding versus matched filtering,"
+\textit{Applied Optics}, vol. 45, no. 25, pp. 6568-6576, 
+September 2006.
+
+\bibitem{AccHS1994}
+G. Cao and X. Yu, "Accuracy analysis of a Hartmann-Shack wavefront sensor operated with a faint object," 
+\textit{Optical Engineering}, vol. 33(7), pp. 2331-2335, 
+July 1994. 
+
+
+
+\end{thebibliography}
 
 
 \end{document}

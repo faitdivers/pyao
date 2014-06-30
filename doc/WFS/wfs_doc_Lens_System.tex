@@ -1,3 +1,5 @@
+% ALL PARTS OF THIS DOCUMENT HAVE BEEN MOVED TO WFS_DOC.TEX AND RELATED FILES.  PLEASE CONTINUE ALL WORK THERE. June 11, 2014. 
+
 \documentclass{article}
 
 \usepackage[utf8]{inputenc}
@@ -5,6 +7,7 @@
 \usepackage{mathrsfs,amsmath}
 \usepackage{float}
 \usepackage{subfig}
+\usepackage{graphicx}
 
 % Puts captions of tables on top
 \floatstyle{plaintop}
@@ -47,6 +50,7 @@ P(\xi,\eta)= \begin{cases} 1 & \text{inside the aperture} \\ 0 & \text{otherwise
 Moreover the exponential function in Equation \eqref{eq:dis_behind_lens}, is the phase change introduced by the lens with focal length $f$. Using the Fresnel diffraction formula the field distribution in the back focal plane of the lens can be found as
 \begin{equation}
 U_f(x,y)=\frac{e^{jkf}e^{j\frac{k}{2f}(x^2+y^2)}}{j\lambda f}\iint\limits_{-\infty}^{~~~\infty} \left. U_i(\xi,\eta)P(\xi,\eta)e^{-j2\pi(f_X\xi+f_Y\eta)}d\xi d\eta \right|_{f_X=\frac{x}{\lambda z},f_Y=\frac{y}{\lambda z}}.
+\label{eq:fresnel}
 \end{equation}
 Hence the complex amplitude field distribution in the back focal plane of the lens is simply the Fraunhofer diffraction pattern seen in Equation \eqref{eq:fraunhofer}, but with the propagation distance $f$ instead of $z$. Thus the Fraunhofer diffraction patterns can be observed although not satisfying the before discussed conditions \eqref{eq:strong_con} and \eqref{eq:normal_con}. The real interest is the intensity across the focal plane and is computed by
 \begin{equation}
@@ -57,7 +61,7 @@ Also the model of the lens system as derived here is studied under the condition
 
 The above text is based on (\textbf{Goodman,2005}) and is also advised for further reading.
 
-\section{Numerical Computation of the Intensity Distribution in the Focal Plane}
+\section{Numerical Computation of the Intensity Distribution in the Focal Plane for a Single Lens}
 The computation of the FT will be done numerically. This can be done in a highly efficient algorithm called the Fast Fourier Transform (FFT). Using the Discrete Fourier Transform (DFT) it approximates the continuous FT of a function $g(x)$, where the FT of a two dimensional function is defined as
 \begin{equation}
 \hat{g}(f_X,f_Y)=\iint\limits_{-\infty}^{~~~\infty} g(x,y)e^{-j2\pi(f_Xx + f_Yy)}dxdy.
@@ -81,5 +85,24 @@ In short the procedure is:
 	\item plotting the resulting matrix of size $(N_x,N_y)$ at points $(f_k,f_l)$ in the spatial frequency space.
 \end{enumerate}
 
+The numerical calculation of the diffraction pattern is now easily done by applying the FFT to $U_i(\xi,\eta)P(\xi,\eta)$ adding the multiplicative factor as seen in Equation \eqref{eq:fresnel} and setting $(f_k=\frac{x_k}{\lambda z},f_l=\frac{y_l}{\lambda z})$. The intensity distribution is then found by taking the modulus squared.
+
+\section{The Intensity Distribution of a Lenslet Array}
+Every intensity distribution of a lenslet is calculated separately by the procedure discussed above.
+If the incident rays enter on a to big angle, the FFT will be incorrect. To solve this, the average tilt of the incident phase on a lenslet is calculated. From this tilt a shift of the intensity distribution can be calculated. Putting this into a loop we calculate every intensity distribution of every lenslet with the correct coordinates. Then the distributions are interpolated on a grid that represent the Charge-Couple Device (CCD) giving the complete intensity distribution. 
+
+\section{Answers to assignment questions} 
+\begin{enumerate}
+\item 
+	In figure \ref{fig:num_vs_an} the difference is seen between the numerical solved diffraction pattern and the analytically solved diffraction pattern. Clearly the two are almost identically except for the outer rings where the flaws of numerical computation are seen through the not disk like shape in the airy function. Because only the first few orders of the airy disk are important this is a good approximation to be used for calculating the centroids. 
+	\begin{figure}[H]
+		\centering
+			\includegraphics[width=1.0\textwidth]{./figures/num_vs_an.pdf}
+		\caption{Numerical solution VS analytical solution}
+		\label{fig:num_vs_an}
+	\end{figure}
+\item
+
+\end{enumerate}
 
 \end{document}
