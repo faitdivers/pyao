@@ -1,0 +1,27 @@
+\select@language {english}
+\contentsline {section}{\numberline {1}Introduction}{2}
+\contentsline {subsection}{\numberline {1.1}Overview on Wavefront Generation}{2}
+\contentsline {subsection}{\numberline {1.2}Wave Equation}{2}
+\contentsline {section}{\numberline {2}Aberrations}{3}
+\contentsline {subsection}{\numberline {2.1}Generalized Pupil Plane}{3}
+\contentsline {subsection}{\numberline {2.2}Seidel Aberrations}{3}
+\contentsline {section}{\numberline {3}Zernike}{4}
+\contentsline {subsection}{\numberline {3.1}Zernike Polynomials}{4}
+\contentsline {subsection}{\numberline {3.2}Noll Indices}{6}
+\contentsline {subsection}{\numberline {3.3}Constructing the Wavefront}{8}
+\contentsline {subsection}{\numberline {3.4}Decomposition of the Wavefront}{9}
+\contentsline {subsection}{\numberline {3.5}Validity of the Decomposition}{11}
+\contentsline {section}{\numberline {4}Atmospheric Aberrations}{12}
+\contentsline {subsection}{\numberline {4.1}Turbulence in the Atmosphere}{12}
+\contentsline {subsection}{\numberline {4.2}Kolmogorov}{12}
+\contentsline {subsection}{\numberline {4.3}Power Spectral Densities}{16}
+\contentsline {subsection}{\numberline {4.4}Discrete Phase Screens}{17}
+\contentsline {section}{\numberline {5}WFG in Python}{19}
+\contentsline {subsection}{\numberline {5.1}Zernike: Coding Example}{19}
+\contentsline {subsection}{\numberline {5.2}Zernike functions}{20}
+\contentsline {subsection}{\numberline {5.3}ZernikeWave Class: Methods and Functions}{22}
+\contentsline {subsection}{\numberline {5.4}PhaseScreen Class: Example}{33}
+\contentsline {subsection}{\numberline {5.5}PhaseScreen Class: Methods and Functions}{34}
+\contentsline {subsection}{\numberline {5.6}Support Functions}{45}
+\contentsline {section}{\numberline {6}Appendix: Maxwell Equations}{51}
+\contentsline {subsection}{\numberline {6.1}Obtaining the Wave-Equation}{51}

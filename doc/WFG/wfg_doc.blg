@@ -1,0 +1,19 @@
+This is BibTeX, Version 0.99dThe top-level auxiliary file: wfg_doc.aux
+The style file: ieeetran.bst
+Database file #1: refs.bib
+I was expecting a `,' or a `}'---line 46 of file refs.bib
+ : 
+ : OPTpages = {402-404}
+(Error may have been on previous line)
+I'm skipping whatever remains of this entry
+-- IEEEtran.bst version 1.13 (2008/09/30) by Michael Shell.
+-- http://www.michaelshell.org/tex/ieeetran/bibtex/
+-- See the "IEEEtran_bst_HOWTO.pdf" manual for usage information.
+Warning--empty author and editor in zernikeMatlabPag
+Warning--empty author and editor in lectureNotes
+Warning--empty author and editor in lay
+Warning--empty author and editor in zernikeMatlab
+Warning--missing publisher in sasiela2007electromagnetic
+
+Done.
+(There was 1 error message)
