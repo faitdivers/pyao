@@ -11,6 +11,8 @@ from Control.mainControl import *
 from DM.mainDM import *
 from Simulation.LatencyBuffer import LatencyBuffer
 from Simulation.WavefrontAnimator import WavefronAnimator
+from Simulation.IntensitiesCentroidsAnimator import IntensitiesCentroidsAnimator
+
 
 def setup_params():
     """ Set-up the simulation parameters
@@ -208,9 +210,13 @@ def runOpenLoop(parameters, iterations, buffer_size):
         wfRec = delay_buffer.update(wfRec)
         wfDM = dm(0, sensorParameters)
 
+        tmp = {
+        'x': sensorParameters['lensCentx'] * sensorParameters['lx'],
+        'y': sensorParameters['lensCenty'] * sensorParameters['ly'],
+        }
         wf_buffer.append(wf)
         intensities_buffer.append(intensities)
-        centroids_buffer.append(centroids)
+        centroids_buffer.append(tmp)
         reconstructed_buffer.append(wfRec)
         wf_dm_buffer.append(wfDM)
 
@@ -237,6 +243,7 @@ def run_simulation(parameters):
 
     """
     simulation_parameters = parameters['Simulation']
+    sensor_parameters = parameters['Sensor']
     iterations = int(simulation_parameters['frequency'] *
                   simulation_parameters['time'])
 
@@ -247,7 +254,24 @@ def run_simulation(parameters):
     else:
         results = runOpenLoop(parameters, iterations, delay_buffer_size)
 
-    wfAnimator = WavefronAnimator(simulation_parameters, parameters['Sensor'])
+    intCentroidsAnimator = IntensitiesCentroidsAnimator('Centroids',
+                                                        simulation_parameters)
+
+    Nx = sensor_parameters['numPupilx']  # Samples on the x-axis
+    Ny = sensor_parameters['numPupily']  # Samples on the y_axis
+    lx = sensor_parameters['lx']  # Width of the lenslet array in the x-dir [m]
+    ly = sensor_parameters['ly']  # Width of the lenslet array in the y-dir [m]
+    dx = lx / (Nx - 1.0)  # Sample length on x-axis [m]
+    dy = ly / (Ny - 1.0)  # Sample length on y-axis [m]
+    x = arange(0.0, lx + 1.5 * dx, dx)  # Sample positions on x-axis [m]
+    y = arange(0.0, ly + 1.5 * dy, dy)  # Sample positions on y-axis [m]
+
+    intCentroidsAnimator.set_xy_grid(x, y)
+    intCentroidsAnimator.set_centroids_data(results['centroids'])
+    intCentroidsAnimator.set_intensities_data(results['intensities'])
+    intCentroidsAnimator.plot_animation()
+    wfAnimator = WavefronAnimator('Generated Wavefron', simulation_parameters)
+    wfAnimator.set_xy_grid(x, y)
     wfAnimator.set_wavefront_data(results['wf'])
     wfAnimator.plot_animation()
 
