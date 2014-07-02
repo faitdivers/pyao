@@ -8,14 +8,8 @@ import SimulationAnimator as SA
 
 
 class IntensitiesCentroidsAnimator(SA.SimulationAnimator):
-    '''
-    classdocs
-    '''
 
     def __init__(self, name, simulation_parameters):
-        '''
-        Constructor
-        '''
         SA.SimulationAnimator.__init__(self, name, simulation_parameters)
 
     def set_xy_grid(self, x, y):

@@ -19,8 +19,8 @@ class WavefronAnimator(SA.SimulationAnimator):
         ''' Constructor
 
         Keyword arguments:
+        name -- Name for the movie file and plot title
         simulation_parameters -- Dictionary with simulation parameters
-        sensor_parameters -- Dictionary with sensor parameters
         '''
         SA.SimulationAnimator.__init__(self, name, simulation_parameters)
 

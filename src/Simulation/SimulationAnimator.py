@@ -13,9 +13,6 @@ class SimulationAnimator():
     '''
 
     def __init__(self, name, simulation_parameters):
-        '''
-        Constructor
-        '''
         self.name = name
         self.time = simulation_parameters['time']
         self.frequency = simulation_parameters['frequency']
