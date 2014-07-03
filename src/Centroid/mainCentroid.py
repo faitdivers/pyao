@@ -51,31 +51,29 @@ def centroid(intensities, paramsSensor):
     # With the assumsion distance between center to its nearest center are all same
     # If function is used to distinguish whether the center is on the edge of the geometry
     if (pixlensCentx[2]-pixlensCentx[1])==(pixlensCentx[3]-pixlensCentx[2]):
-        widthx = int(pixlensCentx[2]-pixlensCentx[1])
+        width = int(pixlensCentx[2]-pixlensCentx[1])
     else:
-        widthx = int(pixlensCentx[4]-pixlensCentx[3])
+        width = int(pixlensCentx[3]-pixlensCentx[2])
     # The centroid of each aperture will be calculated individually based on region of interest.
     # The region of interest of matrix intensities is determined in a loop process.
-    
-    widthy = int(pixlensCenty[1+noApertx]-pixlensCenty[1])
-    
+        
     # The iteration for center in each aperture
     for k in range(noApertures):
         # Region of Interest:
         
-        xbegin = int(pixlensCentx[k]-(widthx/2)+1)
+        xbegin = int(pixlensCentx[k]-(width/2)+1)
         if (xbegin < 0):
             xbegin = 0;
         
-        xend = int(pixlensCentx[k]+(widthx/2)+1)
+        xend = int(pixlensCentx[k]+(width/2)+1)
         if (xend > numImagx-1):
             xend = numImagx-1;
 
-        ybegin = int(pixlensCenty[k]-(widthy/2)+1)
+        ybegin = int(pixlensCenty[k]-(width/2)+1)
         if (ybegin < 0):
             ybegin = 0;
         
-        yend = int(pixlensCenty[k]+(widthy/2)+1)
+        yend = int(pixlensCenty[k]+(width/2)+1)
         if (yend > numImagy-1):
             yend = numImagy-1;
 
