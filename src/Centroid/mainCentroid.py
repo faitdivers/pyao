@@ -14,13 +14,13 @@ import matplotlib.pyplot as pl
 
 def centroid(intensities, paramsSensor):
     # parameters for centroid:
-    threshold = 0.3
+    threshold = paramsSensor['illumThreshold']
     
     # Unwrap paramsSensor
     lx = paramsSensor['lx'] # Width of the lenslet array in the x-direction [m]
     ly = paramsSensor['ly'] # Width of the lenslet array in the y-direction [m]
-    lensCentx = paramsSensor['lensCentx'] # Lenslet centers on x-axis [m]
-    lensCenty = paramsSensor['lensCenty'] # Lenslet centers on y-axis [m]
+    lensCentx = paramsSensor['lensCentx']*lx; # Lenslet centers on x-axis [m]
+    lensCenty = paramsSensor['lensCenty']*ly; # Lenslet centers on y-axis [m]
     f = paramsSensor['f'] # Focal length [m]
     noApertx = paramsSensor['noApertx'] # number of apertures in x axis
     noAperty = paramsSensor['noAperty'] # number of apertures in y axis
@@ -38,7 +38,7 @@ def centroid(intensities, paramsSensor):
     # ideal centroid spot in pixel
     pixlensCentx = [(round(z/dx)-1) for z in lensCentx] # round() is used because in pixel, -1 used as the index in python starts at 0
     pixlensCenty = [(round(z/dy)-1) for z in lensCenty] # round() is used because in pixel, -1 used as the index in python starts at 0
-    idealCenter = [pixlensCentx,pixlensCenty]     # make a vector of pixlensCentx and pixlensCenty
+    idealCenter = [pixlensCentx,pixlensCenty]           # make a vector of pixlensCentx and pixlensCenty
     idealCenter = np.asarray(idealCenter)
     idealCenter = idealCenter.reshape((2,noApertx*noAperty))
       
@@ -60,10 +60,23 @@ def centroid(intensities, paramsSensor):
     # The iteration for center in each aperture
     for k in range(noApertures):
         # Region of Interest:
+        
         xbegin = int(pixlensCentx[k]-(width/2)+1)
+        if (xbegin < 0):
+            xbegin = 0;
+        
         xend = int(pixlensCentx[k]+(width/2)+1)
+        if (xend > numImagx-1):
+            xend = numImagx-1;
+
         ybegin = int(pixlensCenty[k]-(width/2)+1)
+        if (ybegin < 0):
+            ybegin = 0;
+        
         yend = int(pixlensCenty[k]+(width/2)+1)
+        if (yend > numImagy-1):
+            yend = numImagy-1;
+
         # Matrix of Interest
         IntensitiesofInterst = intensities[range(int(xbegin),int(xend)),ybegin:yend]
         # Calculating centroid
@@ -83,7 +96,7 @@ def centroid(intensities, paramsSensor):
     slopevector = zip(*slopevector)
     slopevector = np.asarray(slopevector)
     slopevector = np.transpose(slopevector)
-    slopevector = slopevector.reshape((1,2*noApertx*noAperty))
+    slopevector = slopevector.reshape((2*noApertx*noAperty,1))
             
     return slopevector  
 
@@ -118,3 +131,4 @@ def findSlope(Centroid,idealCenter,f):
     slope =  [z/f for z in delta]   
     
     return slope
+
